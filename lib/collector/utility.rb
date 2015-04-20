@@ -35,6 +35,7 @@ module Collector
         \b(?i:dupl?\.?(\s+by)?\s+|duplicate(\s+by)?\s+)\b|
         \b(?i:ex\.?(\s+by)?\s+|examined(\s+by)?\s+)\b|
         \b(?i:in\s+part(\s+by)?\s+)\b|
+        \b(?i:redet\.?(\s+by?)?\s+)\b|
         \b(?i:stet!?)\b|
         \b(?i:ver\.?(\s+by)?\s+|verified(\s+by)?\s+)\b
       }x

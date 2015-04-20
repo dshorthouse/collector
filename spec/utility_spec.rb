@@ -258,6 +258,12 @@ describe "Utility functions to handle names of people" do
     expect(@utility.explode_names(input)).to match_array(expected)
   end
 
+  it "should explode names with 'redet by'" do
+    input = "Jack Smith redet. by Michael Jackson"
+    expected = ["Jack Smith", "Michael Jackson"]
+    expect(@utility.explode_names(input)).to match_array(expected)
+  end
+
   it "should explode names with 'stet'" do
     input = "anna Roberts stet R. Scagel 1981"
     expected = ["Anna Roberts", "R. Scagel"]
