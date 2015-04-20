@@ -1,0 +1,42 @@
+-content_for :stylesheets do
+  %link{href: 'http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css', rel: 'stylesheet', type: 'text/css' }
+  %link{href: '/stylesheet/leaflet.draw.css', rel: 'stylesheet', type: 'text/css' }
+
+-content_for :scripts do
+  %script{src: '/javascript/typeahead.bundle.min.js', type: 'text/javascript' }
+  %script{src: 'http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js', type: 'text/javascript' }
+  %script{src: 'http://maps.stamen.com/js/tile.stamen.js?v1.2.4', type: 'text/javascript' }
+  %script{src: '/javascript/leaflet.draw.js', type: 'text/javascript' }
+  %script{src: '/javascript/home.js', type: 'text/javascript' }
+  :javascript
+    $(function() { Collector.init(); });
+
+%form{ id: "search_form", method: "get", action: "/", "accept-charset" => "UTF-8", class: "clear" }
+  #form-wrapper.clear
+    %div.search-agent
+      %input.typeahead{type: :text, name: "q", placeholder: "Luc Brouillet", value: "#{params[:q]}", size: 30}
+      %input.form-button.submit-button{type: :submit, value: "Search"}
+      %input.form-button.submit-button{id: "reset_form", type: :reset, value: "Reset"}
+      %input{type: :hidden, name: "geo", id: "geo_type", value: "#{params[:geo]}"}
+      %input{type: :hidden, name: "c", id: "geo_center", value: "#{params[:c]}"}
+      %input{type: :hidden, name: "r", id: "geo_radius", value: "#{params[:r]}"}
+      %input{type: :hidden, name: "b", id: "geo_bounds", value: "#{params[:b]}"}
+      %input{type: :hidden, name: "p", id: "geo_polygon", value: "#{params[:p]}"}
+
+  #map
+
+  #results
+    - if @results.respond_to?('total_entries') && @results.total_entries == 0 && !params[:q].nil?
+      #summary No results found.
+
+    - if @results.respond_to?('total_entries') && @results.total_entries > 0
+      #summary= "Page #{@results.current_page.to_i} of #{@results.total_entries} results"
+      - @results.each do |r|
+        %div.result
+          %div.agent
+            - if r[:_type] == 'taxon'
+              %a{href: "/taxon/#{r[:fields][:id][0]}"}= r[:fields][:family][0]
+            - elsif r[:_type] == 'agent'
+              %a{href: "/agent/#{r[:fields][:id][0]}"}= [r[:fields][:family][0].presence,r[:fields][:given][0].presence].compact.join(", ")
+
+      = paginate @results

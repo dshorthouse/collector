@@ -1,0 +1,12 @@
+%h1 #{@result[:family]}
+
+#colleagues-wrapper
+  %h2 Identified By
+  - if @result[:identifiedBy].size > 0
+    %ul.collectors
+      - @result[:identifiedBy].sort_by { |a| a[:family] }.each do |c|
+        %li
+          - name = [c[:given].presence, c[:family].presence]. join(" ")
+          %a{href: "/agent/#{c[:id]}" }=  name
+  - else
+    %p None

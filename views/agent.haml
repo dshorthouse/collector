@@ -1,0 +1,66 @@
+-content_for :stylesheets do
+  %link{href: 'http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css', rel: 'stylesheet', type: 'text/css' }
+  %link{href: '/stylesheet/leaflet.dvf.css', rel: 'stylesheet', type: 'text/css' }
+
+-content_for :scripts do
+  %script{src: 'https://www.google.com/jsapi', type: 'text/javascript' }
+  %script{src: 'http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js', type: 'text/javascript' }
+  %script{src: 'http://maps.stamen.com/js/tile.stamen.js?v1.2.4', type: 'text/javascript' }
+  %script{src: '/javascript/leaflet-dvf.min.js', type: 'text/javascript' }
+  %script{src: '/javascript/geohash.js', type: 'text/javascript' }
+  %script{src: '/javascript/agent.js', type: 'text/javascript' }
+  :javascript
+    google.load("visualization", "1", { packages:["corechart", "bar"] });
+    $(function() { Agent.init(#{@result[:id]}); });
+
+%h1 #{@result[:given]} #{@result[:family]}
+
+- if @result[:determined_taxa].size > 0
+  %h2 Families Identified
+  %ul.determinations
+    - @result[:determined_taxa].sort_by { |d| d[:family] }.each do |t|
+      %li
+        %a{href: "/taxon/#{t[:id]}" }=  t[:family]
+
+#recordings-wrapper.clear
+  #recordings-map
+    %h2 Collecting Localities
+    #map-wrapper
+      #map
+      #legend
+
+  #recordings-chart
+    %h2 Collecting Activity
+    #recordings
+
+#colleagues-wrapper
+  %h2 Fellow Collectors
+  - if @result[:recordings_with].size > 0
+    %ul.collectors
+      - @result[:recordings_with].sort_by { |a| a[:family] }.each do |c|
+        %li
+          - name = [c[:given].presence, c[:family].presence]. join(" ")
+          %a{href: "/agent/#{c[:id]}" }=  name
+  - else
+    %p None
+
+#determinations-wrapper
+  #identifications.chart
+    %h2 Identification Activity
+    #determinations
+
+#publications-wrapper
+  %h2 Publications
+  %p
+    ORCID:
+    - if @result[:orcid]
+      %a{href: "https://orcid.org/#{@result[:orcid]}" }= @result[:orcid]
+    - else
+      Unknown
+
+  - if @result[:works].size > 0
+    - @result[:works].each do |w|
+      %div.citation
+        %a{href: "http://dx.doi.org/#{w[:doi]}" }= w[:citation]
+  - else
+    %p No publications recorded
