@@ -2,7 +2,7 @@ module Collector
   class Utility
 
     def self.clean_namae(parsed_namae)
-      family = parsed_namae[0].family rescue nil
+      family = parsed_namae[0].family.mb_chars.titleize.to_s rescue nil
       given = parsed_namae[0].normalize_initials.given rescue nil
 
       if family.nil? && !given.nil? && !given.include?(".")
@@ -22,29 +22,45 @@ module Collector
         \b,\s+\d+|
         \b(?i:unknown)\b|
         \b(?i:ann?onymous)\b|
-        [\[\]":\d+]
+        \b(?i:undetermined)\b|
+        [":\d+]
       }x
 
+      substitutions = {
+        '.' => '. ',
+        '(' => ' ',
+        ')' => ' ',
+        '[' => ' ',
+        ']' => ' ',
+        '?' => '',
+        '!' => '',
+        '=' => ''
+      }
+
       split_by = %r{
-        [–;|&/!?]|
+        [–;|&\/]|
         \b(?:\s+-\s+)\b|
         \b(?i:with|and|et)\b|
         \b(?i:annotated(\s+by)?\s+)\b|
         \b(?i:conf\.?(\s+by)?\s+|confirmed(\s+by)?\s+)\b|
         \b(?i:checked(\s+by)?\s+)\b|
+        \b(?i:det\.?(\s+by)?\s+)\b|
         \b(?i:dupl?\.?(\s+by)?\s+|duplicate(\s+by)?\s+)\b|
         \b(?i:ex\.?(\s+by)?\s+|examined(\s+by)?\s+)\b|
+        \b(?i:in?dentified(\s+by)?\s+)\b|
         \b(?i:in\s+part(\s+by)?\s+)\b|
         \b(?i:redet\.?(\s+by?)?\s+)\b|
+        \b(?i:reidentified(\s+by)?\s+)\b|
         \b(?i:stet!?)\b|
-        \b(?i:ver\.?(\s+by)?\s+|verified(\s+by)?\s+)\b
+        \b(?i:then(\s+by)?\s+)\b|
+        \b(?i:ver\.?(\s+by)?\s+|verf\.?(\s+by)?\s+|verified?(\s+by)?\s+)\b
       }x
 
       name.gsub(strip_out, '')
-          .gsub(/\./,'. ').squeeze(' ')
+          .gsub(/[#{substitutions.keys.join('\\')}]/, substitutions).squeeze(' ')
           .split(split_by)
-          .map{ |c| c.strip.mb_chars.titleize.to_s }
-          .reject{ |c| c.empty? || c.length < 3 }
+          .map{ |c| c.strip }
+          .reject{ |c| c.empty? || c.length < 3 || c.length > 30 }
     end
 
     def self.valid_year(year)

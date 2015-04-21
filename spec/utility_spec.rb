@@ -48,6 +48,12 @@ describe "Utility functions to handle names of people" do
     expect(@utility.explode_names(input)).to match_array(expected)
   end
 
+  it "should remove brackets from name" do
+    input = "W.P. Coreneuk(?)"
+    expected = ["W. P. Coreneuk"]
+    expect(@utility.explode_names(input)).to match_array(expected)
+  end
+
   it "should explode by 'stet!'" do
     input = "Jack Smith stet! 1989"
     expected = ["Jack Smith"]
@@ -265,7 +271,7 @@ describe "Utility functions to handle names of people" do
   end
 
   it "should explode names with 'stet'" do
-    input = "anna Roberts stet R. Scagel 1981"
+    input = "Anna Roberts stet R. Scagel 1981"
     expected = ["Anna Roberts", "R. Scagel"]
     expect(@utility.explode_names(input)).to match_array(expected)
   end
@@ -312,19 +318,31 @@ describe "Utility functions to handle names of people" do
     expect(@utility.explode_names(input)).to match_array(expected)
   end
 
-  it "should capitalize names like 'Jack smith'" do
+  it "should reject an empty name" do
+    input = "Norman Johnson and P"
+    expected = ["Norman Johnson"]
+    expect(@utility.explode_names(input)).to match_array(expected)
+  end
+
+  it "should reject a long name" do
+    input = "Ontario Ministry of Natural Resources"
+    expected = []
+    expect(@utility.explode_names(input)).to match_array(expected)
+  end
+
+  it "should parse name with given initials without period(s)" do
+    input = "JH Picard"
+    parsed = Namae.parse @utility.explode_names(input)[0]
+    cleaned = @utility.clean_namae(parsed).to_h
+    expected = { family: "Picard", given: "J.H."}
+    expect(cleaned).to eq(expected)
+  end
+
+  it "should capitalize surnames like 'Jack smith'" do
     input = "Jack smith"
     parsed = Namae.parse @utility.explode_names(input)[0]
     cleaned = @utility.clean_namae(parsed).to_h
     expected = { family: "Smith", given: "Jack"}
-    expect(cleaned).to eq(expected)
-  end
-
-  it "should capitalize names like 'j.v.r. roe'" do
-    input = "j.v.r. roe"
-    parsed = Namae.parse @utility.explode_names(input)[0]
-    cleaned = @utility.clean_namae(parsed).to_h
-    expected = { family: "Roe", given: "J.V.R."}
     expect(cleaned).to eq(expected)
   end
 
