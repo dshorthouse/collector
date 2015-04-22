@@ -8,7 +8,7 @@ See http://www.elastic.co/guide/en/elasticsearch/reference/1.4/modules-snapshots
 
 To discover where snapshots are located:
 
-    $ curl -XPUT 'http://localhost:9200/_snapshot/
+    $ curl -XPUT "http://localhost:9200/_snapshot/"
 
 To restore:
 
