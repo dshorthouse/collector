@@ -11,6 +11,13 @@
   :javascript
     $(function() { Collector.init(); });
 
+-content_for :title do
+  Collector
+
+%h1 Collector
+
+%p.byline Search for collectors and determiners of specimens in Canada and explore their networks.
+
 %form{ id: "search_form", method: "get", action: "/", "accept-charset" => "UTF-8", class: "clear" }
   #form-wrapper.clear
     %div.search-agent
@@ -40,3 +47,15 @@
               %a{href: "/agent/#{r[:fields][:id][0]}"}= [r[:fields][:family][0].presence,r[:fields][:given][0].presence].compact.join(", ")
 
       = paginate @results
+
+%footer
+  This proof-of-concept was produced by 
+  %a{href: "https://orcid.org/0000-0001-7618-5230" } David P. Shorthouse 
+  using biodiversity occurrence data from 
+  %a{href: "http://data.canadensys.net"} Canadensys 
+  and academic information from 
+  = succeed "." do
+    %a{href: "https://orcid.org" } ORCID
+  Collector and determiner names were parsed and cleaned using the 
+  %a{href: "https://rubygems.org/gems/namae" } Namae gem 
+  among other custom regular expressions.

@@ -49,14 +49,26 @@ p{
   line-height:1.5em;
 }
 
+p.byline{
+  color:#777;
+}
+
 header .contact-details{
   color:#777;
   font-size:1.25em;
   margin:0.5em 0;
 }
 
+footer{
+  width:600px;
+  margin-top:1em;
+  border-top:2px solid #CCC;
+  padding-top:0.75em;
+  line-height:1.5em;
+}
+
 #form-wrapper {
-  margin:2em;
+  margin-bottom:1.75em;
 }
 #form-wrapper .search-agent{
   height:3em;
