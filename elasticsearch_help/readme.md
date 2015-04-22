@@ -8,8 +8,9 @@ See http://www.elastic.co/guide/en/elasticsearch/reference/1.4/modules-snapshots
 
 To discover where snapshots are located:
 
-    $ curl -XPUT "http://localhost:9200/_snapshot/"
+    $ curl -XGET "http://localhost:9200/_snapshot/"
 
 To restore:
-
-    $ curl -XPOST "localhost:9200/_snapshot/es_backup/all/_restore" -d '{ "indices": "collector,canent" }'
+    $ curl -XPOST 'localhost:9200/collector/_close'
+    $ curl -XPOST "localhost:9200/_snapshot/es_backup/all/_restore" -d '{ "indices": "collector" }'
+    $ curl -XPOST 'localhost:9200/collector/_open'
