@@ -97,6 +97,10 @@ module Collector
               id: { type: 'integer', index: 'not_analyzed' },
               family: { type: 'string', search_analyzer: :family_search, index_analyzer: :family_index, omit_norms: true },
               given: { type: 'string', search_analyzer: :given_search, index_analyzer: :given_index, omit_norms: true },
+              orcid: { type: 'string', index: 'not_analyzed' },
+              email: { type: 'string', index: 'not_analyzed' },
+              position: { type: 'string', index: 'not_analyzed' },
+              affiliation: { type: 'string', index: 'not_analyzed' },
               coordinates: { type: 'geo_point', lat_lon: true, fielddata: { format: 'compressed', precision: "5km" }, index: 'not_analyzed' },
               determined_taxa: {
                 properties: {
@@ -112,7 +116,6 @@ module Collector
                   given: { type: 'string', index: 'not_analyzed' }
                 }
               },
-              orcid: { type: 'string', index: 'not_analyzed' },
               works: {
                 properties: {
                   doi: { type: 'string', index: 'not_analyzed' },
@@ -162,10 +165,13 @@ module Collector
                           id: a.id,
                           family: a.family,
                           given: a.given,
+                          orcid: a.orcid_identifier,
+                          email: a.email,
+                          position: a.position,
+                          affiliation: a.affiliation,
                           coordinates: a.recordings_coordinates,
                           recordings_with: a.recordings_with,
                           determined_taxa: a.determined_taxa.uniq,
-                          orcid: a.orcid_identifier,
                           works: a.works.select("doi,citation")
                         }
                       }
@@ -235,10 +241,12 @@ module Collector
                 family: a.family,
                 given: a.given,
                 orcid: a.orcid_identifier,
+                email: a.email,
+                position: a.position,
+                affiliation: a.affiliation,
                 coordinates: a.recordings_coordinates,
                 recordings_with: a.recordings_with,
                 determined_taxa: a.determined_taxa.uniq,
-                orcid: a.orcid_identifier,
                 works: a.works.select("doi,citation")
               }
 

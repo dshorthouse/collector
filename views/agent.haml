@@ -13,14 +13,22 @@
     google.load("visualization", "1", { packages:["corechart", "bar"] });
     $(function() { Agent.init(#{@result[:id]}); });
 
-%h1 #{@result[:given]} #{@result[:family]}
+-content_for :title do
+  #{@result[:given]} #{@result[:family]}
 
-- if @result[:determined_taxa].size > 0
-  %h2 Families Identified
-  %ul.determinations
-    - @result[:determined_taxa].sort_by { |d| d[:family] }.each do |t|
-      %li
-        %a{href: "/taxon/#{t[:id]}" }=  t[:family]
+%header
+  %hgroup
+    %h1 #{@result[:given]} #{@result[:family]}
+
+    .contact-details #{@result[:position]}
+    .contact-details #{@result[:affiliation]}
+    .contact-details
+      - if @result[:email]
+        %a{href: "mailto:#{@result[:email]}" }= @result[:email]
+    .contact-details
+      - if @result[:orcid]
+        ORCID
+        %a{href: "https://orcid.org/#{@result[:orcid]}" }= @result[:orcid]
 
 #recordings-wrapper.clear
   #recordings-map
@@ -44,6 +52,13 @@
   - else
     %p None
 
+- if @result[:determined_taxa].size > 0
+  %h2 Families Identified
+  %ul.determinations
+    - @result[:determined_taxa].sort_by { |d| d[:family] }.each do |t|
+      %li
+        %a{href: "/taxon/#{t[:id]}" }=  t[:family]
+
 #determinations-wrapper
   #identifications.chart
     %h2 Identification Activity
@@ -51,12 +66,6 @@
 
 #publications-wrapper
   %h2 Publications
-  %p
-    ORCID:
-    - if @result[:orcid]
-      %a{href: "https://orcid.org/#{@result[:orcid]}" }= @result[:orcid]
-    - else
-      Unknown
 
   - if @result[:works].size > 0
     - @result[:works].each do |w|

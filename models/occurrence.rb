@@ -72,10 +72,10 @@ class Occurrence < ActiveRecord::Base
   end
 
   def self.save_agent(name, id, type)
+
+    return if name.family.nil? || name.family.length < 3
+
     agent_id = nil
-
-    return if name.family.nil? && name.given.nil?
-
     family = name.family.to_s
     given = name.given.to_s
 
@@ -95,8 +95,10 @@ class Occurrence < ActiveRecord::Base
   end
 
   def self.save_taxon(family, agent_id)
-    family_id = nil
+
     return if family.nil? || agent_id.nil?
+
+    family_id = nil
 
     Occurrence.transaction do
       family_id = Occurrence.connection.select_value("SELECT id FROM taxa WHERE family = %s" % [Occurrence.connection.quote(family)])

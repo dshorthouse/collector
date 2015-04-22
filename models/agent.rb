@@ -15,6 +15,10 @@ class Agent < ActiveRecord::Base
     search_orcid
   end
 
+  def self.populate_profiles
+    search_profile
+  end
+
   def self.search_orcid
     Agent.where("orcid_matches IS NULL").find_each do |agent|
       agent.orcid_matches = 0
@@ -27,19 +31,70 @@ class Agent < ActiveRecord::Base
             url: Collector::Config.orcid_base_url + 'search/orcid-bio?q=' + search,
             headers: { accept: 'application/orcid+json' }
           )
-          parse_orcid_response(agent, response)
+          parse_search_orcid_response(agent, response)
         end
       end
       agent.save!
     end
   end
 
-  def self.parse_orcid_response(agent, response)
+  def self.parse_search_orcid_response(agent, response)
     hits = JSON.parse(response, :symbolize_names => true)[:"orcid-search-results"][:"orcid-search-result"] rescue []
     agent.orcid_matches = hits.length
     found = hits.length > 0 ? " ... found " + hits.length.to_s : ""
     agent.orcid_identifier = hits[0][:"orcid-profile"][:"orcid-identifier"][:path] if hits.length == 1
     puts "Searched orcid for " + agent.family + ", " + agent.given + found
+  end
+
+  def self.search_profile
+    Agent.where("agents.orcid_matches = 1").find_each do |agent|
+      next if agent.processed_profile
+      response = RestClient::Request.execute(
+        method: :get,
+        url: Collector::Config.orcid_base_url + agent.orcid_identifier + '/orcid-profile',
+        headers: { accept: 'application/orcid+json' }
+      )
+      parse_profile_orcid_response(agent, response)
+    end
+  end
+
+  def self.parse_profile_orcid_response(agent, response)
+
+    doi_sub = %r{
+      ^http\:\/\/dx\.doi\.org\/|
+      ^(?i:doi\=?\:?\s+?)
+    }x
+
+    Work.transaction do
+      profile = JSON.parse(response, :symbolize_names => true)[:"orcid-profile"]
+      agent.email = profile[:"orcid-bio"][:"contact-details"][:email][0][:value] rescue nil
+      agent.position = profile[:"orcid-activities"][:affiliations][:affiliation][0][:"role-title"] rescue nil
+      agent.affiliation = profile[:"orcid-activities"][:affiliations][:affiliation][0][:organization][:name] rescue nil
+
+      publications = profile[:"orcid-activities"][:"orcid-works"][:"orcid-work"] rescue []
+      publications.each do |pub|
+        identifiers = pub[:"work-external-identifiers"][:"work-external-identifier"] rescue []
+        identifiers.each do |identifier|
+            if identifier[:"work-external-identifier-type"] == "DOI"
+              doi = identifier[:"work-external-identifier-id"][:value].gsub(doi_sub,'')
+              work_id = Work.connection.select_value("SELECT id FROM works WHERE doi = %s" % Work.connection.quote(doi))
+              unless work_id
+                work = Work.new
+                work.doi = identifier[:"work-external-identifier-id"][:value]
+                work.save!
+                work_id = work.id
+              end
+              Work.connection.execute("INSERT INTO agent_works (agent_id, work_id) VALUES (%s, %s)" % [agent.id, work_id])
+              break
+            end
+        end
+      end
+
+      puts "Added profile for " + agent.id.to_s + ": " + agent.family + ", " + agent.given
+
+      agent.processed_profile = true
+      agent.save!
+    end
   end
 
   def determinations_year_range

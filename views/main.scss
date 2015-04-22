@@ -48,6 +48,13 @@ a{
 p{
   line-height:1.5em;
 }
+
+header .contact-details{
+  color:#777;
+  font-size:1.25em;
+  margin:0.5em 0;
+}
+
 #form-wrapper {
   margin:2em;
 }
@@ -168,6 +175,14 @@ label input {
 .result {
   font-size:1.25em;
   line-height:1.5em;
+}
+
+
+
+/* AGENT */
+
+#recordings-wrapper, #determinations-wrapper {
+  display:none;
 }
 
 .citation{
