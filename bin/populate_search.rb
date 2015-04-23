@@ -53,3 +53,10 @@ if ARGV[0] == '--rebuild-taxa'
   index.refresh
   puts "Finished indexing #{Collector::Config.elastic_index} taxa"
 end
+
+if ARGV[0] == '--refresh'
+  index = Collector::ElasticIndexer.new
+  puts "Refreshing the index..."
+  index.refresh
+  puts "Finished refreshing the index."
+end

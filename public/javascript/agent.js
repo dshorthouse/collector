@@ -34,13 +34,13 @@ var Agent = (function($, window) {
     createCharts: function() {
       var self = this;
 
-      if(this.activity.aggregations.determinations_histogram.buckets.length > 0) {
-        $.each(this.activity.aggregations.determinations_histogram.buckets, function() {
+      if(this.activity.aggregations.determinations.histogram.buckets.length > 0) {
+        $.each(this.activity.aggregations.determinations.histogram.buckets, function() {
           self.chartData.determinations.push([this.key_as_string, this.doc_count]);
         });
       }
-      if(this.activity.aggregations.recordings_histogram.buckets.length > 0) {
-        $.each(this.activity.aggregations.recordings_histogram.buckets, function() {
+      if(this.activity.aggregations.recordings.histogram.buckets.length > 0) {
+        $.each(this.activity.aggregations.recordings.histogram.buckets, function() {
           self.chartData.recordings.push([this.key_as_string, this.doc_count]);
         });
       }
@@ -88,7 +88,7 @@ var Agent = (function($, window) {
 
       this.map.on('zoomend', function() {
         mapZoom = self.map.getZoom();
-        if(self.activity.aggregations.recordings_histogram.buckets.length > 0) {
+        if(self.activity.aggregations.recordings.histogram.buckets.length > 0) {
           if(mapZoom < 2) {
             zoom = 2;
           }
@@ -145,7 +145,7 @@ var Agent = (function($, window) {
          }
       };
 
-      $.each(this.activity.aggregations.recordings_histogram.buckets, function() {
+      $.each(this.activity.aggregations.recordings.histogram.buckets, function() {
         if (this.geohash.buckets.length > 0) {
           layer = new L.DataLayer(this.geohash, options);
           self.map.addLayer(layer);
@@ -168,7 +168,7 @@ var Agent = (function($, window) {
     },
     geohashMax: function() {
       var _max,
-      max = this.activity.aggregations.recordings_histogram.buckets.reduce(function(max, bucket) {
+      max = this.activity.aggregations.recordings.histogram.buckets.reduce(function(max, bucket) {
           _max = 0;
           if (bucket.geohash.buckets.length > 0) {
             _max = bucket.geohash.buckets.reduce(function(max2, inner_bucket) {

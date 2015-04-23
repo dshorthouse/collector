@@ -158,36 +158,42 @@ class COLLECTOR < Sinatra::Base
 
     body = {
       query: {
-        bool: {
-          should: [
-            match: { identifiedBy: id }
-          ],
-          should: [
-            match: { recordedBy: id }
-          ]
+        multi_match: {
+          query: id,
+          fields: ["identifiedBy", "recordedBy"]
         }
       },
       aggregations: {
-        determinations_histogram: {
-          date_histogram: {
-            field: "dateIdentified",
-            interval: "year",
-            format: "year",
-            min_doc_count: 0
+        determinations: {
+          filter: { query: { match: { identifiedBy: id } } },
+          aggregations: {
+            histogram: {
+              date_histogram: {
+                field: "dateIdentified",
+                interval: "year",
+                format: "year",
+                min_doc_count: 0
+              }
+            }
           }
         },
-        recordings_histogram: {
-          date_histogram: {
-            field: "eventDate",
-            interval: "year",
-            format: "year",
-            min_doc_count: 0
-          },
+        recordings: {
+          filter: { query: { match: { recordedBy: id } } },
           aggregations: {
-            geohash: {
-              geohash_grid: {
-                field: "coordinates",
-                precision: precision
+            histogram: {
+              date_histogram: {
+                field: "eventDate",
+                interval: "year",
+                format: "year",
+                min_doc_count: 0
+              },
+              aggregations: {
+                geohash: {
+                  geohash_grid: {
+                    field: "coordinates",
+                    precision: precision
+                  }
+                }
               }
             }
           }
