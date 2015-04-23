@@ -232,22 +232,26 @@ module Collector
       end
     end
 
-    def update_agent(id)
+    def update_agent(id, orcid)
       a = Agent.find(id)
       return if !a.present?
+
+      a.orcid_identifier = orcid
+      a.refresh_orcid_data
+      Work.populate_citations
 
       body = {
                 id: a.id,
                 family: a.family,
                 given: a.given,
-                orcid: a.orcid_identifier,
+                orcid: orcid,
                 email: a.email,
                 position: a.position,
                 affiliation: a.affiliation,
                 coordinates: a.recordings_coordinates,
                 recordings_with: a.recordings_with,
                 determined_taxa: a.determined_taxa.uniq,
-                works: a.works.select("doi,citation")
+                works: a.works.select("doi,citation").uniq
               }
 
       @client.delete index: Collector::Config.elastic_index, type: 'agent', id: id rescue nil

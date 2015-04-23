@@ -65,7 +65,7 @@ class Agent < ActiveRecord::Base
       ^(?i:doi\=?\:?\s+?)
     }x
 
-    Work.transaction do
+    Agent.transaction do
       profile = JSON.parse(response, :symbolize_names => true)[:"orcid-profile"]
       agent.email = profile[:"orcid-bio"][:"contact-details"][:email][0][:value] rescue nil
       agent.position = profile[:"orcid-activities"][:affiliations][:affiliation][0][:"role-title"] rescue nil
@@ -77,14 +77,14 @@ class Agent < ActiveRecord::Base
         identifiers.each do |identifier|
             if identifier[:"work-external-identifier-type"] == "DOI"
               doi = identifier[:"work-external-identifier-id"][:value].gsub(doi_sub,'')
-              work_id = Work.connection.select_value("SELECT id FROM works WHERE doi = %s" % Work.connection.quote(doi))
+              work_id = Agent.connection.select_value("SELECT id FROM works WHERE doi = %s" % Work.connection.quote(doi))
               unless work_id
                 work = Work.new
                 work.doi = identifier[:"work-external-identifier-id"][:value].gsub(doi_sub,'')
                 work.save!
                 work_id = work.id
               end
-              Work.connection.execute("INSERT INTO agent_works (agent_id, work_id) VALUES (%s, %s)" % [agent.id, work_id])
+              Agent.connection.execute("INSERT INTO agent_works (agent_id, work_id) VALUES (%s, %s)" % [agent.id, work_id])
               break
             end
         end
@@ -98,21 +98,27 @@ class Agent < ActiveRecord::Base
   end
 
   def determinations_year_range
-    years = determinations.select("dateIdentified").collect{ |d| Date.strptime(d.dateIdentified, "%Y").year rescue nil }.compact.minmax rescue [nil,nil]
+    years = determinations.select("dateIdentified")
+                          .collect{ |d| Date.strptime(d.dateIdentified, "%Y").year rescue nil }
+                          .compact.minmax rescue [nil,nil]
     years[0] = years[1] if years[0].nil?
     years[1] = years[0] if years[1].nil?
     years
   end
 
   def recordings_year_range
-    years = recordings.select("eventDate").collect{ |d| Date.strptime(d.eventDate, "%Y").year rescue nil }.compact.minmax rescue [nil,nil]
+    years = recordings.select("eventDate")
+                      .collect{ |d| Date.strptime(d.eventDate, "%Y").year rescue nil }
+                      .compact.minmax rescue [nil,nil]
     years[0] = years[1] if years[0].nil?
     years[1] = years[0] if years[1].nil?
     years
   end
 
   def recordings_coordinates
-    recordings.select("decimalLatitude,decimalLongitude").collect{ |c| [c.decimalLongitude.to_f, c.decimalLatitude.to_f] }.compact.uniq
+    recordings.select("decimalLatitude,decimalLongitude")
+              .collect{ |c| [c.decimalLongitude.to_f, c.decimalLatitude.to_f] }
+              .compact.uniq
   end
 
   def recordings_with
@@ -129,11 +135,23 @@ class Agent < ActiveRecord::Base
 
   def determined_species
     parser = ScientificNameParser.new
-    determinations.select("scientificName").collect{ |c| c.scientificName }.compact.uniq.sort.map{ |s| parser.parse(s)[:scientificName][:canonical] rescue s }
+    determinations.select("scientificName")
+                  .collect{ |c| c.scientificName }
+                  .compact.uniq.sort
+                  .map{ |s| parser.parse(s)[:scientificName][:canonical] rescue s }
   end
 
   def determined_families
-    determined_taxa.select("family").map{ |f| f.family }.uniq
+    determined_taxa.select("family").map{ |f| f.family }.uniq.sort
+  end
+
+  def refresh_orcid_data
+    response = RestClient::Request.execute(
+      method: :get,
+      url: Collector::Config.orcid_base_url + orcid_identifier + '/orcid-profile',
+      headers: { accept: 'application/orcid+json' }
+    )
+    self.class.parse_profile_orcid_response(self, response)
   end
 
 end
