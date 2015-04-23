@@ -24,7 +24,7 @@ class Agent < ActiveRecord::Base
       agent.orcid_matches = 0
       if !agent.family.empty? && !agent.given.empty?
         max_year = [agent.determinations_year_range[1], agent.recordings_year_range[1]].compact.max
-        if !max_year.nil? && max_year >= 1950
+        if !max_year.nil? && max_year >= 1975
           search = 'family-name:' + URI::encode(agent.family) + '+AND+given-names:' + URI::encode(agent.given)
           response = RestClient::Request.execute(
             method: :get,
@@ -80,7 +80,7 @@ class Agent < ActiveRecord::Base
               work_id = Work.connection.select_value("SELECT id FROM works WHERE doi = %s" % Work.connection.quote(doi))
               unless work_id
                 work = Work.new
-                work.doi = identifier[:"work-external-identifier-id"][:value]
+                work.doi = identifier[:"work-external-identifier-id"][:value].gsub(doi_sub,'')
                 work.save!
                 work_id = work.id
               end
@@ -129,7 +129,7 @@ class Agent < ActiveRecord::Base
 
   def determined_species
     parser = ScientificNameParser.new
-    determinations.select("scientificName").collect{ |c| c.scientificName }.compact.uniq.map{ |s| parser.parse(s)[:scientificName][:canonical] rescue s }
+    determinations.select("scientificName").collect{ |c| c.scientificName }.compact.uniq.sort.map{ |s| parser.parse(s)[:scientificName][:canonical] rescue s }
   end
 
   def determined_families

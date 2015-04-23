@@ -26,7 +26,7 @@ class Occurrence < ActiveRecord::Base
 
   def self.parse_determiners
     count = 0
-    Occurrence.where("identifiedBy IS NOT NULL AND basisOfRecord = 'PreservedSpecimen'").find_each do |o|
+    Occurrence.where("identifiedBy IS NOT NULL").find_each do |o|
       count += 1
 
       determiners = Collector::Utility.explode_names(o.identifiedBy)
@@ -43,7 +43,7 @@ class Occurrence < ActiveRecord::Base
 
   def self.parse_recorders
     count = 0
-    Occurrence.where("recordedBy IS NOT NULL AND basisOfRecord = 'PreservedSpecimen'").find_each do |o|
+    Occurrence.where("recordedBy IS NOT NULL").find_each do |o|
       count += 1
 
       recorders = Collector::Utility.explode_names(o.recordedBy)
@@ -60,7 +60,7 @@ class Occurrence < ActiveRecord::Base
 
   def self.parse_taxa
     count = 0
-    Occurrence.where("identifiedBy IS NOT NULL AND basisOfRecord = 'PreservedSpecimen' AND family <> ''").find_each do |o|
+    Occurrence.where("identifiedBy IS NOT NULL AND family <> ''").find_each do |o|
       count += 1
 
       o.occurrence_determiners.each do |d|

@@ -186,19 +186,19 @@ module Collector
     def import_occurrences
       counter = 0
       parser = ScientificNameParser.new
-      Occurrence.where("basisOfRecord = 'PreservedSpecimen'").find_in_batches(batch_size: 1_000) do |group|
+      Occurrence.find_in_batches(batch_size: 1_000) do |group|
         occurrences = []
         group.each do |o|
-          scientificName = parser.parse(o.scientificName)[:scientificName][:canonical] rescue o.scientificName
+          agents = o.agents
           occurrences << {
             index: {
               _id: o.id,
               data: {
                 id: o.id,
                 coordinates: o.coordinates,
-                identifiedBy: o.agents[:determiners],
+                identifiedBy: agents[:determiners],
                 dateIdentified: Collector::Utility.valid_year(o.dateIdentified),
-                recordedBy: o.agents[:recorders],
+                recordedBy: agents[:recorders],
                 eventDate: Collector::Utility.valid_year(o.eventDate),
               }
             }

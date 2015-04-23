@@ -11,6 +11,7 @@ To discover where snapshots are located:
     $ curl -XGET "http://localhost:9200/_snapshot/"
 
 To restore:
+
     $ curl -XPOST 'localhost:9200/collector/_close'
     $ curl -XPOST "localhost:9200/_snapshot/es_backup/all/_restore" -d '{ "indices": "collector" }'
     $ curl -XPOST 'localhost:9200/collector/_open'
