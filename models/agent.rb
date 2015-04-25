@@ -66,6 +66,8 @@ class Agent < ActiveRecord::Base
     }x
 
     Agent.transaction do
+      Agent.connection.execute("DELETE FROM agent_works WHERE agent_id = %s" % agent.id)
+
       profile = JSON.parse(response, :symbolize_names => true)[:"orcid-profile"]
       agent.email = profile[:"orcid-bio"][:"contact-details"][:email][0][:value] rescue nil
       agent.position = profile[:"orcid-activities"][:affiliations][:affiliation][0][:"role-title"] rescue nil

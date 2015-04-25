@@ -6,7 +6,7 @@ var Agent = (function($, window) {
   var _private = {
 
     id: "",
-    activity: { hits: { total: "" }, aggregations: { determinations_histogram: { buckets: [] }, recordings_histogram: { buckets: [] } } },
+    activity: { hits: { total: "" }, aggregations: { determinations: { histogram: { buckets: [] } }, recordings: { histogram: { buckets: [] } } } },
     chartData: { determinations : [["Year", "Identifications"]], recordings : [["Year", "Collected specimens"]]},
     map: {},
     layers: [],
@@ -80,9 +80,6 @@ var Agent = (function($, window) {
           var type = e.layerType,
               layer = e.layer;
 
-          console.log(type);
-
-          // Do whatever else you need to. (save to db, add to map etc)
           map.addLayer(layer);
       });
 
@@ -152,7 +149,8 @@ var Agent = (function($, window) {
           self.layers.push(layer);
         }
       });
-      if(layer) {
+      if(this.layers.length > 0) {
+        //L.control.layers(null, this.layers).addTo(this.map);
         $('#legend').append(layer.getLegend({
           numSegments: (max/10 > 5) ? 20 : 5,
           width: 80
@@ -161,6 +159,7 @@ var Agent = (function($, window) {
     },
     removeLayers: function() {
       var self = this;
+
       $.each(this.layers, function() {
         self.map.removeLayer(this);
       });
