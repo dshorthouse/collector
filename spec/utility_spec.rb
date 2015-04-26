@@ -84,6 +84,14 @@ describe "Utility functions to handle names of people" do
     expect(@utility.explode_names(input)).to match_array(expected)
   end
 
+  it "should preserve caps in family names" do
+    input = "Chris MacQuarrie"
+    parsed = Namae.parse @utility.explode_names(input)[0]
+    cleaned = @utility.clean_namae(parsed).to_h
+    expected = { family: "MacQuarrie", given: "Chris"}
+    expect(cleaned).to eq(expected)
+  end
+
   it "should remove more exteneous material" do
     input = "Jack [John]: Smith12345"
     expected = ["Jack John Smith"]

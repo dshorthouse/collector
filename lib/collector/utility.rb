@@ -2,7 +2,7 @@ module Collector
   class Utility
 
     def self.clean_namae(parsed_namae)
-      family = parsed_namae[0].family.mb_chars.titleize.to_s rescue nil
+      family = parsed_namae[0].family rescue nil
       given = parsed_namae[0].normalize_initials.given rescue nil
 
       if family.nil? && !given.nil? && !given.include?(".")
@@ -10,6 +10,14 @@ module Collector
         given = nil
       end
 
+      if family == family.upcase || family == family.downcase
+        family = family.mb_chars.capitalize.to_s rescue nil
+      end
+
+      if (given == given.upcase || given == given.downcase) && !given.include?(".")
+        given = given.mb_chars.capitalize.to_s rescue nil
+      end
+  
       OpenStruct.new(given: given, family: family)
     end
 

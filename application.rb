@@ -248,14 +248,6 @@ class COLLECTOR < Sinatra::Base
     @results.to_json
   end
 
-  get '/api.?:format?' do
-    execute_search
-    case params[:format]
-      when 'json'
-        @results.to_json
-    end
-  end
-
   get '/main.css' do
     content_type 'text/css', charset: 'utf-8'
     scss :main
