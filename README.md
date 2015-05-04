@@ -1,7 +1,7 @@
 # Collector
 Sinatra app to parse people names from biodiversity occurrence data
 
-[![Continuous Integration Status][1]][2]
+[![Build Status](https://travis-ci.org/dshorthouse/collector.svg?branch=master)](https://travis-ci.org/dshorthouse/collector)
 
 ##Make ElasticSearch Snapshot
 
