@@ -53,24 +53,20 @@ namespace :db do
 
   namespace :drop do
     task(:all) do
-      conf[env].each do |k, v| 
-        if ['0.0.0.0', '127.0.0.1', 'localhost'].include?(v[:host].strip)
-          database = v.delete(:database)
-          ActiveRecord::Base.establish_connection(v)
-          ActiveRecord::Base.connection.execute("drop database if exists  #{database}")
-        end
+      if ['0.0.0.0', '127.0.0.1', 'localhost'].include?(conf[env][:host].strip)
+        database = conf[env].delete(:database)
+        ActiveRecord::Base.establish_connection(conf[env])
+        ActiveRecord::Base.connection.execute("drop database if exists  #{database}")
       end
     end
   end
   
   namespace :create do
     task(:all) do
-      conf[env].each do |k, v| 
-        if ['0.0.0.0', '127.0.0.1', 'localhost'].include?(v[:host].strip)
-          database = v.delete(:database)
-          ActiveRecord::Base.establish_connection(v)
-          ActiveRecord::Base.connection.execute("create database if not exists  #{database}")
-        end
+      if ['0.0.0.0', '127.0.0.1', 'localhost'].include?(conf[env][:host].strip)
+        database = conf[env].delete(:database)
+        ActiveRecord::Base.establish_connection(conf[env])
+        ActiveRecord::Base.connection.execute("create database if not exists #{database}")
       end
     end
   end
