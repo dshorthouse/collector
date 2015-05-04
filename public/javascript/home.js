@@ -5,7 +5,7 @@ var Collector = (function($, window) {
 
   var _private = {
 
-    data_sources: { agent : {} },
+    data_sources: { agent : {}, taxon : {} },
     map: {},
     layer: {},
 
@@ -30,7 +30,8 @@ var Collector = (function($, window) {
         limit : 10,
         remote : {
           url : '/'+type+'.json?q=%QUERY',
-          filter : function(r) { return $.map(r, function(v) { return { 'name' : v }; }); }
+          wildcard : '%QUERY',
+          transform : function(r) { return $.map(r, function(v) { v['type'] = type; return v; });  }
         }
       });
     },
@@ -42,20 +43,22 @@ var Collector = (function($, window) {
         {
           name: 'agent',
           source : this.data_sources.agent.ttAdapter(),
-          displayKey : 'name',
+          display : 'name',
           templates : {
-            header: '<h3 class="agent-name">People</h3>'
+            header: '<h3 class="tt-menu-header">People</h3>'
           }
         },
         {
           name: 'taxon',
           source : this.data_sources.taxon.ttAdapter(),
-          displayKey : 'name',
+          display : 'name',
           templates : {
-            header: '<h3 class="agent-name">Families</h3>'
+            header: '<h3 class="tt-menu-header">Families</h3>'
           }
         }
-        ).on('typeahead:selected', this.dropdown_selected).focus().select();
+        ).on('typeahead:select', function(obj, datum) {
+          window.location.href = '/' + datum.type + '/' + datum.id;
+        }).focus().select();
     },
     getParameterByName: function(name) {
         name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");

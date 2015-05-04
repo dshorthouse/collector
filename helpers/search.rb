@@ -183,11 +183,11 @@ module Sinatra
       end
 
       def format_agents
-        @results.map{ |n| [n[:fields][:family][0].presence, n[:fields][:given][0].presence].compact.join(", ") }
+        @results.map{ |n| { id: n[:fields][:id][0], name: [n[:fields][:family][0].presence, n[:fields][:given][0].presence].compact.join(", ") } }
       end
 
       def format_taxa
-        @results.map{ |f| f[:fields][:family][0].presence }
+        @results.map{ |f| { id: f[:fields][:id][0], name: f[:fields][:family][0].presence } }
       end
 
     end
