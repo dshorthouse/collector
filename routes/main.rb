@@ -20,6 +20,11 @@ module Sinatra
             format_agents.to_json
           end
 
+          app.get '/agent/:id.json' do
+            agent_profile(params[:id].to_i)
+            @result.to_json
+          end
+
           app.get '/agent/:id' do
             agent_profile(params[:id].to_i)
             haml :agent
