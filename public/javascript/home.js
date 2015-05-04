@@ -25,9 +25,9 @@ var Collector = (function($, window) {
     },
     create_bloodhound: function(type) {
       return new Bloodhound({
-        datumTokenizer : function(d) { return Bloodhound.tokenizers.whitespace(d.name); },
+        datumTokenizer : Bloodhound.tokenizers.whitespace,
         queryTokenizer : Bloodhound.tokenizers.whitespace,
-        limit : 10,
+        sufficient : 10,
         remote : {
           url : '/'+type+'.json?q=%QUERY',
           wildcard : '%QUERY',
