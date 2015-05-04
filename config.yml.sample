@@ -4,6 +4,14 @@ development:
   username: root
   password:
   database: collector_dev
+  orcid_base_url: 'http://pub.orcid.org/v1.2/'
+  orcid_key: ''
+  orcid_secret: ''
+  orcid_site: 'https://sandbox.orcid.org'
+  orcid_authorize_url: 'https://sandbox.orcid.org/oauth/authorize'
+  orcid_token_url: 'https://api.sandbox.orcid.org/oauth/token'
+  elastic_server: 'http://localhost:9200'
+  elastic_index: 'collector'
 
 test:
   adapter: mysql2
@@ -18,3 +26,11 @@ production:
   username: root
   password:
   database: collector
+  orcid_base_url: 'http://pub.orcid.org/v1.2/'
+  orcid_key: ''
+  orcid_secret: ''
+  orcid_site: ''
+  orcid_authorize_url: ''
+  orcid_token_url: ''
+  elastic_server: 'http://localhost:9200'
+  elastic_index: 'collector'

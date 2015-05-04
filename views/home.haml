@@ -16,6 +16,15 @@
 
 %h1 Collector
 
+- if @orcid
+  %p
+    -# %a(href="/orcid_profile") Connect to ORCID API to fetch full profile data as JSON
+  %p
+    %a(href="/logout") Logout
+- else
+  %p
+    -# %a(href="/auth/orcid") Log in with my ORCiD
+
 %p.byline Search for collectors and determiners of specimens in Canada and explore their networks.
 
 %form{ id: "search_form", method: "get", action: "/", "accept-charset" => "UTF-8", class: "clear" }

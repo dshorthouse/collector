@@ -1,26 +1,29 @@
+# encoding: utf-8
+
 module Collector
   class ElasticIndexer
-    
+
     def initialize
       @client = Elasticsearch::Client.new
+      @settings = Sinatra::Application.settings
     end
-    
+
     def delete
-      if @client.indices.exists index: Collector::Config.elastic_index
-        @client.indices.delete index: Collector::Config.elastic_index
+      if @client.indices.exists index: @settings.elastic_index
+        @client.indices.delete index: @settings.elastic_index
       end
     end
 
     def delete_agents
-      @client.delete_by_query index: Collector::Config.elastic_index, type: 'agent', q: '*'
+      @client.delete_by_query index: @settings.elastic_index, type: 'agent', q: '*'
     end
 
     def delete_occurrences
-      @client.delete_by_query index: Collector::Config.elastic_index, type: 'occurrence', q: '*'
+      @client.delete_by_query index: @settings.elastic_index, type: 'occurrence', q: '*'
     end
 
     def delete_taxa
-      @client.delete_by_query index: Collector::Config.elastic_index, type: 'taxon', q: '*'
+      @client.delete_by_query index: @settings.elastic_index, type: 'taxon', q: '*'
     end
 
     def create
@@ -121,6 +124,12 @@ module Collector
                   doi: { type: 'string', index: 'not_analyzed' },
                   citation: { type: 'string', index: 'not_analyzed' }
                 }
+              },
+              named_species: {
+                properties: {
+                  scientificName: { type: 'string', index: 'not_analyzed' },
+                  year: { type: 'date', format: 'year' }
+                }
               }
             }
           },
@@ -150,7 +159,7 @@ module Collector
           }
         }
       }
-      @client.indices.create index: Collector::Config.elastic_index, body: config
+      @client.indices.create index: @settings.elastic_index, body: config
     end
 
     def import_agents
@@ -172,12 +181,13 @@ module Collector
                           coordinates: a.recordings_coordinates,
                           recordings_with: a.recordings_with,
                           determined_taxa: a.determined_taxa.uniq,
-                          works: a.works.select("doi,citation")
+                          works: a.works.select("doi,citation"),
+                          named_species: a.descriptions
                         }
                       }
                     }
         end
-        @client.bulk index: Collector::Config.elastic_index, type: 'agent', body: agents
+        @client.bulk index: @settings.elastic_index, type: 'agent', body: agents
         counter += agents.size
         puts "Added #{counter} agents"
       end
@@ -197,14 +207,14 @@ module Collector
                 id: o.id,
                 coordinates: o.coordinates,
                 identifiedBy: agents[:determiners],
-                dateIdentified: Collector::Utility.valid_year(o.dateIdentified),
+                dateIdentified: Utility.valid_year(o.dateIdentified),
                 recordedBy: agents[:recorders],
-                eventDate: Collector::Utility.valid_year(o.eventDate),
+                eventDate: Utility.valid_year(o.eventDate),
               }
             }
           }
         end
-        @client.bulk index: Collector::Config.elastic_index, type: 'occurrence', body: occurrences
+        @client.bulk index: @settings.elastic_index, type: 'occurrence', body: occurrences
         counter += occurrences.size
         puts "Added #{counter} occurrences"
       end
@@ -226,7 +236,7 @@ module Collector
                     }
                   }
         end
-        @client.bulk index: Collector::Config.elastic_index, type: 'taxon', body: taxa
+        @client.bulk index: @settings.elastic_index, type: 'taxon', body: taxa
         counter += taxa.size
         puts "Added #{counter} taxa"
       end
@@ -254,12 +264,12 @@ module Collector
                 works: a.works.select("doi,citation").uniq
               }
 
-      @client.delete index: Collector::Config.elastic_index, type: 'agent', id: id rescue nil
-      @client.create index: Collector::Config.elastic_index, type: 'agent', id: id, body: body
+      @client.delete index: @settings.elastic_index, type: 'agent', id: id rescue nil
+      @client.create index: @settings.elastic_index, type: 'agent', id: id, body: body
     end
 
     def refresh
-      @client.indices.refresh index: Collector::Config.elastic_index
+      @client.indices.refresh index: @settings.elastic_index
     end
 
   end

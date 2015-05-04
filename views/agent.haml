@@ -64,6 +64,13 @@
     %h2 Identification Activity
     #determinations
 
+#description-wrapper
+  - if @result[:named_species].size > 0
+    %h2 Species Described
+    %ul.descriptions
+      - @result[:named_species].each do |s|
+        %li #{s[:scientificName]}
+
 #publications-wrapper
   %h2 Publications
 

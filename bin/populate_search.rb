@@ -3,7 +3,7 @@
 require_relative '../environment.rb'
 
 if ARGV[0] == '--flush'
-  puts "Flushing the #{Collector::Config.elastic_index} index"
+  puts "Flushing the #{settings.elastic_index} index"
   index = Collector::ElasticIndexer.new
   index.delete
   puts "Flushed"
@@ -11,6 +11,7 @@ end
 
 if ARGV[0] == '--rebuild-all'
   index = Collector::ElasticIndexer.new
+  puts "Flushing the index..."
   index.delete
   index.create
   puts "Populating taxa..."
@@ -21,7 +22,7 @@ if ARGV[0] == '--rebuild-all'
   index.import_occurrences
   puts "Refreshing the index..."
   index.refresh
-  puts "Finished indexing #{Collector::Config.elastic_index}"
+  puts "Finished indexing #{settings.elastic_index}"
 end
 
 if ARGV[0] == '--rebuild-agents'
@@ -31,7 +32,7 @@ if ARGV[0] == '--rebuild-agents'
   index.import_agents
   puts "Refreshing the index..."
   index.refresh
-  puts "Finished indexing #{Collector::Config.elastic_index} agents"
+  puts "Finished indexing #{settings.elastic_index} agents"
 end
 
 if ARGV[0] == '--rebuild-occurrences'
@@ -41,7 +42,7 @@ if ARGV[0] == '--rebuild-occurrences'
   index.import_occurrences
   puts "Refreshing the index..."
   index.refresh
-  puts "Finished indexing #{Collector::Config.elastic_index} occurrences"
+  puts "Finished indexing #{settings.elastic_index} occurrences"
 end
 
 if ARGV[0] == '--rebuild-taxa'
@@ -51,7 +52,7 @@ if ARGV[0] == '--rebuild-taxa'
   index.import_taxa
   puts "Refreshing the index..."
   index.refresh
-  puts "Finished indexing #{Collector::Config.elastic_index} taxa"
+  puts "Finished indexing #{settings.elastic_index} taxa"
 end
 
 if ARGV[0] == '--refresh'

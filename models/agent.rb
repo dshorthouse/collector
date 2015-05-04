@@ -2,8 +2,11 @@ class Agent < ActiveRecord::Base
   has_many :determinations, :through => :occurrence_determiners, :source => :occurrence
   has_many :occurrence_determiners
 
-  has_many :recordings, :through => :occurrence_recorders, :source => :occurrence  
+  has_many :recordings, :through => :occurrence_recorders, :source => :occurrence
   has_many :occurrence_recorders
+
+  has_many :descriptions, :through => :agent_descriptions, :source => :description
+  has_many :agent_descriptions
 
   has_many :determined_taxa, :through => :taxon_determiners, :source => :taxon
   has_many :taxon_determiners
@@ -28,7 +31,7 @@ class Agent < ActiveRecord::Base
           search = 'family-name:' + URI::encode(agent.family) + '+AND+given-names:' + URI::encode(agent.given)
           response = RestClient::Request.execute(
             method: :get,
-            url: Collector::Config.orcid_base_url + 'search/orcid-bio?q=' + search,
+            url: Sinatra::Application.settings.orcid_base_url + 'search/orcid-bio?q=' + search,
             headers: { accept: 'application/orcid+json' }
           )
           parse_search_orcid_response(agent, response)
@@ -51,7 +54,7 @@ class Agent < ActiveRecord::Base
       next if agent.processed_profile
       response = RestClient::Request.execute(
         method: :get,
-        url: Collector::Config.orcid_base_url + agent.orcid_identifier + '/orcid-profile',
+        url: Sinatra::Application.settings.orcid_base_url + agent.orcid_identifier + '/orcid-profile',
         headers: { accept: 'application/orcid+json' }
       )
       parse_profile_orcid_response(agent, response)
@@ -150,7 +153,7 @@ class Agent < ActiveRecord::Base
   def refresh_orcid_data
     response = RestClient::Request.execute(
       method: :get,
-      url: Collector::Config.orcid_base_url + orcid_identifier + '/orcid-profile',
+      url: Sinatra::Application.settings.orcid_base_url + orcid_identifier + '/orcid-profile',
       headers: { accept: 'application/orcid+json' }
     )
     self.class.parse_profile_orcid_response(self, response)

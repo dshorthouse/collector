@@ -11,7 +11,9 @@ require 'htmlentities'
 require 'haml'
 require 'sass'
 require 'sinatra'
+require 'sinatra/base'
 require 'sinatra/content_for'
+require 'sinatra/config_file'
 require 'yaml'
 require 'namae'
 require 'elasticsearch'
@@ -20,43 +22,18 @@ require 'will_paginate'
 require 'will_paginate/collection'
 require 'will_paginate/view_helpers/sinatra'
 require 'chronic'
+require 'omniauth-orcid'
+require 'thin'
+require 'oauth2'
+require 'biodiversity'
+require 'require_all'
 
-module Collector
-  
-  def self.symbolize_keys(obj)
-    if obj.class == Array
-      obj.map {|o| Collector.symbolize_keys(o)}
-    elsif obj.class == Hash
-      obj.inject({}) {|res, data| res.merge(data[0].to_sym => Collector.symbolize_keys(data[1]))}
-    else
-      obj
-    end
-  end
+require_all 'lib'
+require_all 'helpers'
+require_all 'routes'
+require_all 'models'
 
-  root_path = File.expand_path(File.dirname(__FILE__))
-  CONF_DATA = Collector.symbolize_keys(YAML.load(open(File.join(root_path, 'config.yml')).read))
-  conf = CONF_DATA
-  environment = ENV['COLLECTOR_DEV'] || 'development'
-  Config = OpenStruct.new(
-                 root_path: root_path,
-                 orcid_base_url: conf[:orcid_base_url],
-                 orcid_client_id: conf[:orcid_client_id],
-                 orcid_secret: conf[:orcid_secret],
-                 environment: environment,
-                 elastic_server: conf[:elastic_server],
-                 elastic_index: conf[:elastic_index]
-               )
-  # load models
-  ActiveSupport::Inflector.inflections do |inflect|
-    inflect.irregular 'taxon', 'taxa'
-  end
-  db_settings = conf[Config.environment.to_sym]
-  # ActiveRecord::Base.logger = Logger.new(STDOUT, :debug) if environment == 'test'
-  ActiveRecord::Base.establish_connection(db_settings)
-  $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), 'lib'))
-  $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), 'lib', 'collector'))
-  $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), 'models'))
-  Dir.glob(File.join(File.dirname(__FILE__), 'lib', '**', '*.rb')) { |lib|   require File.basename(lib, '.*') }
-  Dir.glob(File.join(File.dirname(__FILE__), 'models', '*.rb')) { |model| require File.basename(model, '.*') }
-end
+register Sinatra::ConfigFile
+config_file File.join(File.dirname(__FILE__), 'config.yml')
 
+register Sinatra::Collector::Model::Initialize

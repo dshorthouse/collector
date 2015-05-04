@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-require 'pp'
+# encoding: utf-8
 require_relative '../environment.rb'
 
 if ARGV[0] == '--truncate'
@@ -7,8 +7,11 @@ if ARGV[0] == '--truncate'
   Occurrence.connection.execute("TRUNCATE TABLE agents")
   Occurrence.connection.execute("TRUNCATE TABLE occurrence_determiners")
   Occurrence.connection.execute("TRUNCATE TABLE occurrence_recorders")
+  Occurrence.connection.execute("TRUNCATE TABLE descriptions")
+  Occurrence.connection.execute("TRUNCATE TABLE agent_descriptions")
 end
 
 puts 'Starting to populate agents'
 Occurrence.populate_agents
+Description.populate_agents
 puts 'Done populating agents'

@@ -15,6 +15,10 @@ gem 'elasticsearch'
 gem 'biodiversity'
 gem 'will_paginate'
 gem 'chronic'
+gem 'omniauth-orcid'
+gem 'thin'
+gem 'oauth2'
+gem 'require_all'
 
 group :production do
 end
@@ -22,5 +26,5 @@ end
 group :test, :development do
   gem 'rake'
   gem 'rspec'
-  gem 'debugger'
+  gem 'byebug'
 end

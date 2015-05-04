@@ -47,8 +47,8 @@ class Occurrence < ActiveRecord::Base
       count += 1
 
       recorders = Collector::Utility.explode_names(o.recordedBy)
-      recorders.each do |c|
-        name = Namae.parse c
+      recorders.each do |r|
+        name = Namae.parse r
         cleaned_name = Collector::Utility.clean_namae(name)
         save_agent(cleaned_name, o.id, "recorder")
       end

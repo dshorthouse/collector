@@ -206,41 +206,23 @@ label input {
   width: 600px; height: 250px;
 }
 
-ul.collectors, ul.determinations {
-  list-style: none outside none;
+ul.collectors, ul.determinations, ul.descriptions { list-style: none outside none; }
+ul.determinations li, ul.collectors li, ul.descriptions li {
+  border:1px solid #E0E0E0;
+  border-radius:3px;
+  display:inline;
+  margin-right:5px;
+  padding:3px;
+  line-height:2.25em;
 }
 
-ul.determinations li {
-  background-color:#F0FFF0;
-  border:1px solid #E0E0E0;
-  border-radius:3px;
-  display:inline;
-  margin-right:5px;
-  padding:3px;
-  line-height:2.25em;
-}
-ul.collectors li {
-  background-color:#F0F0F0;
-  border:1px solid #E0E0E0;
-  border-radius:3px;
-  display:inline;
-  margin-right:5px;
-  padding:3px;
-  line-height:2.25em;
-}
-ul.collectors li:hover{
-  border:1px solid #246D80;
-  background-color:#246D80;
-  border-radius:3px;
-}
-ul.determinations li:hover{
-  border:1px solid #246D80;
-  background-color:#3CB371;
-  border-radius:3px;
-}
-ul.collectors li:hover a, ul.determinations li:hover a {
-  color:#FFF;
-}
+ul.determinations li:hover, ul.collectors li:hover { border-radius:3px; border:1px solid #246D80; }
+ul.collectors li:hover a, ul.determinations li:hover a { color:#FFF; }
+
+ul.determinations li { background-color:#F0FFF0; }
+ul.determinations li:hover{ background-color:#3CB371; }
+ul.collectors li { background-color:#F0F0F0; }
+ul.collectors li:hover{ background-color:#246D80; }
 
 #recordings-chart, #recordings-map {
   float:left;

@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-require 'pp'
+# encoding: utf-8
 require_relative '../environment.rb'
 
 if ARGV[0] == '--truncate'
