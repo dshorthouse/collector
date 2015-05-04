@@ -261,7 +261,8 @@ module Collector
                 coordinates: a.recordings_coordinates,
                 recordings_with: a.recordings_with,
                 determined_taxa: a.determined_taxa.uniq,
-                works: a.works.select("doi,citation").uniq
+                works: a.works.select("doi,citation").uniq,
+                named_species: a.descriptions
               }
 
       @client.delete index: @settings.elastic_index, type: 'agent', id: id rescue nil

@@ -15,6 +15,7 @@ var Collector = (function($, window) {
       this.createMap();
       this.addMapEvents();
       this.loadOverlay();
+      this.activateReset();
     },
     bloodhound: function() {
       this.data_sources.agent = this.create_bloodhound('agent');
@@ -101,11 +102,7 @@ var Collector = (function($, window) {
       var self = this;
 
       this.map.on('draw:drawstart', function (e) {
-        $.each(['type', 'center', 'radius', 'bounds', 'polygon'], function() {
-          $('#geo_' + this).val('');
-          self.map.removeLayer(self.layer);
-        });
-
+        self.clearOverlays();
       });
 
       this.map.on('draw:created', function (e) {
@@ -166,7 +163,19 @@ var Collector = (function($, window) {
             this.map.setView(this.layer.getBounds().getCenter(), 3);
           break;
         }
-    }
+      },
+      clearOverlays: function() {
+        var self = this;
+
+        $.each(['type', 'center', 'radius', 'bounds', 'polygon'], function() {
+          $('#geo_' + this).val('');
+          self.map.removeLayer(self.layer);
+        });
+      },
+      activateReset: function() {
+        var self = this;
+        $('#reset_form').on('click', function() { self.clearOverlays(); });
+      }
   };
 
   return {

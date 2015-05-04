@@ -1,6 +1,8 @@
 require 'rake'
 require 'bundler/setup'
 require 'rspec/core/rake_task'
+require 'byebug'
+require './environment'
 
 task :default => :test
 task :test => :spec
@@ -40,7 +42,8 @@ end
 
 namespace :db do
   require 'active_record'
-  conf = YAML.load(open(File.join(File.expand_path(File.dirname(__FILE__)), 'config.yml')).read)
+  conf = YAML.load(open(File.join(File.expand_path(File.dirname(__FILE__)), 'config.yml')).read).deep_symbolize_keys
+  env = Sinatra::Application.settings.environment
   desc "Migrate the database"
   task(:migrate => :environment) do
     ActiveRecord::Base.logger = Logger.new(STDOUT)
@@ -50,9 +53,9 @@ namespace :db do
 
   namespace :drop do
     task(:all) do
-      conf.each do |k, v| 
-        if ['0.0.0.0', '127.0.0.1', 'localhost'].include?(v['host'].strip)
-          database = v.delete('database')
+      conf[env].each do |k, v| 
+        if ['0.0.0.0', '127.0.0.1', 'localhost'].include?(v[:host].strip)
+          database = v.delete(:database)
           ActiveRecord::Base.establish_connection(v)
           ActiveRecord::Base.connection.execute("drop database if exists  #{database}")
         end
@@ -62,9 +65,9 @@ namespace :db do
   
   namespace :create do
     task(:all) do
-      conf.each do |k, v| 
-        if ['0.0.0.0', '127.0.0.1', 'localhost'].include?(v['host'].strip)
-          database = v.delete('database')
+      conf[env].each do |k, v| 
+        if ['0.0.0.0', '127.0.0.1', 'localhost'].include?(v[:host].strip)
+          database = v.delete(:database)
           ActiveRecord::Base.establish_connection(v)
           ActiveRecord::Base.connection.execute("create database if not exists  #{database}")
         end

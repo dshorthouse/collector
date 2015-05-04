@@ -127,7 +127,7 @@ var Agent = (function($, window) {
             color: colorFunction,
             fillColor: fillColorFunction,
             gradient: true,
-            displayName: "Collections"
+            displayName: "Records"
           }
         },
         layerOptions: {

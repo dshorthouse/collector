@@ -9,5 +9,6 @@ end
 
 index = Collector::ElasticIndexer.new
 puts "Updating agent..."
+#format: id, orcid
 index.update_agent(ARGV[0], ARGV[1])
 puts "Finished updaing agent."
