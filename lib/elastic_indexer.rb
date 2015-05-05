@@ -105,7 +105,7 @@ module Collector
               position: { type: 'string', index: 'not_analyzed' },
               affiliation: { type: 'string', index: 'not_analyzed' },
               coordinates: { type: 'geo_point', lat_lon: true, fielddata: { format: 'compressed', precision: "5km" }, index: 'not_analyzed' },
-              determined_taxa: {
+              determined_families: {
                 properties: {
                   id: { type: 'integer', index: 'not_analyzed' },
                   family: {type: 'string', index: 'not_analyzed' },
@@ -180,8 +180,8 @@ module Collector
                           affiliation: a.affiliation,
                           coordinates: a.recordings_coordinates,
                           recordings_with: a.recordings_with,
-                          determined_taxa: a.determined_taxa.uniq,
-                          works: a.works.select("doi,citation"),
+                          determined_families: a.determined_families,
+                          works: a.works.pluck(:doi,:citation).uniq.map{ |c| { doi: c[0], citation: c[1] } },
                           named_species: a.descriptions
                         }
                       }
@@ -231,7 +231,7 @@ module Collector
                       data: {
                         id: t.id,
                         family: t.family,
-                        identifiedBy: t.determinations.select("agents.id,family,given").uniq
+                        identifiedBy: t.determinations.pluck(:id, :family, :given).uniq.map {|a| { id: a[0], family: a[1], given: a[2] } }
                       }
                     }
                   }
@@ -260,8 +260,8 @@ module Collector
                 affiliation: a.affiliation,
                 coordinates: a.recordings_coordinates,
                 recordings_with: a.recordings_with,
-                determined_taxa: a.determined_taxa.uniq,
-                works: a.works.select("doi,citation").uniq,
+                determined_families: a.determined_families,
+                works: a.works.pluck(:doi,:citation).uniq.map{ |c| { doi: c[0], citation: c[1] } },
                 named_species: a.descriptions
               }
 

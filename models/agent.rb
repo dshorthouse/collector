@@ -103,51 +103,52 @@ class Agent < ActiveRecord::Base
   end
 
   def determinations_year_range
-    years = determinations.select("dateIdentified")
-                          .collect{ |d| Date.strptime(d.dateIdentified, "%Y").year rescue nil }
-                          .compact.minmax rescue [nil,nil]
+    years = determinations.pluck(:dateIdentified)
+                          .map{ |d| Collector::Utility.valid_year(d) }
+                          .compact
+                          .minmax rescue [nil,nil]
     years[0] = years[1] if years[0].nil?
     years[1] = years[0] if years[1].nil?
     years
   end
 
   def recordings_year_range
-    years = recordings.select("eventDate")
-                      .collect{ |d| Date.strptime(d.eventDate, "%Y").year rescue nil }
-                      .compact.minmax rescue [nil,nil]
+    years = recordings.pluck(:eventDate)
+                      .map{ |d| Collector::Utility.valid_year(d) }
+                      .compact
+                      .minmax rescue [nil,nil]
     years[0] = years[1] if years[0].nil?
     years[1] = years[0] if years[1].nil?
     years
   end
 
   def recordings_coordinates
-    recordings.select("decimalLatitude,decimalLongitude")
-              .collect{ |c| [c.decimalLongitude.to_f, c.decimalLatitude.to_f] }
+    recordings.pluck(:decimalLongitude, :decimalLatitude)
+              .map{ |c| [c[0].to_f, c[1].to_f] }
               .compact.uniq
   end
 
   def recordings_with
-    occurrence_ids = occurrence_recorders.select("occurrence_id").collect{ |o| o.occurrence_id }
+    occurrence_ids = occurrence_recorders.pluck(:occurrence_id)
     return [] if occurrence_ids.empty?
-    OccurrenceRecorder.select("agent_id, family, given")
-                                .joins("JOIN agents ON occurrence_recorders.agent_id = agents.id")
-                                .where(occurrence_id: occurrence_ids)
-                                .where.not(agent_id: id)
-                                .map{ |a| { id: a.agent_id, given: a.given, family: a.family } }
-                                .uniq
-                                .sort_by { |a| a[:family] }
+    OccurrenceRecorder.joins("JOIN agents ON occurrence_recorders.agent_id = agents.id")
+                      .where(occurrence_id: occurrence_ids)
+                      .where.not(agent_id: id)
+                      .pluck(:agent_id, :given, :family)
+                      .uniq
+                      .map{ |a| { id: a[0], given: a[1], family: a[2] } }
+                      .sort_by { |a| a[:family] }
   end
 
   def determined_species
     parser = ScientificNameParser.new
-    determinations.select("scientificName")
-                  .collect{ |c| c.scientificName }
+    determinations.pluck(:scientificName)
                   .compact.uniq.sort
                   .map{ |s| parser.parse(s)[:scientificName][:canonical] rescue s }
   end
 
   def determined_families
-    determined_taxa.select("family").map{ |f| f.family }.uniq.sort
+    determined_taxa.pluck(:id, :family).uniq.sort.map{|f| { id: f[0], family: f[1] } }
   end
 
   def refresh_orcid_data

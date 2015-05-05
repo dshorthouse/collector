@@ -76,14 +76,14 @@ module Collector
     def self.valid_year(year)
       return if year.presence.nil?
 
-      begin
-        parsed = Date.strptime(year, "%Y").year
-      rescue
+      parsed = Date.strptime(year, "%Y").year rescue nil
+
+      if parsed.nil? || parsed <= 1756 || parsed >= Time.now.year
         parsed = Chronic.parse(year).year rescue nil
       end
 
       if !parsed.nil? && parsed >= 1756 && parsed <= Time.now.year
-        parsed.to_s
+        parsed
       end
     end
 

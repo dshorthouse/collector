@@ -52,10 +52,10 @@
   - else
     %p None
 
-- if @result[:determined_taxa].size > 0
+- if @result[:determined_families].size > 0
   %h2 Families Identified
   %ul.determinations
-    - @result[:determined_taxa].sort_by { |d| d[:family] }.each do |t|
+    - @result[:determined_families].sort_by { |d| d[:family] }.each do |t|
       %li
         %a{href: "/taxon/#{t[:id]}" }=  t[:family]
 
