@@ -308,9 +308,9 @@ describe "Utility functions to handle names of people" do
     expect(@utility.explode_names(input)).to match_array(expected)
   end
 
-  it "should explode concatenated names like 'J.L.Gentry Jr.'" do
-    input = "J.L.Gentry Jr."
-    expected = ["J. L. Gentry Jr."]
+  it "should explode concatenated names like 'J.L.Gentry Jr'" do
+    input = "J.L.Gentry Jr"
+    expected = ["J. L. Gentry Jr"]
     expect(@utility.explode_names(input)).to match_array(expected)
   end
 
@@ -323,6 +323,54 @@ describe "Utility functions to handle names of people" do
   it "should explode a complicated example" do
     input = "Vernon C. Brink; Thomas C. Brayshaw stet! 1979"
     expected = ["Vernon C. Brink", "Thomas C. Brayshaw"]
+    expect(@utility.explode_names(input)).to match_array(expected)
+  end
+
+  it "should explode names with extraneous commas" do
+    input = "4073 A.A. Beetle, with D.E. Beetle and Alva Hansen"
+    expected = ["A. A. Beetle", "D. E. Beetle", "Alva Hansen"]
+    expect(@utility.explode_names(input)).to match_array(expected)
+  end
+
+  it "should explode names with extraneous period" do
+    input = "C. Tanner.; M.W. Hawkes"
+    expected = ["C. Tanner", "M. W. Hawkes"]
+    expect(@utility.explode_names(input)).to match_array(expected)
+  end
+
+  it "should explode names with Jan. 14, 2013 included in string" do
+    input = "Jan Jones Jan. 14, 2013"
+    expected = ["Jan Jones"]
+    expect(@utility.explode_names(input)).to match_array(expected)
+  end
+
+  it "should explode names with freeform dates in the string" do
+    input = "Richard Robohm on 15 January 2013"
+    expected = ["Richard Robohm"]
+    expect(@utility.explode_names(input)).to match_array(expected)
+  end
+
+  it "should explode names with structured dates in the string" do
+    input = "C.J. Bird 20/Aug./1980"
+    expected = ["C. J. Bird"]
+    expect(@utility.explode_names(input)).to match_array(expected)
+  end
+
+  it "should explode names with dates separated by semicolons in the string" do
+    input = "K. January; January; 1979"
+    expected = ["K. January"]
+    expect(@utility.explode_names(input)).to match_array(expected)
+  end
+  
+  it "should explode names with possibly conflicting months in the string" do
+    input = "Michael May May 2013"
+    expected = ["Michael May"]
+    expect(@utility.explode_names(input)).to match_array(expected)
+  end
+
+  it "should explode names with a year and month at the end of a string" do
+    input = "Paul Kroeger 2006 May"
+    expected = ["Paul Kroeger"]
     expect(@utility.explode_names(input)).to match_array(expected)
   end
 

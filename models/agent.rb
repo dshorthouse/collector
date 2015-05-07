@@ -124,8 +124,8 @@ class Agent < ActiveRecord::Base
 
   def recordings_coordinates
     recordings.pluck(:decimalLongitude, :decimalLatitude)
-              .map{ |c| [c[0].to_f, c[1].to_f] }
               .compact.uniq
+              .map{ |c| [c[0].to_f, c[1].to_f] }
   end
 
   def recordings_with
@@ -148,7 +148,7 @@ class Agent < ActiveRecord::Base
   end
 
   def determined_families
-    determined_taxa.pluck(:id, :family).uniq.sort.map{|f| { id: f[0], family: f[1] } }
+    determined_taxa.pluck(:id, :family).uniq.map{|f| { id: f[0], family: f[1] } }.sort_by { |a| a[:family] }
   end
 
   def refresh_orcid_data

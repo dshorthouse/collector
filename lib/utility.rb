@@ -24,19 +24,46 @@ module Collector
     end
 
     def self.explode_names(name)
-      strip_out = %r{
+      global_strip_out = %r{
         \bet\s+al(\.)?|
         \bu\.\s*a\.|
         (\band|\&)\s+others|
         \betc(\.)?|
         \b,\s+\d+|
+        \b(?i:on)\b|
+        \b(?i:others)\b|
         \b(?i:unknown)\b|
         \b(?i:ann?onymous)\b|
         \b(?i:undetermined)\b|
+        \b\d+/(Jan(\.)?|Feb(\.)?|Mar(\.)?|Apr(\.)?|May(\.)?|Jun(\.)?|Jul(\.)?|Aug(\.)?|Sep(\.)?|Oct(\.)?|Nov(\.)?|Dec(\.)?)/\d+|
+        \bJan(\.)?(;)?(\s+)?\d+|\bJanuary(;)?(\s+)?\d+|
+        \bFeb(\.)?(;)?(\s+)?\d+|\bFebruary(;)?(\s+)?\d+|
+        \bMar(\.)?(;)?(\s+)?\d+|\bMarch(;)?(\s+)?\d+|
+        \bApr(\.)?(;)?(\s+)?\d+|\bApril(;)?(\s+)?\d+|
+        \bMay(;)?(\s+)?\d+|
+        \bJun(\.)?(;)?(\s+)?\d+|\bJune(;)?(\s+)?\d+|
+        \bJul(\.)?(;)?(\s+)?\d+|\bJuly(;)?(\s+)?\d+|
+        \bAug(\.)?(;)?(\s+)?\d+|\bAugust(;)?(\s+)?\d+|
+        \bSep(\.)?(;)?(\s+)?\d+|\bSeptember(;)?(\s+)?\d+|
+        \bOct(\.)?(;)?(\s+)?\d+|\bOctober(;)?(\s+)?\d+|
+        \bNov(\.)?(;)?(\s+)?\d+|\bNovember(;)?(\s+)?\d+|
+        \bDec(\.)?(;)?(\s+)?\d+|\bDecember(;)?(\s+)?\d+|
+        \d+\s+Jan(\.)?\b|\d+\s+January\b|
+        \d+\s+Feb(\.)?\b|\d+\s+February\b|
+        \d+\s+Mar(\.)?\b|\d+\s+March\b|
+        \d+\s+Apr(\.)?\b|\d+\s+April\b|
+        \d+\s+May\b|
+        \d+\s+Jun(\.)?\b|\d+\s+June\b|
+        \d+\s+Jul(\.)?\b|\d+\s+July\b|
+        \d+\s+Aug(\.)?\b|\d+\s+August\b|
+        \d+\s+Sep(\.)?\b|\d+\s+September\b|
+        \d+\s+Oct(\.)?\b|\d+\s+October\b|
+        \d+\s+Nov(\.)?\b|\d+\s+November\b|
+        \d+\s+Dec(\.)?\b|\d+\s+December\b|
         [":\d+]
       }x
 
-      substitutions = {
+      character_substitutions = {
         '.' => '. ',
         '(' => ' ',
         ')' => ' ',
@@ -66,10 +93,11 @@ module Collector
         \b(?i:ver\.?(\s+by)?\s+|verf\.?(\s+by)?\s+|verified?(\s+by)?\s+)\b
       }x
 
-      name.gsub(strip_out, '')
-          .gsub(/[#{substitutions.keys.join('\\')}]/, substitutions).squeeze(' ')
+      name.gsub(global_strip_out, '')
+          .gsub(/[#{character_substitutions.keys.join('\\')}]/, character_substitutions)
+          .squeeze(' ')
           .split(split_by)
-          .map{ |c| c.strip }
+          .map{ |c| c.strip.gsub(/[.,]\z/, '').strip }
           .reject{ |c| c.empty? || c.length < 3 || c.length > 30 }
     end
 

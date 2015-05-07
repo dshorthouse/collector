@@ -207,9 +207,9 @@ module Collector
                 id: o.id,
                 coordinates: o.coordinates,
                 identifiedBy: agents[:determiners],
-                dateIdentified: Utility.valid_year(o.dateIdentified),
+                dateIdentified: Utility.valid_year(o.dateIdentified).to_s,
                 recordedBy: agents[:recorders],
-                eventDate: Utility.valid_year(o.eventDate),
+                eventDate: Utility.valid_year(o.eventDate).to_s,
               }
             }
           }
