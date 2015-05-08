@@ -16,19 +16,17 @@
 -content_for :title do
   #{@result[:given]} #{@result[:family]}
 
-%header
-  %hgroup
-    %h1 #{@result[:given]} #{@result[:family]}
+%h1 #{@result[:given]} #{@result[:family]}
 
-    .contact-details #{@result[:position]}
-    .contact-details #{@result[:affiliation]}
-    .contact-details
-      - if @result[:email]
-        %a{href: "mailto:#{@result[:email]}" }= @result[:email]
-    .contact-details
-      - if @result[:orcid]
-        ORCID
-        %a{href: "https://orcid.org/#{@result[:orcid]}" }= @result[:orcid]
+.contact-details #{@result[:position]}
+.contact-details #{@result[:affiliation]}
+.contact-details
+  - if @result[:email]
+    %a{href: "mailto:#{@result[:email]}" }= @result[:email]
+.contact-details
+  - if @result[:orcid]
+    ORCID
+    %a{href: "https://orcid.org/#{@result[:orcid]}" }= @result[:orcid]
 
 #recordings-wrapper.clear
   #recordings-map

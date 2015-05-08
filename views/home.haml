@@ -14,20 +14,6 @@
 -content_for :title do
   Collector
 
-%h1 Collector
-
-- if @orcid
-  %p
-    -# %a{ href: "/orcid_profile" } Connect to ORCID API to fetch full profile data as JSON
-  %p
-    %a{ href: "/logout" } Logout
-- else
-  %p
-    -# %a{ href: "/auth/orcid" } Log in with my ORCiD
-
-%p.byline Search for collectors and determiners of specimens in Canada and explore their networks.
-
-
 %form{ id: "search_form", method: "get", action: "/", "accept-charset" => "UTF-8", class: "clear" }
   #form-wrapper.clear
     %div.search-agent
@@ -89,17 +75,3 @@
     %a{ href: "/?q=&geo=circle&c=81.79562207979932%2C-71.103515625&r=49.87033031208762&b=&p=" } Lake Hazen
   %li
     %a{ href: "/?q=&geo=polygon&c=&r=&b=&p=%5B%5B30.372875188118016%2C81.40869140625%5D%2C%5B28.632746799225856%2C84.9462890625%5D%2C%5B27.819644755099446%2C87.86865234374999%5D%2C%5B26.509904531413927%2C88.04443359375%5D%2C%5B26.725986812271756%2C85.01220703125%5D%2C%5B27.994401411046148%2C81.5185546875%5D%2C%5B28.786918085420226%2C80.09033203125%5D%2C%5B29.897805610155874%2C80.48583984375%5D%2C%5B30.20211367909724%2C80.9912109375%5D%5D" } Nepal
-
-%footer
-  This proof-of-concept was produced by 
-  %a{href: "https://orcid.org/0000-0001-7618-5230" } David P. Shorthouse 
-  using biodiversity occurrence data from 
-  %a{href: "http://data.canadensys.net"} Canadensys 
-  and academic information from 
-  = succeed "." do
-    %a{href: "https://orcid.org" } ORCID
-  Collector and determiner names were parsed and cleaned using the 
-  %a{href: "https://rubygems.org/gems/namae" } Namae gem 
-  among other custom regular expressions. Scientific authority information in scientific names were extracted using the 
-  = succeed "." do
-    %a{href: "https://rubygems.org/gems/biodiversity" } Biodiversity gem
