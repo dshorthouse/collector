@@ -52,7 +52,7 @@
         %div.result
           %div.agent
             - if r[:_type] == 'taxon'
-              %a{href: "/taxon/#{r[:fields][:id][0]}"}= r[:fields][:family][0]
+              %a{href: "/taxon/#{r[:fields][:family][0]}"}= r[:fields][:family][0]
             - elsif r[:_type] == 'agent'
               - id = r[:fields][:id][0]
               - if r[:fields].has_key? :orcid

@@ -57,7 +57,7 @@
   %ul.determinations
     - @result[:determined_families].sort_by { |d| d[:family] }.each do |t|
       %li
-        %a{href: "/taxon/#{t[:id]}" }=  t[:family]
+        %a{href: "/taxon/#{t[:family]}" }=  t[:family]
 
 #determinations-wrapper
   #identifications.chart
