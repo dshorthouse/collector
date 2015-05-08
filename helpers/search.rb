@@ -19,7 +19,7 @@ module Sinatra
         polygon = YAML::load(params[:p] || "[[0,0]]").map{ |n| n.reverse } rescue []
 
         body = { query: { match_all: {} } }
-        fields = "id,family,given"
+        fields = "id,family,given,orcid"
         sort = ""
 
         client = Elasticsearch::Client.new
@@ -94,9 +94,13 @@ module Sinatra
         return if !id.present?
 
         client = Elasticsearch::Client.new
-        body = { query: { match: { id: id } } }
 
-        response = client.search index: settings.elastic_index, type: 'agent', body: body
+        query = { match: { id: id.to_i } }
+        if id.include? "-"
+          query = { match: { orcid: id } }
+        end
+
+        response = client.search index: settings.elastic_index, type: 'agent', body: { query: query }
         result = response["hits"].deep_symbolize_keys
         if result[:total] > 0
           @result = result[:hits][0][:_source]
@@ -110,9 +114,13 @@ module Sinatra
         return if !id.present?
 
         client = Elasticsearch::Client.new
-        body = { query: { match: { id: id } } }
 
-        response = client.search index: settings.elastic_index, type: 'taxon', body: body
+        query = { match: { id: id.to_i } }
+        if id.to_i == 0
+          query = { match: { family: id } }
+        end
+
+        response = client.search index: settings.elastic_index, type: 'taxon', body: { query: query }
         result = response["hits"].deep_symbolize_keys
         if result[:total] > 0
           @result = result[:hits][0][:_source]
@@ -183,7 +191,10 @@ module Sinatra
       end
 
       def format_agents
-        @results.map{ |n| { id: n[:fields][:id][0], name: [n[:fields][:family][0].presence, n[:fields][:given][0].presence].compact.join(", ") } }
+        @results.map{ |n|
+          orcid = n[:fields][:orcid][0].presence if n[:fields].has_key? :orcid
+          { id: n[:fields][:id][0], name: [n[:fields][:family][0].presence, n[:fields][:given][0].presence].compact.join(", "), orcid: orcid }
+        }
       end
 
       def format_taxa

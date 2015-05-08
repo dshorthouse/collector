@@ -29,37 +29,50 @@ module Collector
         \bu\.\s*a\.|
         (\band|\&)\s+others|
         \betc(\.)?|
-        \b,\s+\d+|
         \b(?i:on)\b|
         \b(?i:others)\b|
         \b(?i:unknown)\b|
         \b(?i:ann?onymous)\b|
         \b(?i:undetermined)\b|
-        \b\d+/(Jan(\.)?|Feb(\.)?|Mar(\.)?|Apr(\.)?|May(\.)?|Jun(\.)?|Jul(\.)?|Aug(\.)?|Sep(\.)?|Oct(\.)?|Nov(\.)?|Dec(\.)?)/\d+|
-        \bJan(\.)?(;)?(\s+)?\d+|\bJanuary(;)?(\s+)?\d+|
-        \bFeb(\.)?(;)?(\s+)?\d+|\bFebruary(;)?(\s+)?\d+|
-        \bMar(\.)?(;)?(\s+)?\d+|\bMarch(;)?(\s+)?\d+|
-        \bApr(\.)?(;)?(\s+)?\d+|\bApril(;)?(\s+)?\d+|
-        \bMay(;)?(\s+)?\d+|
-        \bJun(\.)?(;)?(\s+)?\d+|\bJune(;)?(\s+)?\d+|
-        \bJul(\.)?(;)?(\s+)?\d+|\bJuly(;)?(\s+)?\d+|
-        \bAug(\.)?(;)?(\s+)?\d+|\bAugust(;)?(\s+)?\d+|
-        \bSep(\.)?(;)?(\s+)?\d+|\bSeptember(;)?(\s+)?\d+|
-        \bOct(\.)?(;)?(\s+)?\d+|\bOctober(;)?(\s+)?\d+|
-        \bNov(\.)?(;)?(\s+)?\d+|\bNovember(;)?(\s+)?\d+|
-        \bDec(\.)?(;)?(\s+)?\d+|\bDecember(;)?(\s+)?\d+|
-        \d+\s+Jan(\.)?\b|\d+\s+January\b|
-        \d+\s+Feb(\.)?\b|\d+\s+February\b|
-        \d+\s+Mar(\.)?\b|\d+\s+March\b|
-        \d+\s+Apr(\.)?\b|\d+\s+April\b|
-        \d+\s+May\b|
-        \d+\s+Jun(\.)?\b|\d+\s+June\b|
-        \d+\s+Jul(\.)?\b|\d+\s+July\b|
-        \d+\s+Aug(\.)?\b|\d+\s+August\b|
-        \d+\s+Sep(\.)?\b|\d+\s+September\b|
-        \d+\s+Oct(\.)?\b|\d+\s+October\b|
-        \d+\s+Nov(\.)?\b|\d+\s+November\b|
-        \d+\s+Dec(\.)?\b|\d+\s+December\b|
+        \d+/(?i:
+          Jan(\.)?(\s+)?|
+          Feb(\.)?(\s+)?|
+          Mar(\.)?(\s+)?|
+          Apr(\.)?(\s+)?|
+          May(\.)?(\s+)?|
+          Jun(\.)?(\s+)?|
+          Jul(\.)?(\s+)?|
+          Aug(\.)?(\s+)?|
+          Sep(t)?(\.)?(\s+)?|
+          Oct(\.)?(\s+)?|
+          Nov(\.)?(\s+)?|
+          Dec(\.)?(\s+)?
+          )/\d+|
+        \b(?i:Jan|January)(\.)?(;)?(\s+)?\d+|
+        \b(?i:Feb|February)(\.)?(;)?(\s+)?\d+|
+        \b(?i:Mar|March)(\.)?(;)?(\s+)?\d+|
+        \b(?i:Apr|Apri|April)(\.)?(;)?(\s+)?\d+|
+        \b(?i:May)(;)?(\s+)?\d+|
+        \b(?i:Jun|June)(\.)?(;)?(\s+)?\d+|
+        \b(?i:Jul|July)(\.)?(;)?(\s+)?\d+|
+        \b(?i:Aug|August)(\.)?(;)?(\s+)?\d+|
+        \b(?i:Sep|Sept|September)(\.)?(;)?(\s+)?\d+|
+        \b(?i:Oct|October)(\.)?(;)?(\s+)?\d+|
+        \b(?i:Nov|November)(\.)?(;)?(\s+)?\d+|
+        \b(?i:Dec|December)(\.)?(;)?(\s+)?\d+|
+        \d+\s+(?i:Jan|January)(\.)?\b|
+        \d+\s+(?i:Feb|February)(\.)?\b|
+        \d+\s+(?i:Mar|March)(\.)?\b|
+        \d+\s+(?i:Apr|Apri|April)(\.)?\b|
+        \d+\s+(?i:May)\b|
+        \d+\s+(?i:Jun|June)(\.)?\b|
+        \d+\s+(?i:Jul|July)(\.)?\b|
+        \d+\s+(?i:Aug|August)(\.)?\b|
+        \d+\s+(?i:Sep|September)(t)?(\.)?\b|
+        \d+\s+(?i:Oct|October)(\.)?\b|
+        \d+\s+(?i:Nov|November)(\.)?\b|
+        \d+\s+(?i:Dec|December)(\.)?\b|
+        \b,\s+\d+|
         [":\d+]
       }x
 

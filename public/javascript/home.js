@@ -57,7 +57,14 @@ var Collector = (function($, window) {
           }
         }
         ).on('typeahead:select', function(obj, datum) {
-          window.location.href = '/' + datum.type + '/' + datum.id;
+          var id = datum.id;
+          if(datum.type == 'taxon') {
+            id = datum.name;
+          }
+          if(datum.type == 'agent' && datum.orcid) {
+            id = datum.orcid;
+          }
+          window.location.href = '/' + datum.type + '/' + id;
         }).focus().select();
     },
     getParameterByName: function(name) {

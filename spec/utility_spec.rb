@@ -368,8 +368,14 @@ describe "Utility functions to handle names of people" do
     expect(@utility.explode_names(input)).to match_array(expected)
   end
 
-  it "should explode names with a year and month at the end of a string" do
+  it "should explode names with a year and month (normal case) at the end of a string" do
     input = "Paul Kroeger 2006 May"
+    expected = ["Paul Kroeger"]
+    expect(@utility.explode_names(input)).to match_array(expected)
+  end
+
+  it "should explode names with a year and month (lower case) at the end of a string" do
+    input = "Paul Kroeger 2006 may"
     expected = ["Paul Kroeger"]
     expect(@utility.explode_names(input)).to match_array(expected)
   end

@@ -54,30 +54,33 @@
             - if r[:_type] == 'taxon'
               %a{href: "/taxon/#{r[:fields][:id][0]}"}= r[:fields][:family][0]
             - elsif r[:_type] == 'agent'
-              %a{href: "/agent/#{r[:fields][:id][0]}"}= [r[:fields][:family][0].presence,r[:fields][:given][0].presence].compact.join(", ")
+              - id = r[:fields][:id][0]
+              - if r[:fields].has_key? :orcid
+                - id = r[:fields][:orcid][0].presence
+              %a{href: "/agent/#{id}"}= [r[:fields][:family][0].presence,r[:fields][:given][0].presence].compact.join(", ")
 
       = paginate @results
 
 %h2 Examples 
 %ul.agent-examples
   %li
-    %a{ href: "/agent/3385" } T.A. Wheeler
+    %a{ href: "/agent/0000-0002-7260-0350" } T.A. Wheeler
   %li
-    %a{ href: "/agent/34070" } Schwarzfeld
+    %a{ href: "/agent/0000-0002-5177-2815" } Schwarzfeld
   %li
-    %a{ href: "/agent/16212" } Crystal Ernst
+    %a{ href: "/agent/0000-0002-0257-6252" } Crystal Ernst
   %li
-    %a{ href: "/agent/9869" } G.E. Ball
+    %a{ href: "/agent/9609" } G.E. Ball
   %li
-    %a{ href: "/agent/32659" } E.O. Wilson
+    %a{ href: "/agent/32022" } E.O. Wilson
   %li
-    %a{ href: "/agent/1387" } Stuart G. Hay
+    %a{ href: "/agent/0000-0002-5684-9420" } Stuart G. Hay
     
 %ul.taxon-examples
   %li
-    %a{ href: "/taxon/732" } Carabidae
+    %a{ href: "/taxon/Carabidae" } Carabidae
   %li
-    %a{ href: "/taxon/216" } Cannabaceae
+    %a{ href: "/taxon/Cannabaceae" } Cannabaceae
 
 %ul.location-examples
   %li

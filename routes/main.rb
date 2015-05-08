@@ -21,12 +21,12 @@ module Sinatra
           end
 
           app.get '/agent/:id.json' do
-            agent_profile(params[:id].to_i)
+            agent_profile(params[:id])
             @result.to_json
           end
 
           app.get '/agent/:id' do
-            agent_profile(params[:id].to_i)
+            agent_profile(params[:id])
             haml :agent
           end
 
@@ -51,7 +51,7 @@ module Sinatra
           end
 
           app.get '/taxon/:id' do
-            taxon_profile(params[:id].to_i)
+            taxon_profile(params[:id])
             haml :taxon
           end
 

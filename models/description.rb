@@ -18,7 +18,7 @@ class Description < ActiveRecord::Base
         Description.transaction do
           description = Description.find_or_create_by(scientificName: normalized_scientific_name, year: authors_year[:year])
           authors_year[:authors].uniq.each do |d|
-            name = Namae.parse d
+            name = Namae.parse Collector::Utility.explode_names(d)[0]
             cleaned_name = Collector::Utility.clean_namae(name)
             if !cleaned_name.family.nil?
               agent = Agent.find_or_create_by(family: cleaned_name.family.to_s, given: cleaned_name.given.to_s)
