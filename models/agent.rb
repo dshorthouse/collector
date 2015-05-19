@@ -14,6 +14,9 @@ class Agent < ActiveRecord::Base
   has_many :works, :through => :agent_works
   has_many :agent_works
 
+  has_many :aliases, class_name: "Agent", foreign_key: "canonical_id"
+  belongs_to :canonical, class_name: "Agent"
+
   def self.populate_orcids
     search_orcid
   end
@@ -23,7 +26,7 @@ class Agent < ActiveRecord::Base
   end
 
   def self.search_orcid
-    Agent.where("orcid_matches IS NULL").find_each do |agent|
+    Agent.where("id = canonical_id AND orcid_matches IS NULL").find_each do |agent|
       agent.orcid_matches = 0
       if !agent.family.empty? && !agent.given.empty?
         max_year = [agent.determinations_year_range[1], agent.recordings_year_range[1]].compact.max
@@ -82,14 +85,8 @@ class Agent < ActiveRecord::Base
         identifiers.each do |identifier|
             if identifier[:"work-external-identifier-type"] == "DOI"
               doi = identifier[:"work-external-identifier-id"][:value].gsub(doi_sub,'')
-              work_id = Agent.connection.select_value("SELECT id FROM works WHERE doi = %s" % Work.connection.quote(doi))
-              unless work_id
-                work = Work.new
-                work.doi = identifier[:"work-external-identifier-id"][:value].gsub(doi_sub,'')
-                work.save!
-                work_id = work.id
-              end
-              Agent.connection.execute("INSERT INTO agent_works (agent_id, work_id) VALUES (%s, %s)" % [agent.id, work_id])
+              work = Work.find_or_create_by(doi: doi)
+              AgentWork.create(agent_id: agent.id, work_id: work.id)
               break
             end
         end
@@ -104,7 +101,7 @@ class Agent < ActiveRecord::Base
 
   def determinations_year_range
     years = determinations.pluck(:dateIdentified)
-                          .map{ |d| Collector::Utility.valid_year(d) }
+                          .map{ |d| Collector::AgentUtility.valid_year(d) }
                           .compact
                           .minmax rescue [nil,nil]
     years[0] = years[1] if years[0].nil?
@@ -114,7 +111,7 @@ class Agent < ActiveRecord::Base
 
   def recordings_year_range
     years = recordings.pluck(:eventDate)
-                      .map{ |d| Collector::Utility.valid_year(d) }
+                      .map{ |d| Collector::AgentUtility.valid_year(d) }
                       .compact
                       .minmax rescue [nil,nil]
     years[0] = years[1] if years[0].nil?
@@ -158,6 +155,14 @@ class Agent < ActiveRecord::Base
       headers: { accept: 'application/orcid+json' }
     )
     self.class.parse_profile_orcid_response(self, response)
+  end
+
+  def aka
+    (Agent.where(canonical_id: id).where.not(id: id) | Agent.where(canonical_id: canonical_id).where.not(id: id)).map{|a| {id: a.id, family: a.family, given: a.given}}
+  end
+
+  def aka_ids
+    (Agent.where(canonical_id: id).where.not(id: id) | Agent.where(canonical_id: canonical_id).where.not(id: id)).map{|a| a.id }
   end
 
 end

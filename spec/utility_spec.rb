@@ -3,7 +3,7 @@ require_relative "./spec_helper"
 
 describe "Utility functions to handle names of people" do
   before(:all) do
-    @utility = Collector::Utility
+    @utility = Collector::AgentUtility
   end
 
   it "should remove 'et al'" do
@@ -365,6 +365,18 @@ describe "Utility functions to handle names of people" do
   it "should explode names with possibly conflicting months in the string" do
     input = "Michael May May 2013"
     expected = ["Michael May"]
+    expect(@utility.explode_names(input)).to match_array(expected)
+  end
+
+  it "should explode names with months (in French) in the string" do
+    input = "Jacques, Avril décembre 2013"
+    expected = ["Jacques, Avril"]
+    expect(@utility.explode_names(input)).to match_array(expected)
+  end
+
+  it "should explode names with possibly conflicting months (in French) in the string" do
+    input = "Jacques, Avril avril 2013"
+    expected = ["Jacques, Avril"]
     expect(@utility.explode_names(input)).to match_array(expected)
   end
 

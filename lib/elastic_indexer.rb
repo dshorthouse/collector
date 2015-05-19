@@ -100,6 +100,14 @@ module Collector
               id: { type: 'integer', index: 'not_analyzed' },
               family: { type: 'string', search_analyzer: :family_search, index_analyzer: :family_index, omit_norms: true },
               given: { type: 'string', search_analyzer: :given_search, index_analyzer: :given_index, omit_norms: true },
+              aka: {
+                type: 'nested',
+                properties: {
+                  id: { type: 'integer', index: 'not_analyzed' },
+                  family: { type: 'string', index: 'not_analyzed' },
+                  given: { type: 'string', index: 'not_analyzed' }
+                }
+              },
               orcid: { type: 'string', index: 'not_analyzed' },
               email: { type: 'string', index: 'not_analyzed' },
               position: { type: 'string', index: 'not_analyzed' },
@@ -174,6 +182,7 @@ module Collector
                           id: a.id,
                           family: a.family,
                           given: a.given,
+                          aka: a.aka,
                           orcid: a.orcid_identifier,
                           email: a.email,
                           position: a.position,
@@ -207,9 +216,9 @@ module Collector
                 id: o.id,
                 coordinates: o.coordinates,
                 identifiedBy: agents[:determiners],
-                dateIdentified: Utility.valid_year(o.dateIdentified).to_s,
+                dateIdentified: AgentUtility.valid_year(o.dateIdentified).to_s,
                 recordedBy: agents[:recorders],
-                eventDate: Utility.valid_year(o.eventDate).to_s,
+                eventDate: AgentUtility.valid_year(o.eventDate).to_s,
               }
             }
           }
@@ -254,6 +263,7 @@ module Collector
                 id: a.id,
                 family: a.family,
                 given: a.given,
+                aka: a.aka,
                 orcid: orcid,
                 email: a.email,
                 position: a.position,

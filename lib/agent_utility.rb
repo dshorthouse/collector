@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 module Collector
-  module Utility
+  module AgentUtility
 
     def self.clean_namae(parsed_namae)
       family = parsed_namae[0].family rescue nil
@@ -48,30 +48,30 @@ module Collector
           Nov(\.)?(\s+)?|
           Dec(\.)?(\s+)?
           )/\d+|
-        \b(?i:Jan|January)(\.)?(;)?(\s+)?\d+|
-        \b(?i:Feb|February)(\.)?(;)?(\s+)?\d+|
-        \b(?i:Mar|March)(\.)?(;)?(\s+)?\d+|
-        \b(?i:Apr|Apri|April)(\.)?(;)?(\s+)?\d+|
-        \b(?i:May)(;)?(\s+)?\d+|
-        \b(?i:Jun|June)(\.)?(;)?(\s+)?\d+|
-        \b(?i:Jul|July)(\.)?(;)?(\s+)?\d+|
-        \b(?i:Aug|August)(\.)?(;)?(\s+)?\d+|
-        \b(?i:Sep|Sept|September)(\.)?(;)?(\s+)?\d+|
-        \b(?i:Oct|October)(\.)?(;)?(\s+)?\d+|
-        \b(?i:Nov|November)(\.)?(;)?(\s+)?\d+|
-        \b(?i:Dec|December)(\.)?(;)?(\s+)?\d+|
-        \d+\s+(?i:Jan|January)(\.)?\b|
-        \d+\s+(?i:Feb|February)(\.)?\b|
-        \d+\s+(?i:Mar|March)(\.)?\b|
-        \d+\s+(?i:Apr|Apri|April)(\.)?\b|
-        \d+\s+(?i:May)\b|
-        \d+\s+(?i:Jun|June)(\.)?\b|
-        \d+\s+(?i:Jul|July)(\.)?\b|
-        \d+\s+(?i:Aug|August)(\.)?\b|
-        \d+\s+(?i:Sep|September)(t)?(\.)?\b|
-        \d+\s+(?i:Oct|October)(\.)?\b|
-        \d+\s+(?i:Nov|November)(\.)?\b|
-        \d+\s+(?i:Dec|December)(\.)?\b|
+        \b(?i:Jan|Jan(uary|vier))(\.)?(;)?(\s+)?\d+|
+        \b(?i:Feb|February|f(é|e)vrier)(\.)?(;)?(\s+)?\d+|
+        \b(?i:Mar|Mar(ch|s))(\.)?(;)?(\s+)?\d+|
+        \b(?i:Apr|Apri|April|avril)(\.)?(;)?(\s+)?\d+|
+        \b(?i:Ma(y|i))(;)?(\s+)?\d+|
+        \b(?i:Jun|June|juin)(\.)?(;)?(\s+)?\d+|
+        \b(?i:Jul|July|juillet)(\.)?(;)?(\s+)?\d+|
+        \b(?i:Aug|August|ao(û|u)t)(\.)?(;)?(\s+)?\d+|
+        \b(?i:Sep|Sept|Septemb(er|re))(\.)?(;)?(\s+)?\d+|
+        \b(?i:Oct|Octob(er|re))(\.)?(;)?(\s+)?\d+|
+        \b(?i:Nov|Novemb(er|re))(\.)?(;)?(\s+)?\d+|
+        \b(?i:Dec|D(é|e)cemb(er|re))(\.)?(;)?(\s+)?\d+|
+        \d+\s+(?i:Jan|Jan(uary|vier))(\.)?\b|
+        \d+\s+(?i:Feb|February|f(é|e)vrier)(\.)?\b|
+        \d+\s+(?i:Mar|March|mars)(\.)?\b|
+        \d+\s+(?i:Apr|Apri|April|avril)(\.)?\b|
+        \d+\s+(?i:Ma(y|i))\b|
+        \d+\s+(?i:Jun|June|juin)(\.)?\b|
+        \d+\s+(?i:Jul|July|juillet)(\.)?\b|
+        \d+\s+(?i:Aug|August|ao(û|u)t)(\.)?\b|
+        \d+\s+(?i:Sep|Septemb(er|re))(t)?(\.)?\b|
+        \d+\s+(?i:Oct|Octob(er|re))(\.)?\b|
+        \d+\s+(?i:Nov|Novemb(er|re))(\.)?\b|
+        \d+\s+(?i:Dec|D(e|é)cemb(er|re))(\.)?\b|
         \b,\s+\d+|
         [":\d+]
       }x
@@ -103,7 +103,7 @@ module Collector
         \b(?i:reidentified(\s+by)?\s+)\b|
         \b(?i:stet!?)\b|
         \b(?i:then(\s+by)?\s+)\b|
-        \b(?i:ver\.?(\s+by)?\s+|verf\.?(\s+by)?\s+|verified?(\s+by)?\s+)\b
+        \b(?i:verf?\.?(\s+by)?\s+|verified?(\s+by)?\s+)\b
       }x
 
       name.gsub(global_strip_out, '')

@@ -29,10 +29,10 @@ class Occurrence < ActiveRecord::Base
     Occurrence.where("identifiedBy IS NOT NULL").find_each do |o|
       count += 1
 
-      determiners = Collector::Utility.explode_names(o.identifiedBy)
+      determiners = Collector::AgentUtility.explode_names(o.identifiedBy)
       determiners.each do |d|
         name = Namae.parse d
-        cleaned_name = Collector::Utility.clean_namae(name)
+        cleaned_name = Collector::AgentUtility.clean_namae(name)
         save_agent(cleaned_name, o.id, "determiner")
       end
 
@@ -46,10 +46,10 @@ class Occurrence < ActiveRecord::Base
     Occurrence.where("recordedBy IS NOT NULL").find_each do |o|
       count += 1
 
-      recorders = Collector::Utility.explode_names(o.recordedBy)
+      recorders = Collector::AgentUtility.explode_names(o.recordedBy)
       recorders.each do |r|
         name = Namae.parse r
-        cleaned_name = Collector::Utility.clean_namae(name)
+        cleaned_name = Collector::AgentUtility.clean_namae(name)
         save_agent(cleaned_name, o.id, "recorder")
       end
 
@@ -80,16 +80,15 @@ class Occurrence < ActiveRecord::Base
     given = name.given.to_s
 
     Occurrence.transaction do
-      agent_id = Occurrence.connection.select_value("SELECT id FROM agents WHERE family = %s and given = %s" % [Occurrence.connection.quote(family), Occurrence.connection.quote(given)])
-      unless agent_id
-        Occurrence.connection.execute("INSERT INTO agents (family, given) VALUES (%s, %s)" % [Occurrence.connection.quote(family), Occurrence.connection.quote(given)])
-        agent_id = Occurrence.connection.select_values("SELECT last_insert_id()")[0]
+      agent = Agent.find_or_create_by(family: family, given: given)
+      if agent.canonical_id.nil?
+        agent.update(canonical_id: agent.id)
       end
       if type == "determiner"
-        Occurrence.connection.execute("INSERT INTO occurrence_determiners (occurrence_id, agent_id) VALUES (%s, %s)" % [id, agent_id])
+        OccurrenceDeterminer.create(occurrence_id: id, agent_id: agent.id)
       end
       if type == "recorder"
-        Occurrence.connection.execute("INSERT INTO occurrence_recorders (occurrence_id, agent_id) VALUES (%s, %s)" % [id, agent_id])
+        OccurrenceRecorder.create(occurrence_id: id, agent_id: agent.id)
       end
     end
   end
@@ -101,12 +100,8 @@ class Occurrence < ActiveRecord::Base
     family_id = nil
 
     Occurrence.transaction do
-      family_id = Occurrence.connection.select_value("SELECT id FROM taxa WHERE family = %s" % [Occurrence.connection.quote(family)])
-      unless family_id
-        Occurrence.connection.execute("INSERT INTO taxa (family) VALUES (%s)" % [Occurrence.connection.quote(family)])
-        family_id = Occurrence.connection.select_values("SELECT last_insert_id()")[0]
-      end
-      Occurrence.connection.execute("INSERT INTO taxon_determiners (taxon_id, agent_id) VALUES (%s, %s)" % [family_id, agent_id])
+      taxon = Taxon.find_or_create_by(family: family)
+      TaxonDeterminer.create(family_id: taxon.id, agent_id: agent_id)
     end
   end
 

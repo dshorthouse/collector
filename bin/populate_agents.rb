@@ -14,4 +14,6 @@ end
 puts 'Starting to populate agents'
 Occurrence.populate_agents
 Description.populate_agents
+graphs = Collector::Disambiguator.new
+graphs.reconcile_agents
 puts 'Done populating agents'

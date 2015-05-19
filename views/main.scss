@@ -56,7 +56,7 @@ p.byline{
 
 header {
   border-bottom:2px solid #CCC;
-  margin-bottom:1em;
+  margin-bottom:2em;
   width:600px;
 }
 
@@ -235,8 +235,8 @@ label input {
   width: 600px; height: 250px;
 }
 
-ul.collectors, ul.determinations, ul.descriptions, ul.agent-examples, ul.taxon-examples, ul.location-examples { list-style: none outside none; }
-ul.determinations li, ul.collectors li, ul.descriptions li, ul.agent-examples li, ul.taxon-examples li, ul.location-examples li {
+ul.collectors, ul.determinations, ul.descriptions, ul.agent-examples, ul.taxon-examples, ul.location-examples, ul.aka { list-style: none outside none; }
+ul.determinations li, ul.collectors li, ul.descriptions li, ul.agent-examples li, ul.taxon-examples li, ul.location-examples li, ul.aka li {
   border:1px solid #E0E0E0;
   border-radius:3px;
   display:inline;
@@ -245,8 +245,8 @@ ul.determinations li, ul.collectors li, ul.descriptions li, ul.agent-examples li
   line-height:2.25em;
 }
 
-ul.determinations li:hover, ul.collectors li:hover, ul.agent-examples li:hover, ul.taxon-examples li:hover, ul.location-examples li:hover { border-radius:3px; border:1px solid #246D80; }
-ul.collectors li:hover a, ul.determinations li:hover a, ul.agent-examples li:hover a, ul.taxon-examples li:hover a, ul.location-examples li:hover a { color:#FFF; }
+ul.determinations li:hover, ul.collectors li:hover, ul.agent-examples li:hover, ul.taxon-examples li:hover, ul.location-examples li:hover, ul.aka li:hover { border-radius:3px; border:1px solid #246D80; }
+ul.collectors li:hover a, ul.determinations li:hover a, ul.agent-examples li:hover a, ul.taxon-examples li:hover a, ul.location-examples li:hover a, ul.aka li:hover a { color:#FFF; }
 
 ul.determinations li, ul.taxon-examples li { background-color:#F0FFF0; }
 ul.determinations li:hover, ul.taxon-examples li:hover { background-color:#3CB371; }
@@ -254,6 +254,8 @@ ul.collectors li, ul.agent-examples li { background-color:#F0F0F0; }
 ul.collectors li:hover, ul.agent-examples li:hover { background-color:#246D80; }
 ul.location-examples li { background-color:#FFE0FF; }
 ul.location-examples li:hover { background-color:#DD6D80; }
+ul.aka li { background-color:#FFE0FF; }
+ul.aka li:hover { background-color:#DD6D80; }
 
 #recordings-chart, #recordings-map {
   float:left;

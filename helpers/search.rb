@@ -42,7 +42,7 @@ module Sinatra
             }
           else
             parsed = Namae.parse searched_term
-            name = ::Collector::Utility.clean_namae(parsed)
+            name = ::Collector::AgentUtility.clean_namae(parsed)
             family = !name.family.nil? ? name.family : ""
             given = !name.given.nil? ? name.given : ""
 

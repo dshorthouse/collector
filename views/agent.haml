@@ -39,6 +39,15 @@
     %h2 Collecting Activity
     #recordings
 
+- if @result[:aka].size > 0
+  #aka-wrapper
+    %h2 Other Recognized Names
+    %ul.aka
+      - @result[:aka].each do |a|
+        %li
+          - name = [a[:given].presence, a[:family].presence]. join(" ")
+          %a{href: "/agent/#{a[:id]}" }= name
+
 #colleagues-wrapper
   %h2 Fellow Collectors
   - if @result[:recordings_with].size > 0

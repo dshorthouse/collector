@@ -19,6 +19,7 @@ gem 'omniauth-orcid'
 gem 'thin'
 gem 'oauth2'
 gem 'require_all'
+gem 'rgl'
 
 group :production do
 end

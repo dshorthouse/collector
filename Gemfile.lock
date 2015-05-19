@@ -14,6 +14,7 @@ GEM
       minitest (~> 5.1)
       thread_safe (~> 0.3, >= 0.3.4)
       tzinfo (~> 1.1)
+    algorithms (0.5.0)
     arel (6.0.0)
     backports (3.6.4)
     biodiversity (3.1.8)
@@ -91,6 +92,9 @@ GEM
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 3.0)
       netrc (~> 0.7)
+    rgl (0.5.0)
+      algorithms (~> 0.5.0)
+      stream (~> 0.5.0)
     rspec (3.2.0)
       rspec-core (~> 3.2.0)
       rspec-expectations (~> 3.2.0)
@@ -120,8 +124,7 @@ GEM
       rack-test
       sinatra (~> 1.4.0)
       tilt (~> 1.3)
-    sinatra-static-assets (1.0.4)
-      sinatra (>= 1.1.0)
+    stream (0.5)
     thin (1.6.3)
       daemons (~> 1.0, >= 1.0.9)
       eventmachine (~> 1.0)
@@ -443,11 +446,11 @@ DEPENDENCIES
   rake
   require_all
   rest-client
+  rgl
   rspec
   sanitize
   sass
   sinatra
   sinatra-contrib
-  sinatra-static-assets
   thin
   will_paginate
