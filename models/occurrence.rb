@@ -101,7 +101,7 @@ class Occurrence < ActiveRecord::Base
 
     Occurrence.transaction do
       taxon = Taxon.find_or_create_by(family: family)
-      TaxonDeterminer.create(family_id: taxon.id, agent_id: agent_id)
+      TaxonDeterminer.create(taxon_id: taxon.id, agent_id: agent_id)
     end
   end
 

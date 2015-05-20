@@ -2,7 +2,7 @@
 # encoding: utf-8
 require_relative '../environment.rb'
 
-if ARGV[0] == '--flush'
+if ARGV[0] == '--reset'
   puts "Truncating data"
   #Agent.connection.execute("TRUNCATE TABLE works")
   Agent.connection.execute("TRUNCATE TABLE agent_works")

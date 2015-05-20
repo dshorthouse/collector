@@ -34,7 +34,8 @@ module Collector
         end
         add_edges(agents)
         deduce_canonicals
-        @graph.write_to_graphic_file('png', 'graphs/' + @family) if @graph.length > 2
+        remove_isolates
+        #@graph.write_to_graphic_file('png', 'graphs/' + @family) if @graph.length > 2
       end
     end
 
@@ -49,16 +50,19 @@ module Collector
     end
 
     def deduce_canonicals
-      #remove isolates
-      @graph.isolates.each do |i|
-        @graph.remove_vertex i
-      end
       @graph.each_connected_component do |component|
-        fully_connected = fully_connected_subgraph?(component)
-        update_vertices(component) if fully_connected
-        if component.length == 3 && !fully_connected
-          unacceptable_edge_weight = component.combination(2).to_a.any? { |p| (@graph.weight(p.first, p.second).nil? ? 0.8 : @graph.weight(p.first, p.second)) < 0.8 }
-          update_vertices(component) unless unacceptable_edge_weight
+        edges = subgraph_edges(component)
+        max_edges = (component.length*(component.length-1))/2
+        update_vertices(component) if edges.length == max_edges
+
+        if component.length == 3 && edges.length != max_edges
+          edges.each do |k,v|
+            if v < 0.8
+              @graph.remove_edge(k[0],k[1])
+              edges.delete k
+            end
+          end
+          update_vertices(edges.each_key.first) if !edges.empty?
         end
         if component.length > 3
           #create cliques, set canonical_id
@@ -68,19 +72,30 @@ module Collector
       end
     end
 
-    def fully_connected_subgraph?(vertices)
-      @graph.edges.length == vertices.combination.length
+    def subgraph_edges(vertices)
+      edges = {}
+      vertices.combination(2).each do |pair|
+        if @graph.has_edge?(pair.first, pair.second)
+          edges[[pair.first, pair.second]] = @graph.weight(pair.first, pair.second)
+        end
+      end
+      edges
     end
 
     def update_vertices(vertices)
       sorted_vertices = vertices.sort_by { |g| g[:given].length }
       ids = sorted_vertices.map {|v| v[:id] }
-      agents = Agent.where(id: ids)
-      agents.update_all(canonical_id: sorted_vertices[sorted_vertices.length-1][:id])
-      puts sorted_vertices.map {|v| v[:given] }.join(" | ") + " => " + [sorted_vertices[sorted_vertices.length-1][:given],@family].join(" ")
-      sorted_vertices.each do |v|
-        @graph.remove_vertex v
+      canonical = ids.pop
+      Agent.transaction do
+        agents = Agent.where(id: ids)
+        agents.update_all(canonical_id: canonical)
       end
+      puts sorted_vertices.map {|v| v[:given] }.join(" | ") + " => " + [sorted_vertices.last[:given],@family].join(" ")
+      vertices.each { |v| @graph.remove_vertex v }
+    end
+
+    def remove_isolates
+      @graph.isolates.each { |v| @graph.remove_vertex v }
     end
 
     def name_similarity(agent1, agent2)
@@ -152,6 +167,17 @@ module Collector
       end
 
       return 0
+    end
+
+    def reassign_data
+      Agent.where("id <> canonical_id").find_each do |a|
+        puts "Reassigning data for #{a.given} #{a.family}"
+        Agent.connection.execute("UPDATE occurrence_determiners set agent_id = %d WHERE agent_id = %d" % [a.canonical_id, a.id])
+        Agent.connection.execute("UPDATE occurrence_recorders set agent_id = %d WHERE agent_id = %d" % [a.canonical_id, a.id])
+        Agent.connection.execute("UPDATE taxon_determiners set agent_id = %d WHERE agent_id = %d" % [a.canonical_id, a.id])
+        Agent.connection.execute("UPDATE agent_works set agent_id = %d WHERE agent_id = %d" % [a.canonical_id, a.id])
+        Agent.connection.execute("UPDATE agent_descriptions set agent_id = %d WHERE agent_id = %d" % [a.canonical_id, a.id])
+      end
     end
 
   end

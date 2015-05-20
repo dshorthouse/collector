@@ -2,7 +2,7 @@
 # encoding: utf-8
 require_relative '../environment.rb'
 
-if ARGV[0] == '--flush'
+if ARGV[0] == '--reset'
   puts "Flushing data"
   Work.connection.execute("UPDATE works SET citation = NULL, processed = NULL")
 end

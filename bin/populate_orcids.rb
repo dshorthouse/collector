@@ -2,7 +2,7 @@
 # encoding: utf-8
 require_relative '../environment.rb'
 
-if ARGV[0] == '--flush'
+if ARGV[0] == '--reset'
   puts "Flushing data"
   Agent.connection.execute("UPDATE agents set orcid_matches = NULL and orcid_identifier = NULL")
 end
