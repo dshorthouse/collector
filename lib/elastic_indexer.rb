@@ -98,6 +98,7 @@ module Collector
           agent: {
             properties: {
               id: { type: 'integer', index: 'not_analyzed' },
+              canonical_id: { type: 'integer', index: 'not_analyzed' },
               family: { type: 'string', search_analyzer: :family_search, index_analyzer: :family_index, omit_norms: true },
               given: { type: 'string', search_analyzer: :given_search, index_analyzer: :given_index, omit_norms: true },
               aka: {
@@ -180,6 +181,7 @@ module Collector
                         _id: a.id,
                         data: {
                           id: a.id,
+                          canonical_id: a.canonical_id,
                           family: a.family,
                           given: a.given,
                           aka: a.aka,
@@ -209,6 +211,8 @@ module Collector
         occurrences = []
         group.each do |o|
           agents = o.agents
+          date_identified = Collector::AgentUtility.valid_year(o.dateIdentified)
+          event_date = Collector::AgentUtility.valid_year(o.eventDate)
           occurrences << {
             index: {
               _id: o.id,
@@ -216,9 +220,9 @@ module Collector
                 id: o.id,
                 coordinates: o.coordinates,
                 identifiedBy: agents[:determiners],
-                dateIdentified: AgentUtility.valid_year(o.dateIdentified).to_s,
+                dateIdentified: !date_identified.nil? ? date_identified.to_s : nil,
                 recordedBy: agents[:recorders],
-                eventDate: AgentUtility.valid_year(o.eventDate).to_s,
+                eventDate: !event_date.nil? ? event_date.to_s : nil
               }
             }
           }
@@ -261,6 +265,7 @@ module Collector
 
       body = {
                 id: a.id,
+                canonical_id: a.canonical_id,
                 family: a.family,
                 given: a.given,
                 aka: a.aka,

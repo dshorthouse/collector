@@ -22,11 +22,17 @@ module Sinatra
 
           app.get '/agent/:id.json' do
             agent_profile(params[:id])
+            if @result[:id] != @result[:canonical_id]
+              redirect to('/agent/' + @result[:canonical_id].to_s + '.json')
+            end
             @result.to_json
           end
 
           app.get '/agent/:id' do
             agent_profile(params[:id])
+            if @result[:id] != @result[:canonical_id]
+              redirect to('/agent/' + @result[:canonical_id].to_s )
+            end
             haml :agent
           end
 

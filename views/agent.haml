@@ -44,9 +44,8 @@
     %h2 Other Recognized Names
     %ul.aka
       - @result[:aka].each do |a|
-        %li
-          - name = [a[:given].presence, a[:family].presence]. join(" ")
-          %a{href: "/agent/#{a[:id]}" }= name
+        - name = [a[:given].presence, a[:family].presence]. join(" ")
+        %li #{name}
 
 #colleagues-wrapper
   %h2 Fellow Collectors
