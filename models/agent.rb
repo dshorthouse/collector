@@ -149,6 +149,7 @@ class Agent < ActiveRecord::Base
   end
 
   def refresh_orcid_data
+    return if !orcid_identifier.present
     response = RestClient::Request.execute(
       method: :get,
       url: Sinatra::Application.settings.orcid_base_url + orcid_identifier + '/orcid-profile',

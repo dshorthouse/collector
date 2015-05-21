@@ -260,6 +260,7 @@ module Collector
       return if !a.present?
 
       a.orcid_identifier = orcid
+      a.save!
       a.refresh_orcid_data
       Work.populate_citations
 

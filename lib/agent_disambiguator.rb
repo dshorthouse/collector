@@ -13,11 +13,11 @@ module Collector
     end
 
     def reset
-      Agent.connection.execute("UPDATE agents set canonical_id = id")
+      Agent.update_all({ canonical_id: :id })
     end
 
     def disambiguate
-      duplicates = Agent.where('family not like "%.%"').group(:family).count.map{ |k,v| k if v > 1 }.compact
+      duplicates = Agent.where.("family NOT LIKE '%.%'").group(:family).count.map{ |k,v| k if v > 1 }.compact
       duplicates.each do |d|
         @graph = WeightedGraph.new
         @family = d
@@ -172,11 +172,11 @@ module Collector
     def reassign_data
       Agent.where("id <> canonical_id").find_each do |a|
         puts "Reassigning data for #{a.given} #{a.family}"
-        Agent.connection.execute("UPDATE occurrence_determiners set agent_id = %d WHERE agent_id = %d" % [a.canonical_id, a.id])
-        Agent.connection.execute("UPDATE occurrence_recorders set agent_id = %d WHERE agent_id = %d" % [a.canonical_id, a.id])
-        Agent.connection.execute("UPDATE taxon_determiners set agent_id = %d WHERE agent_id = %d" % [a.canonical_id, a.id])
-        Agent.connection.execute("UPDATE agent_works set agent_id = %d WHERE agent_id = %d" % [a.canonical_id, a.id])
-        Agent.connection.execute("UPDATE agent_descriptions set agent_id = %d WHERE agent_id = %d" % [a.canonical_id, a.id])
+        OccurrenceDeterminer.update_all({ agent_id: a.canonical_id }, { agent_id: a.id })
+        OccurrenceRecorder.update_all({ agent_id: a.canonical_id }, { agent_id: a.id })
+        TaxonDeterminer.update_all({ agent_id: a.canonical_id }, { agent_id: a.id })
+        AgentWork.update_all({ agent_id: a.canonical_id }, { id: a.id })
+        AgentDescription.update_all({ agent_id: a.canonical_id }, { id: a.id })
       end
     end
 
