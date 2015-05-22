@@ -1,0 +1,41 @@
+graph Collector__WeightedGraph {
+    "{:id=>16488, :given=>\"J.M.\"}" [
+        fontsize = 8,
+        label = "{:id=>16488, :given=>\"J.M.\"}"
+    ]
+
+    "{:id=>36879, :given=>\"Jane M.\"}" [
+        fontsize = 8,
+        label = "{:id=>36879, :given=>\"Jane M.\"}"
+    ]
+
+    "{:id=>37746, :given=>\"Jane\"}" [
+        fontsize = 8,
+        label = "{:id=>37746, :given=>\"Jane\"}"
+    ]
+
+    "{:id=>42437, :given=>\"J.\"}" [
+        fontsize = 8,
+        label = "{:id=>42437, :given=>\"J.\"}"
+    ]
+
+    "{:id=>16488, :given=>\"J.M.\"}" -- "{:id=>36879, :given=>\"Jane M.\"}" [
+        fontsize = 8,
+        label = 0.9
+    ]
+
+    "{:id=>16488, :given=>\"J.M.\"}" -- "{:id=>42437, :given=>\"J.\"}" [
+        fontsize = 8,
+        label = 0.6
+    ]
+
+    "{:id=>36879, :given=>\"Jane M.\"}" -- "{:id=>37746, :given=>\"Jane\"}" [
+        fontsize = 8,
+        label = 0.9
+    ]
+
+    "{:id=>36879, :given=>\"Jane M.\"}" -- "{:id=>42437, :given=>\"J.\"}" [
+        fontsize = 8,
+        label = 0.6
+    ]
+}

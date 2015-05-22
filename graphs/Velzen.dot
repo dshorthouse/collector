@@ -1,0 +1,66 @@
+graph Collector__WeightedGraph {
+    "{:id=>13930, :given=>\"Joop\"}" [
+        fontsize = 8,
+        label = "{:id=>13930, :given=>\"Joop\"}"
+    ]
+
+    "{:id=>13931, :given=>\"J.\"}" [
+        fontsize = 8,
+        label = "{:id=>13931, :given=>\"J.\"}"
+    ]
+
+    "{:id=>13943, :given=>\"J.Van\"}" [
+        fontsize = 8,
+        label = "{:id=>13943, :given=>\"J.Van\"}"
+    ]
+
+    "{:id=>14335, :given=>\"Joop Van\"}" [
+        fontsize = 8,
+        label = "{:id=>14335, :given=>\"Joop Van\"}"
+    ]
+
+    "{:id=>26130, :given=>\"J.P.\"}" [
+        fontsize = 8,
+        label = "{:id=>26130, :given=>\"J.P.\"}"
+    ]
+
+    "{:id=>38093, :given=>\"J.P.Van\"}" [
+        fontsize = 8,
+        label = "{:id=>38093, :given=>\"J.P.Van\"}"
+    ]
+
+    "{:id=>13930, :given=>\"Joop\"}" -- "{:id=>14335, :given=>\"Joop Van\"}" [
+        fontsize = 8,
+        label = 0.9
+    ]
+
+    "{:id=>13931, :given=>\"J.\"}" -- "{:id=>13943, :given=>\"J.Van\"}" [
+        fontsize = 8,
+        label = 0.6
+    ]
+
+    "{:id=>13931, :given=>\"J.\"}" -- "{:id=>14335, :given=>\"Joop Van\"}" [
+        fontsize = 8,
+        label = 0.6
+    ]
+
+    "{:id=>13931, :given=>\"J.\"}" -- "{:id=>26130, :given=>\"J.P.\"}" [
+        fontsize = 8,
+        label = 0.6
+    ]
+
+    "{:id=>13931, :given=>\"J.\"}" -- "{:id=>38093, :given=>\"J.P.Van\"}" [
+        fontsize = 8,
+        label = 0.6
+    ]
+
+    "{:id=>13943, :given=>\"J.Van\"}" -- "{:id=>14335, :given=>\"Joop Van\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+
+    "{:id=>26130, :given=>\"J.P.\"}" -- "{:id=>38093, :given=>\"J.P.Van\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+}

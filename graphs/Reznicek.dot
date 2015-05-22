@@ -1,0 +1,101 @@
+graph Collector__WeightedGraph {
+    "{:id=>191, :given=>\"A.A.\"}" [
+        fontsize = 8,
+        label = "{:id=>191, :given=>\"A.A.\"}"
+    ]
+
+    "{:id=>9302, :given=>\"Anton\"}" [
+        fontsize = 8,
+        label = "{:id=>9302, :given=>\"Anton\"}"
+    ]
+
+    "{:id=>10180, :given=>\"Anton A.\"}" [
+        fontsize = 8,
+        label = "{:id=>10180, :given=>\"Anton A.\"}"
+    ]
+
+    "{:id=>15404, :given=>\"A.\"}" [
+        fontsize = 8,
+        label = "{:id=>15404, :given=>\"A.\"}"
+    ]
+
+    "{:id=>15431, :given=>\"A.A.M.I.C.H.\"}" [
+        fontsize = 8,
+        label = "{:id=>15431, :given=>\"A.A.M.I.C.H.\"}"
+    ]
+
+    "{:id=>18969, :given=>\"Anton Albert\"}" [
+        fontsize = 8,
+        label = "{:id=>18969, :given=>\"Anton Albert\"}"
+    ]
+
+    "{:id=>191, :given=>\"A.A.\"}" -- "{:id=>9302, :given=>\"Anton\"}" [
+        fontsize = 8,
+        label = 0.55
+    ]
+
+    "{:id=>191, :given=>\"A.A.\"}" -- "{:id=>10180, :given=>\"Anton A.\"}" [
+        fontsize = 8,
+        label = 0.95
+    ]
+
+    "{:id=>191, :given=>\"A.A.\"}" -- "{:id=>15404, :given=>\"A.\"}" [
+        fontsize = 8,
+        label = 0.65
+    ]
+
+    "{:id=>191, :given=>\"A.A.\"}" -- "{:id=>15431, :given=>\"A.A.M.I.C.H.\"}" [
+        fontsize = 8,
+        label = 0.75
+    ]
+
+    "{:id=>191, :given=>\"A.A.\"}" -- "{:id=>18969, :given=>\"Anton Albert\"}" [
+        fontsize = 8,
+        label = 0.9
+    ]
+
+    "{:id=>9302, :given=>\"Anton\"}" -- "{:id=>10180, :given=>\"Anton A.\"}" [
+        fontsize = 8,
+        label = 0.9
+    ]
+
+    "{:id=>9302, :given=>\"Anton\"}" -- "{:id=>15404, :given=>\"A.\"}" [
+        fontsize = 8,
+        label = 0.55
+    ]
+
+    "{:id=>9302, :given=>\"Anton\"}" -- "{:id=>15431, :given=>\"A.A.M.I.C.H.\"}" [
+        fontsize = 8,
+        label = 0.55
+    ]
+
+    "{:id=>9302, :given=>\"Anton\"}" -- "{:id=>18969, :given=>\"Anton Albert\"}" [
+        fontsize = 8,
+        label = 0.9
+    ]
+
+    "{:id=>10180, :given=>\"Anton A.\"}" -- "{:id=>15404, :given=>\"A.\"}" [
+        fontsize = 8,
+        label = 0.65
+    ]
+
+    "{:id=>10180, :given=>\"Anton A.\"}" -- "{:id=>15431, :given=>\"A.A.M.I.C.H.\"}" [
+        fontsize = 8,
+        label = 0.75
+    ]
+
+    "{:id=>10180, :given=>\"Anton A.\"}" -- "{:id=>18969, :given=>\"Anton Albert\"}" [
+        fontsize = 8,
+        label = 0.9
+    ]
+
+    "{:id=>15404, :given=>\"A.\"}" -- "{:id=>15431, :given=>\"A.A.M.I.C.H.\"}" [
+        fontsize = 8,
+        label = 0.55
+    ]
+
+    "{:id=>15431, :given=>\"A.A.M.I.C.H.\"}" -- "{:id=>18969, :given=>\"Anton Albert\"}" [
+        fontsize = 8,
+        label = 0.7
+    ]
+}

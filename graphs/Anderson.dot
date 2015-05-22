@@ -1,0 +1,186 @@
+graph Collector__WeightedGraph {
+    "{:id=>336, :given=>\"J.\"}" [
+        fontsize = 8,
+        label = "{:id=>336, :given=>\"J.\"}"
+    ]
+
+    "{:id=>3759, :given=>\"J.R.\"}" [
+        fontsize = 8,
+        label = "{:id=>3759, :given=>\"J.R.\"}"
+    ]
+
+    "{:id=>3983, :given=>\"A.\"}" [
+        fontsize = 8,
+        label = "{:id=>3983, :given=>\"A.\"}"
+    ]
+
+    "{:id=>5467, :given=>\"R.A.\"}" [
+        fontsize = 8,
+        label = "{:id=>5467, :given=>\"R.A.\"}"
+    ]
+
+    "{:id=>6684, :given=>\"Jas R.\"}" [
+        fontsize = 8,
+        label = "{:id=>6684, :given=>\"Jas R.\"}"
+    ]
+
+    "{:id=>9774, :given=>\"R.S.\"}" [
+        fontsize = 8,
+        label = "{:id=>9774, :given=>\"R.S.\"}"
+    ]
+
+    "{:id=>13699, :given=>\"Robert\"}" [
+        fontsize = 8,
+        label = "{:id=>13699, :given=>\"Robert\"}"
+    ]
+
+    "{:id=>13857, :given=>\"Lewis E.\"}" [
+        fontsize = 8,
+        label = "{:id=>13857, :given=>\"Lewis E.\"}"
+    ]
+
+    "{:id=>13880, :given=>\"L.E.\"}" [
+        fontsize = 8,
+        label = "{:id=>13880, :given=>\"L.E.\"}"
+    ]
+
+    "{:id=>13909, :given=>\"Lewis\"}" [
+        fontsize = 8,
+        label = "{:id=>13909, :given=>\"Lewis\"}"
+    ]
+
+    "{:id=>14467, :given=>\"Le\"}" [
+        fontsize = 8,
+        label = "{:id=>14467, :given=>\"Le\"}"
+    ]
+
+    "{:id=>14866, :given=>\"L.\"}" [
+        fontsize = 8,
+        label = "{:id=>14866, :given=>\"L.\"}"
+    ]
+
+    "{:id=>15245, :given=>\"Lewis A.\"}" [
+        fontsize = 8,
+        label = "{:id=>15245, :given=>\"Lewis A.\"}"
+    ]
+
+    "{:id=>16021, :given=>\"Allan\"}" [
+        fontsize = 8,
+        label = "{:id=>16021, :given=>\"Allan\"}"
+    ]
+
+    "{:id=>17400, :given=>\"R.\"}" [
+        fontsize = 8,
+        label = "{:id=>17400, :given=>\"R.\"}"
+    ]
+
+    "{:id=>30513, :given=>\"James R.\"}" [
+        fontsize = 8,
+        label = "{:id=>30513, :given=>\"James R.\"}"
+    ]
+
+    "{:id=>34684, :given=>\"Lewis F.\"}" [
+        fontsize = 8,
+        label = "{:id=>34684, :given=>\"Lewis F.\"}"
+    ]
+
+    "{:id=>37391, :given=>\"A.A.\"}" [
+        fontsize = 8,
+        label = "{:id=>37391, :given=>\"A.A.\"}"
+    ]
+
+    "{:id=>37438, :given=>\"A.B.\"}" [
+        fontsize = 8,
+        label = "{:id=>37438, :given=>\"A.B.\"}"
+    ]
+
+    "{:id=>336, :given=>\"J.\"}" -- "{:id=>3759, :given=>\"J.R.\"}" [
+        fontsize = 8,
+        label = 0.55
+    ]
+
+    "{:id=>3759, :given=>\"J.R.\"}" -- "{:id=>6684, :given=>\"Jas R.\"}" [
+        fontsize = 8,
+        label = 0.95
+    ]
+
+    "{:id=>3759, :given=>\"J.R.\"}" -- "{:id=>30513, :given=>\"James R.\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+
+    "{:id=>3983, :given=>\"A.\"}" -- "{:id=>16021, :given=>\"Allan\"}" [
+        fontsize = 8,
+        label = 0.55
+    ]
+
+    "{:id=>3983, :given=>\"A.\"}" -- "{:id=>37391, :given=>\"A.A.\"}" [
+        fontsize = 8,
+        label = 0.6
+    ]
+
+    "{:id=>3983, :given=>\"A.\"}" -- "{:id=>37438, :given=>\"A.B.\"}" [
+        fontsize = 8,
+        label = 0.6
+    ]
+
+    "{:id=>5467, :given=>\"R.A.\"}" -- "{:id=>17400, :given=>\"R.\"}" [
+        fontsize = 8,
+        label = 0.6
+    ]
+
+    "{:id=>9774, :given=>\"R.S.\"}" -- "{:id=>13699, :given=>\"Robert\"}" [
+        fontsize = 8,
+        label = 0.55
+    ]
+
+    "{:id=>9774, :given=>\"R.S.\"}" -- "{:id=>17400, :given=>\"R.\"}" [
+        fontsize = 8,
+        label = 0.65
+    ]
+
+    "{:id=>13699, :given=>\"Robert\"}" -- "{:id=>17400, :given=>\"R.\"}" [
+        fontsize = 8,
+        label = 0.55
+    ]
+
+    "{:id=>13857, :given=>\"Lewis E.\"}" -- "{:id=>13880, :given=>\"L.E.\"}" [
+        fontsize = 8,
+        label = 0.9
+    ]
+
+    "{:id=>13857, :given=>\"Lewis E.\"}" -- "{:id=>13909, :given=>\"Lewis\"}" [
+        fontsize = 8,
+        label = 0.9
+    ]
+
+    "{:id=>13857, :given=>\"Lewis E.\"}" -- "{:id=>14866, :given=>\"L.\"}" [
+        fontsize = 8,
+        label = 0.6
+    ]
+
+    "{:id=>13880, :given=>\"L.E.\"}" -- "{:id=>14467, :given=>\"Le\"}" [
+        fontsize = 8,
+        label = 0.6
+    ]
+
+    "{:id=>13880, :given=>\"L.E.\"}" -- "{:id=>14866, :given=>\"L.\"}" [
+        fontsize = 8,
+        label = 0.6
+    ]
+
+    "{:id=>13909, :given=>\"Lewis\"}" -- "{:id=>15245, :given=>\"Lewis A.\"}" [
+        fontsize = 8,
+        label = 0.9
+    ]
+
+    "{:id=>13909, :given=>\"Lewis\"}" -- "{:id=>34684, :given=>\"Lewis F.\"}" [
+        fontsize = 8,
+        label = 0.9
+    ]
+
+    "{:id=>14467, :given=>\"Le\"}" -- "{:id=>14866, :given=>\"L.\"}" [
+        fontsize = 8,
+        label = 0.6
+    ]
+}

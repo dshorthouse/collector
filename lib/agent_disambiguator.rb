@@ -17,7 +17,7 @@ module Collector
     end
 
     def disambiguate
-      duplicates = Agent.where.("family NOT LIKE '%.%'").group(:family).count.map{ |k,v| k if v > 1 }.compact
+      duplicates = Agent.where("family NOT LIKE '%.%'").group(:family).count.map{ |k,v| k if v > 1 }.compact
       duplicates.each do |d|
         @graph = WeightedGraph.new
         @family = d
@@ -51,6 +51,7 @@ module Collector
 
     def deduce_canonicals
       @graph.each_connected_component do |component|
+        next if component.length == 1
         edges = subgraph_edges(component)
         max_edges = (component.length*(component.length-1))/2
         update_vertices(component) if edges.length == max_edges

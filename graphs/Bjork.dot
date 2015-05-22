@@ -1,0 +1,96 @@
+graph Collector__WeightedGraph {
+    "{:id=>5176, :given=>\"C.R.\"}" [
+        fontsize = 8,
+        label = "{:id=>5176, :given=>\"C.R.\"}"
+    ]
+
+    "{:id=>5219, :given=>\"Curtis\"}" [
+        fontsize = 8,
+        label = "{:id=>5219, :given=>\"Curtis\"}"
+    ]
+
+    "{:id=>5526, :given=>\"Curtis R.\"}" [
+        fontsize = 8,
+        label = "{:id=>5526, :given=>\"Curtis R.\"}"
+    ]
+
+    "{:id=>5633, :given=>\"Cutis\"}" [
+        fontsize = 8,
+        label = "{:id=>5633, :given=>\"Cutis\"}"
+    ]
+
+    "{:id=>7193, :given=>\"C.\"}" [
+        fontsize = 8,
+        label = "{:id=>7193, :given=>\"C.\"}"
+    ]
+
+    "{:id=>7623, :given=>\"Cutis R.\"}" [
+        fontsize = 8,
+        label = "{:id=>7623, :given=>\"Cutis R.\"}"
+    ]
+
+    "{:id=>7624, :given=>\"Cutris R.\"}" [
+        fontsize = 8,
+        label = "{:id=>7624, :given=>\"Cutris R.\"}"
+    ]
+
+    "{:id=>7949, :given=>\"Curtis E.\"}" [
+        fontsize = 8,
+        label = "{:id=>7949, :given=>\"Curtis E.\"}"
+    ]
+
+    "{:id=>8744, :given=>\"Curits R.\"}" [
+        fontsize = 8,
+        label = "{:id=>8744, :given=>\"Curits R.\"}"
+    ]
+
+    "{:id=>5176, :given=>\"C.R.\"}" -- "{:id=>5219, :given=>\"Curtis\"}" [
+        fontsize = 8,
+        label = 0.65
+    ]
+
+    "{:id=>5176, :given=>\"C.R.\"}" -- "{:id=>5526, :given=>\"Curtis R.\"}" [
+        fontsize = 8,
+        label = 0.95
+    ]
+
+    "{:id=>5176, :given=>\"C.R.\"}" -- "{:id=>7623, :given=>\"Cutis R.\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+
+    "{:id=>5176, :given=>\"C.R.\"}" -- "{:id=>7624, :given=>\"Cutris R.\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+
+    "{:id=>5176, :given=>\"C.R.\"}" -- "{:id=>8744, :given=>\"Curits R.\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+
+    "{:id=>5219, :given=>\"Curtis\"}" -- "{:id=>5526, :given=>\"Curtis R.\"}" [
+        fontsize = 8,
+        label = 0.9
+    ]
+
+    "{:id=>5219, :given=>\"Curtis\"}" -- "{:id=>7193, :given=>\"C.\"}" [
+        fontsize = 8,
+        label = 0.6
+    ]
+
+    "{:id=>5219, :given=>\"Curtis\"}" -- "{:id=>7949, :given=>\"Curtis E.\"}" [
+        fontsize = 8,
+        label = 0.9
+    ]
+
+    "{:id=>5526, :given=>\"Curtis R.\"}" -- "{:id=>7193, :given=>\"C.\"}" [
+        fontsize = 8,
+        label = 0.65
+    ]
+
+    "{:id=>5633, :given=>\"Cutis\"}" -- "{:id=>7623, :given=>\"Cutis R.\"}" [
+        fontsize = 8,
+        label = 0.9
+    ]
+}

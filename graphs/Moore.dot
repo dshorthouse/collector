@@ -1,0 +1,81 @@
+graph Collector__WeightedGraph {
+    "{:id=>2256, :given=>\"Mary I.\"}" [
+        fontsize = 8,
+        label = "{:id=>2256, :given=>\"Mary I.\"}"
+    ]
+
+    "{:id=>5668, :given=>\"H.\"}" [
+        fontsize = 8,
+        label = "{:id=>5668, :given=>\"H.\"}"
+    ]
+
+    "{:id=>5695, :given=>\"Huber\"}" [
+        fontsize = 8,
+        label = "{:id=>5695, :given=>\"Huber\"}"
+    ]
+
+    "{:id=>8459, :given=>\"M.I.\"}" [
+        fontsize = 8,
+        label = "{:id=>8459, :given=>\"M.I.\"}"
+    ]
+
+    "{:id=>8707, :given=>\"Maurice\"}" [
+        fontsize = 8,
+        label = "{:id=>8707, :given=>\"Maurice\"}"
+    ]
+
+    "{:id=>12764, :given=>\"Harold E.\"}" [
+        fontsize = 8,
+        label = "{:id=>12764, :given=>\"Harold E.\"}"
+    ]
+
+    "{:id=>20534, :given=>\"Mary\"}" [
+        fontsize = 8,
+        label = "{:id=>20534, :given=>\"Mary\"}"
+    ]
+
+    "{:id=>27765, :given=>\"H.E.\"}" [
+        fontsize = 8,
+        label = "{:id=>27765, :given=>\"H.E.\"}"
+    ]
+
+    "{:id=>29178, :given=>\"Hal E.\"}" [
+        fontsize = 8,
+        label = "{:id=>29178, :given=>\"Hal E.\"}"
+    ]
+
+    "{:id=>2256, :given=>\"Mary I.\"}" -- "{:id=>8459, :given=>\"M.I.\"}" [
+        fontsize = 8,
+        label = 0.85
+    ]
+
+    "{:id=>2256, :given=>\"Mary I.\"}" -- "{:id=>20534, :given=>\"Mary\"}" [
+        fontsize = 8,
+        label = 0.9
+    ]
+
+    "{:id=>5668, :given=>\"H.\"}" -- "{:id=>5695, :given=>\"Huber\"}" [
+        fontsize = 8,
+        label = 0.6
+    ]
+
+    "{:id=>5668, :given=>\"H.\"}" -- "{:id=>12764, :given=>\"Harold E.\"}" [
+        fontsize = 8,
+        label = 0.55
+    ]
+
+    "{:id=>8459, :given=>\"M.I.\"}" -- "{:id=>8707, :given=>\"Maurice\"}" [
+        fontsize = 8,
+        label = 0.55
+    ]
+
+    "{:id=>12764, :given=>\"Harold E.\"}" -- "{:id=>27765, :given=>\"H.E.\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+
+    "{:id=>27765, :given=>\"H.E.\"}" -- "{:id=>29178, :given=>\"Hal E.\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+}

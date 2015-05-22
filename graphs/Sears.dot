@@ -1,0 +1,81 @@
+graph Collector__WeightedGraph {
+    "{:id=>5590, :given=>\"Christopher J.\"}" [
+        fontsize = 8,
+        label = "{:id=>5590, :given=>\"Christopher J.\"}"
+    ]
+
+    "{:id=>6836, :given=>\"Chris\"}" [
+        fontsize = 8,
+        label = "{:id=>6836, :given=>\"Chris\"}"
+    ]
+
+    "{:id=>6871, :given=>\"C.J.\"}" [
+        fontsize = 8,
+        label = "{:id=>6871, :given=>\"C.J.\"}"
+    ]
+
+    "{:id=>7613, :given=>\"C.\"}" [
+        fontsize = 8,
+        label = "{:id=>7613, :given=>\"C.\"}"
+    ]
+
+    "{:id=>7985, :given=>\"Christopher\"}" [
+        fontsize = 8,
+        label = "{:id=>7985, :given=>\"Christopher\"}"
+    ]
+
+    "{:id=>8245, :given=>\"Chris J.\"}" [
+        fontsize = 8,
+        label = "{:id=>8245, :given=>\"Chris J.\"}"
+    ]
+
+    "{:id=>5590, :given=>\"Christopher J.\"}" -- "{:id=>6871, :given=>\"C.J.\"}" [
+        fontsize = 8,
+        label = 0.95
+    ]
+
+    "{:id=>5590, :given=>\"Christopher J.\"}" -- "{:id=>7613, :given=>\"C.\"}" [
+        fontsize = 8,
+        label = 0.65
+    ]
+
+    "{:id=>5590, :given=>\"Christopher J.\"}" -- "{:id=>7985, :given=>\"Christopher\"}" [
+        fontsize = 8,
+        label = 0.9
+    ]
+
+    "{:id=>6836, :given=>\"Chris\"}" -- "{:id=>6871, :given=>\"C.J.\"}" [
+        fontsize = 8,
+        label = 0.55
+    ]
+
+    "{:id=>6836, :given=>\"Chris\"}" -- "{:id=>7613, :given=>\"C.\"}" [
+        fontsize = 8,
+        label = 0.65
+    ]
+
+    "{:id=>6836, :given=>\"Chris\"}" -- "{:id=>8245, :given=>\"Chris J.\"}" [
+        fontsize = 8,
+        label = 0.9
+    ]
+
+    "{:id=>6871, :given=>\"C.J.\"}" -- "{:id=>7613, :given=>\"C.\"}" [
+        fontsize = 8,
+        label = 0.65
+    ]
+
+    "{:id=>6871, :given=>\"C.J.\"}" -- "{:id=>8245, :given=>\"Chris J.\"}" [
+        fontsize = 8,
+        label = 0.85
+    ]
+
+    "{:id=>7613, :given=>\"C.\"}" -- "{:id=>7985, :given=>\"Christopher\"}" [
+        fontsize = 8,
+        label = 0.55
+    ]
+
+    "{:id=>7613, :given=>\"C.\"}" -- "{:id=>8245, :given=>\"Chris J.\"}" [
+        fontsize = 8,
+        label = 0.55
+    ]
+}

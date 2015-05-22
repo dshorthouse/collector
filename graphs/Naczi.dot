@@ -1,0 +1,61 @@
+graph Collector__WeightedGraph {
+    "{:id=>2426, :given=>\"Robert F.C.\"}" [
+        fontsize = 8,
+        label = "{:id=>2426, :given=>\"Robert F.C.\"}"
+    ]
+
+    "{:id=>15416, :given=>\"R.F.Z.\"}" [
+        fontsize = 8,
+        label = "{:id=>15416, :given=>\"R.F.Z.\"}"
+    ]
+
+    "{:id=>15418, :given=>\"R.F.C.\"}" [
+        fontsize = 8,
+        label = "{:id=>15418, :given=>\"R.F.C.\"}"
+    ]
+
+    "{:id=>15430, :given=>\"R.F.C.K.N.K.\"}" [
+        fontsize = 8,
+        label = "{:id=>15430, :given=>\"R.F.C.K.N.K.\"}"
+    ]
+
+    "{:id=>42328, :given=>\"R.\"}" [
+        fontsize = 8,
+        label = "{:id=>42328, :given=>\"R.\"}"
+    ]
+
+    "{:id=>2426, :given=>\"Robert F.C.\"}" -- "{:id=>15416, :given=>\"R.F.Z.\"}" [
+        fontsize = 8,
+        label = 0.75
+    ]
+
+    "{:id=>2426, :given=>\"Robert F.C.\"}" -- "{:id=>15418, :given=>\"R.F.C.\"}" [
+        fontsize = 8,
+        label = 0.85
+    ]
+
+    "{:id=>2426, :given=>\"Robert F.C.\"}" -- "{:id=>15430, :given=>\"R.F.C.K.N.K.\"}" [
+        fontsize = 8,
+        label = 0.75
+    ]
+
+    "{:id=>15416, :given=>\"R.F.Z.\"}" -- "{:id=>15418, :given=>\"R.F.C.\"}" [
+        fontsize = 8,
+        label = 0.75
+    ]
+
+    "{:id=>15416, :given=>\"R.F.Z.\"}" -- "{:id=>15430, :given=>\"R.F.C.K.N.K.\"}" [
+        fontsize = 8,
+        label = 0.75
+    ]
+
+    "{:id=>15418, :given=>\"R.F.C.\"}" -- "{:id=>15430, :given=>\"R.F.C.K.N.K.\"}" [
+        fontsize = 8,
+        label = 0.75
+    ]
+
+    "{:id=>15418, :given=>\"R.F.C.\"}" -- "{:id=>42328, :given=>\"R.\"}" [
+        fontsize = 8,
+        label = 0.6
+    ]
+}

@@ -1,0 +1,76 @@
+graph Collector__WeightedGraph {
+    "{:id=>5235, :given=>\"B.C.\"}" [
+        fontsize = 8,
+        label = "{:id=>5235, :given=>\"B.C.\"}"
+    ]
+
+    "{:id=>6102, :given=>\"Benito\"}" [
+        fontsize = 8,
+        label = "{:id=>6102, :given=>\"Benito\"}"
+    ]
+
+    "{:id=>7581, :given=>\"Benito C.\"}" [
+        fontsize = 8,
+        label = "{:id=>7581, :given=>\"Benito C.\"}"
+    ]
+
+    "{:id=>7582, :given=>\"B.\"}" [
+        fontsize = 8,
+        label = "{:id=>7582, :given=>\"B.\"}"
+    ]
+
+    "{:id=>7595, :given=>\"Ben C.\"}" [
+        fontsize = 8,
+        label = "{:id=>7595, :given=>\"Ben C.\"}"
+    ]
+
+    "{:id=>14497, :given=>\"Ben\"}" [
+        fontsize = 8,
+        label = "{:id=>14497, :given=>\"Ben\"}"
+    ]
+
+    "{:id=>5235, :given=>\"B.C.\"}" -- "{:id=>6102, :given=>\"Benito\"}" [
+        fontsize = 8,
+        label = 0.6
+    ]
+
+    "{:id=>5235, :given=>\"B.C.\"}" -- "{:id=>7581, :given=>\"Benito C.\"}" [
+        fontsize = 8,
+        label = 0.9
+    ]
+
+    "{:id=>5235, :given=>\"B.C.\"}" -- "{:id=>7582, :given=>\"B.\"}" [
+        fontsize = 8,
+        label = 0.6
+    ]
+
+    "{:id=>5235, :given=>\"B.C.\"}" -- "{:id=>7595, :given=>\"Ben C.\"}" [
+        fontsize = 8,
+        label = 0.9
+    ]
+
+    "{:id=>5235, :given=>\"B.C.\"}" -- "{:id=>14497, :given=>\"Ben\"}" [
+        fontsize = 8,
+        label = 0.6
+    ]
+
+    "{:id=>6102, :given=>\"Benito\"}" -- "{:id=>7581, :given=>\"Benito C.\"}" [
+        fontsize = 8,
+        label = 0.9
+    ]
+
+    "{:id=>7581, :given=>\"Benito C.\"}" -- "{:id=>7582, :given=>\"B.\"}" [
+        fontsize = 8,
+        label = 0.55
+    ]
+
+    "{:id=>7582, :given=>\"B.\"}" -- "{:id=>14497, :given=>\"Ben\"}" [
+        fontsize = 8,
+        label = 0.6
+    ]
+
+    "{:id=>7595, :given=>\"Ben C.\"}" -- "{:id=>14497, :given=>\"Ben\"}" [
+        fontsize = 8,
+        label = 0.9
+    ]
+}

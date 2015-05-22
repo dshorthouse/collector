@@ -1,0 +1,81 @@
+graph Collector__WeightedGraph {
+    "{:id=>6080, :given=>\"Albert N.\"}" [
+        fontsize = 8,
+        label = "{:id=>6080, :given=>\"Albert N.\"}"
+    ]
+
+    "{:id=>6714, :given=>\"A.N.\"}" [
+        fontsize = 8,
+        label = "{:id=>6714, :given=>\"A.N.\"}"
+    ]
+
+    "{:id=>9237, :given=>\"Ruth E.\"}" [
+        fontsize = 8,
+        label = "{:id=>9237, :given=>\"Ruth E.\"}"
+    ]
+
+    "{:id=>21371, :given=>\"Alberta N.\"}" [
+        fontsize = 8,
+        label = "{:id=>21371, :given=>\"Alberta N.\"}"
+    ]
+
+    "{:id=>21409, :given=>\"Albert\"}" [
+        fontsize = 8,
+        label = "{:id=>21409, :given=>\"Albert\"}"
+    ]
+
+    "{:id=>28022, :given=>\"R.\"}" [
+        fontsize = 8,
+        label = "{:id=>28022, :given=>\"R.\"}"
+    ]
+
+    "{:id=>28125, :given=>\"R.L.\"}" [
+        fontsize = 8,
+        label = "{:id=>28125, :given=>\"R.L.\"}"
+    ]
+
+    "{:id=>31661, :given=>\"Ruth\"}" [
+        fontsize = 8,
+        label = "{:id=>31661, :given=>\"Ruth\"}"
+    ]
+
+    "{:id=>6080, :given=>\"Albert N.\"}" -- "{:id=>6714, :given=>\"A.N.\"}" [
+        fontsize = 8,
+        label = 0.95
+    ]
+
+    "{:id=>6080, :given=>\"Albert N.\"}" -- "{:id=>21409, :given=>\"Albert\"}" [
+        fontsize = 8,
+        label = 0.9
+    ]
+
+    "{:id=>6714, :given=>\"A.N.\"}" -- "{:id=>21371, :given=>\"Alberta N.\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+
+    "{:id=>9237, :given=>\"Ruth E.\"}" -- "{:id=>28022, :given=>\"R.\"}" [
+        fontsize = 8,
+        label = 0.6
+    ]
+
+    "{:id=>9237, :given=>\"Ruth E.\"}" -- "{:id=>31661, :given=>\"Ruth\"}" [
+        fontsize = 8,
+        label = 0.9
+    ]
+
+    "{:id=>28022, :given=>\"R.\"}" -- "{:id=>28125, :given=>\"R.L.\"}" [
+        fontsize = 8,
+        label = 0.6
+    ]
+
+    "{:id=>28022, :given=>\"R.\"}" -- "{:id=>31661, :given=>\"Ruth\"}" [
+        fontsize = 8,
+        label = 0.6
+    ]
+
+    "{:id=>28125, :given=>\"R.L.\"}" -- "{:id=>31661, :given=>\"Ruth\"}" [
+        fontsize = 8,
+        label = 0.6
+    ]
+}

@@ -1,0 +1,81 @@
+graph Collector__WeightedGraph {
+    "{:id=>3511, :given=>\"G.I.\"}" [
+        fontsize = 8,
+        label = "{:id=>3511, :given=>\"G.I.\"}"
+    ]
+
+    "{:id=>3725, :given=>\"Gayle I.\"}" [
+        fontsize = 8,
+        label = "{:id=>3725, :given=>\"Gayle I.\"}"
+    ]
+
+    "{:id=>3912, :given=>\"G.\"}" [
+        fontsize = 8,
+        label = "{:id=>3912, :given=>\"G.\"}"
+    ]
+
+    "{:id=>4043, :given=>\"Gayle\"}" [
+        fontsize = 8,
+        label = "{:id=>4043, :given=>\"Gayle\"}"
+    ]
+
+    "{:id=>5575, :given=>\"Carlo\"}" [
+        fontsize = 8,
+        label = "{:id=>5575, :given=>\"Carlo\"}"
+    ]
+
+    "{:id=>6762, :given=>\"C.G.\"}" [
+        fontsize = 8,
+        label = "{:id=>6762, :given=>\"C.G.\"}"
+    ]
+
+    "{:id=>17984, :given=>\"C.\"}" [
+        fontsize = 8,
+        label = "{:id=>17984, :given=>\"C.\"}"
+    ]
+
+    "{:id=>31493, :given=>\"Charles G.\"}" [
+        fontsize = 8,
+        label = "{:id=>31493, :given=>\"Charles G.\"}"
+    ]
+
+    "{:id=>42109, :given=>\"Gunnar\"}" [
+        fontsize = 8,
+        label = "{:id=>42109, :given=>\"Gunnar\"}"
+    ]
+
+    "{:id=>3511, :given=>\"G.I.\"}" -- "{:id=>3725, :given=>\"Gayle I.\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+
+    "{:id=>3511, :given=>\"G.I.\"}" -- "{:id=>3912, :given=>\"G.\"}" [
+        fontsize = 8,
+        label = 0.6
+    ]
+
+    "{:id=>3725, :given=>\"Gayle I.\"}" -- "{:id=>4043, :given=>\"Gayle\"}" [
+        fontsize = 8,
+        label = 0.9
+    ]
+
+    "{:id=>3912, :given=>\"G.\"}" -- "{:id=>42109, :given=>\"Gunnar\"}" [
+        fontsize = 8,
+        label = 0.6
+    ]
+
+    "{:id=>5575, :given=>\"Carlo\"}" -- "{:id=>6762, :given=>\"C.G.\"}" [
+        fontsize = 8,
+        label = 0.55
+    ]
+
+    "{:id=>5575, :given=>\"Carlo\"}" -- "{:id=>17984, :given=>\"C.\"}" [
+        fontsize = 8,
+        label = 0.6
+    ]
+
+    "{:id=>6762, :given=>\"C.G.\"}" -- "{:id=>31493, :given=>\"Charles G.\"}" [
+        fontsize = 8,
+        label = 0.9
+    ]
+}

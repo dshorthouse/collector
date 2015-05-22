@@ -1,0 +1,66 @@
+graph Collector__WeightedGraph {
+    "{:id=>4747, :given=>\"V.C.\"}" [
+        fontsize = 8,
+        label = "{:id=>4747, :given=>\"V.C.\"}"
+    ]
+
+    "{:id=>5937, :given=>\"Vernon C.\"}" [
+        fontsize = 8,
+        label = "{:id=>5937, :given=>\"Vernon C.\"}"
+    ]
+
+    "{:id=>5972, :given=>\"Verno C.\"}" [
+        fontsize = 8,
+        label = "{:id=>5972, :given=>\"Verno C.\"}"
+    ]
+
+    "{:id=>13087, :given=>\"V.Cuthbert\"}" [
+        fontsize = 8,
+        label = "{:id=>13087, :given=>\"V.Cuthbert\"}"
+    ]
+
+    "{:id=>30823, :given=>\"Vernon Cuthbert\"}" [
+        fontsize = 8,
+        label = "{:id=>30823, :given=>\"Vernon Cuthbert\"}"
+    ]
+
+    "{:id=>4747, :given=>\"V.C.\"}" -- "{:id=>5937, :given=>\"Vernon C.\"}" [
+        fontsize = 8,
+        label = 0.85
+    ]
+
+    "{:id=>4747, :given=>\"V.C.\"}" -- "{:id=>5972, :given=>\"Verno C.\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+
+    "{:id=>4747, :given=>\"V.C.\"}" -- "{:id=>13087, :given=>\"V.Cuthbert\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+
+    "{:id=>4747, :given=>\"V.C.\"}" -- "{:id=>30823, :given=>\"Vernon Cuthbert\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+
+    "{:id=>5937, :given=>\"Vernon C.\"}" -- "{:id=>13087, :given=>\"V.Cuthbert\"}" [
+        fontsize = 8,
+        label = 0.85
+    ]
+
+    "{:id=>5937, :given=>\"Vernon C.\"}" -- "{:id=>30823, :given=>\"Vernon Cuthbert\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+
+    "{:id=>5972, :given=>\"Verno C.\"}" -- "{:id=>13087, :given=>\"V.Cuthbert\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+
+    "{:id=>13087, :given=>\"V.Cuthbert\"}" -- "{:id=>30823, :given=>\"Vernon Cuthbert\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+}

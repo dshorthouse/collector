@@ -25,6 +25,9 @@ module Sinatra
             if @result[:id] != @result[:canonical_id]
               redirect to('/agent/' + @result[:canonical_id].to_s + '.json')
             end
+            if !@result[:orcid].nil? && params[:id] != @result[:orcid]
+              redirect to('/agent/' + @result[:orcid] + '.json' )
+            end
             @result.to_json
           end
 
@@ -32,6 +35,9 @@ module Sinatra
             agent_profile(params[:id])
             if @result[:id] != @result[:canonical_id]
               redirect to('/agent/' + @result[:canonical_id].to_s )
+            end
+            if !@result[:orcid].nil? && params[:id] != @result[:orcid]
+              redirect to('/agent/' + @result[:orcid] )
             end
             haml :agent
           end

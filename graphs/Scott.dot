@@ -1,0 +1,161 @@
+graph Collector__WeightedGraph {
+    "{:id=>6007, :given=>\"W.\"}" [
+        fontsize = 8,
+        label = "{:id=>6007, :given=>\"W.\"}"
+    ]
+
+    "{:id=>12617, :given=>\"George A.M.\"}" [
+        fontsize = 8,
+        label = "{:id=>12617, :given=>\"George A.M.\"}"
+    ]
+
+    "{:id=>12726, :given=>\"William M.\"}" [
+        fontsize = 8,
+        label = "{:id=>12726, :given=>\"William M.\"}"
+    ]
+
+    "{:id=>14142, :given=>\"G.A.M.\"}" [
+        fontsize = 8,
+        label = "{:id=>14142, :given=>\"G.A.M.\"}"
+    ]
+
+    "{:id=>15771, :given=>\"W.B.\"}" [
+        fontsize = 8,
+        label = "{:id=>15771, :given=>\"W.B.\"}"
+    ]
+
+    "{:id=>15939, :given=>\"Wm\"}" [
+        fontsize = 8,
+        label = "{:id=>15939, :given=>\"Wm\"}"
+    ]
+
+    "{:id=>16410, :given=>\"Wm J.\"}" [
+        fontsize = 8,
+        label = "{:id=>16410, :given=>\"Wm J.\"}"
+    ]
+
+    "{:id=>16412, :given=>\"Wm A.\"}" [
+        fontsize = 8,
+        label = "{:id=>16412, :given=>\"Wm A.\"}"
+    ]
+
+    "{:id=>24661, :given=>\"G.A.\"}" [
+        fontsize = 8,
+        label = "{:id=>24661, :given=>\"G.A.\"}"
+    ]
+
+    "{:id=>26048, :given=>\"G.\"}" [
+        fontsize = 8,
+        label = "{:id=>26048, :given=>\"G.\"}"
+    ]
+
+    "{:id=>27377, :given=>\"W.M.\"}" [
+        fontsize = 8,
+        label = "{:id=>27377, :given=>\"W.M.\"}"
+    ]
+
+    "{:id=>36170, :given=>\"William\"}" [
+        fontsize = 8,
+        label = "{:id=>36170, :given=>\"William\"}"
+    ]
+
+    "{:id=>39437, :given=>\"George Am\"}" [
+        fontsize = 8,
+        label = "{:id=>39437, :given=>\"George Am\"}"
+    ]
+
+    "{:id=>53067, :given=>\"W.J.\"}" [
+        fontsize = 8,
+        label = "{:id=>53067, :given=>\"W.J.\"}"
+    ]
+
+    "{:id=>6007, :given=>\"W.\"}" -- "{:id=>12726, :given=>\"William M.\"}" [
+        fontsize = 8,
+        label = 0.55
+    ]
+
+    "{:id=>6007, :given=>\"W.\"}" -- "{:id=>15771, :given=>\"W.B.\"}" [
+        fontsize = 8,
+        label = 0.55
+    ]
+
+    "{:id=>6007, :given=>\"W.\"}" -- "{:id=>15939, :given=>\"Wm\"}" [
+        fontsize = 8,
+        label = 0.55
+    ]
+
+    "{:id=>6007, :given=>\"W.\"}" -- "{:id=>16410, :given=>\"Wm J.\"}" [
+        fontsize = 8,
+        label = 0.55
+    ]
+
+    "{:id=>6007, :given=>\"W.\"}" -- "{:id=>16412, :given=>\"Wm A.\"}" [
+        fontsize = 8,
+        label = 0.55
+    ]
+
+    "{:id=>12617, :given=>\"George A.M.\"}" -- "{:id=>14142, :given=>\"G.A.M.\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+
+    "{:id=>12617, :given=>\"George A.M.\"}" -- "{:id=>24661, :given=>\"G.A.\"}" [
+        fontsize = 8,
+        label = 0.7
+    ]
+
+    "{:id=>12617, :given=>\"George A.M.\"}" -- "{:id=>39437, :given=>\"George Am\"}" [
+        fontsize = 8,
+        label = 0.7
+    ]
+
+    "{:id=>12726, :given=>\"William M.\"}" -- "{:id=>27377, :given=>\"W.M.\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+
+    "{:id=>12726, :given=>\"William M.\"}" -- "{:id=>36170, :given=>\"William\"}" [
+        fontsize = 8,
+        label = 0.9
+    ]
+
+    "{:id=>14142, :given=>\"G.A.M.\"}" -- "{:id=>24661, :given=>\"G.A.\"}" [
+        fontsize = 8,
+        label = 0.7
+    ]
+
+    "{:id=>14142, :given=>\"G.A.M.\"}" -- "{:id=>26048, :given=>\"G.\"}" [
+        fontsize = 8,
+        label = 0.6
+    ]
+
+    "{:id=>14142, :given=>\"G.A.M.\"}" -- "{:id=>39437, :given=>\"George Am\"}" [
+        fontsize = 8,
+        label = 0.7
+    ]
+
+    "{:id=>15771, :given=>\"W.B.\"}" -- "{:id=>15939, :given=>\"Wm\"}" [
+        fontsize = 8,
+        label = 0.55
+    ]
+
+    "{:id=>15939, :given=>\"Wm\"}" -- "{:id=>16410, :given=>\"Wm J.\"}" [
+        fontsize = 8,
+        label = 0.9
+    ]
+
+    "{:id=>15939, :given=>\"Wm\"}" -- "{:id=>16412, :given=>\"Wm A.\"}" [
+        fontsize = 8,
+        label = 0.9
+    ]
+
+    "{:id=>16410, :given=>\"Wm J.\"}" -- "{:id=>53067, :given=>\"W.J.\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+
+    "{:id=>24661, :given=>\"G.A.\"}" -- "{:id=>39437, :given=>\"George Am\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+}

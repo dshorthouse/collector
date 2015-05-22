@@ -1,0 +1,56 @@
+graph Collector__WeightedGraph {
+    "{:id=>20276, :given=>\"Donna L.\"}" [
+        fontsize = 8,
+        label = "{:id=>20276, :given=>\"Donna L.\"}"
+    ]
+
+    "{:id=>20431, :given=>\"Donna\"}" [
+        fontsize = 8,
+        label = "{:id=>20431, :given=>\"Donna\"}"
+    ]
+
+    "{:id=>20439, :given=>\"D.L.\"}" [
+        fontsize = 8,
+        label = "{:id=>20439, :given=>\"D.L.\"}"
+    ]
+
+    "{:id=>20560, :given=>\"Donnal L.\"}" [
+        fontsize = 8,
+        label = "{:id=>20560, :given=>\"Donnal L.\"}"
+    ]
+
+    "{:id=>20813, :given=>\"Donna Louise\"}" [
+        fontsize = 8,
+        label = "{:id=>20813, :given=>\"Donna Louise\"}"
+    ]
+
+    "{:id=>20276, :given=>\"Donna L.\"}" -- "{:id=>20431, :given=>\"Donna\"}" [
+        fontsize = 8,
+        label = 0.9
+    ]
+
+    "{:id=>20276, :given=>\"Donna L.\"}" -- "{:id=>20439, :given=>\"D.L.\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+
+    "{:id=>20276, :given=>\"Donna L.\"}" -- "{:id=>20813, :given=>\"Donna Louise\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+
+    "{:id=>20431, :given=>\"Donna\"}" -- "{:id=>20813, :given=>\"Donna Louise\"}" [
+        fontsize = 8,
+        label = 0.9
+    ]
+
+    "{:id=>20439, :given=>\"D.L.\"}" -- "{:id=>20560, :given=>\"Donnal L.\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+
+    "{:id=>20439, :given=>\"D.L.\"}" -- "{:id=>20813, :given=>\"Donna Louise\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+}

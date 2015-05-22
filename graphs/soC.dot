@@ -1,0 +1,41 @@
+graph Collector__WeightedGraph {
+    "{:id=>24012, :given=>\"Vancouver Mycological\"}" [
+        fontsize = 8,
+        label = "{:id=>24012, :given=>\"Vancouver Mycological\"}"
+    ]
+
+    "{:id=>24032, :given=>\"Van Myco\"}" [
+        fontsize = 8,
+        label = "{:id=>24032, :given=>\"Van Myco\"}"
+    ]
+
+    "{:id=>24689, :given=>\"V.M.\"}" [
+        fontsize = 8,
+        label = "{:id=>24689, :given=>\"V.M.\"}"
+    ]
+
+    "{:id=>25281, :given=>\"Vancouver Mycol\"}" [
+        fontsize = 8,
+        label = "{:id=>25281, :given=>\"Vancouver Mycol\"}"
+    ]
+
+    "{:id=>24012, :given=>\"Vancouver Mycological\"}" -- "{:id=>24689, :given=>\"V.M.\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+
+    "{:id=>24012, :given=>\"Vancouver Mycological\"}" -- "{:id=>25281, :given=>\"Vancouver Mycol\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+
+    "{:id=>24032, :given=>\"Van Myco\"}" -- "{:id=>24689, :given=>\"V.M.\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+
+    "{:id=>24689, :given=>\"V.M.\"}" -- "{:id=>25281, :given=>\"Vancouver Mycol\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+}

@@ -1,0 +1,71 @@
+graph Collector__WeightedGraph {
+    "{:id=>3530, :given=>\"Chris\"}" [
+        fontsize = 8,
+        label = "{:id=>3530, :given=>\"Chris\"}"
+    ]
+
+    "{:id=>3535, :given=>\"C.\"}" [
+        fontsize = 8,
+        label = "{:id=>3535, :given=>\"C.\"}"
+    ]
+
+    "{:id=>3654, :given=>\"C.E.\"}" [
+        fontsize = 8,
+        label = "{:id=>3654, :given=>\"C.E.\"}"
+    ]
+
+    "{:id=>3810, :given=>\"Christopher E.\"}" [
+        fontsize = 8,
+        label = "{:id=>3810, :given=>\"Christopher E.\"}"
+    ]
+
+    "{:id=>3811, :given=>\"Christopher\"}" [
+        fontsize = 8,
+        label = "{:id=>3811, :given=>\"Christopher\"}"
+    ]
+
+    "{:id=>9484, :given=>\"Chris E.\"}" [
+        fontsize = 8,
+        label = "{:id=>9484, :given=>\"Chris E.\"}"
+    ]
+
+    "{:id=>3530, :given=>\"Chris\"}" -- "{:id=>3535, :given=>\"C.\"}" [
+        fontsize = 8,
+        label = 0.6
+    ]
+
+    "{:id=>3530, :given=>\"Chris\"}" -- "{:id=>3654, :given=>\"C.E.\"}" [
+        fontsize = 8,
+        label = 0.6
+    ]
+
+    "{:id=>3530, :given=>\"Chris\"}" -- "{:id=>9484, :given=>\"Chris E.\"}" [
+        fontsize = 8,
+        label = 0.9
+    ]
+
+    "{:id=>3535, :given=>\"C.\"}" -- "{:id=>3654, :given=>\"C.E.\"}" [
+        fontsize = 8,
+        label = 0.6
+    ]
+
+    "{:id=>3535, :given=>\"C.\"}" -- "{:id=>9484, :given=>\"Chris E.\"}" [
+        fontsize = 8,
+        label = 0.6
+    ]
+
+    "{:id=>3654, :given=>\"C.E.\"}" -- "{:id=>3810, :given=>\"Christopher E.\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+
+    "{:id=>3654, :given=>\"C.E.\"}" -- "{:id=>9484, :given=>\"Chris E.\"}" [
+        fontsize = 8,
+        label = 0.9
+    ]
+
+    "{:id=>3810, :given=>\"Christopher E.\"}" -- "{:id=>3811, :given=>\"Christopher\"}" [
+        fontsize = 8,
+        label = 0.9
+    ]
+}

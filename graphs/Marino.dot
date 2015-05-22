@@ -1,0 +1,66 @@
+graph Collector__WeightedGraph {
+    "{:id=>3661, :given=>\"M.Cordeiro\"}" [
+        fontsize = 8,
+        label = "{:id=>3661, :given=>\"M.Cordeiro\"}"
+    ]
+
+    "{:id=>3691, :given=>\"M.C.\"}" [
+        fontsize = 8,
+        label = "{:id=>3691, :given=>\"M.C.\"}"
+    ]
+
+    "{:id=>3776, :given=>\"Marilza Cordeiro\"}" [
+        fontsize = 8,
+        label = "{:id=>3776, :given=>\"Marilza Cordeiro\"}"
+    ]
+
+    "{:id=>3832, :given=>\"Marilza C.\"}" [
+        fontsize = 8,
+        label = "{:id=>3832, :given=>\"Marilza C.\"}"
+    ]
+
+    "{:id=>23666, :given=>\"Marileza Cordeiro\"}" [
+        fontsize = 8,
+        label = "{:id=>23666, :given=>\"Marileza Cordeiro\"}"
+    ]
+
+    "{:id=>3661, :given=>\"M.Cordeiro\"}" -- "{:id=>3691, :given=>\"M.C.\"}" [
+        fontsize = 8,
+        label = 0.9
+    ]
+
+    "{:id=>3661, :given=>\"M.Cordeiro\"}" -- "{:id=>3776, :given=>\"Marilza Cordeiro\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+
+    "{:id=>3661, :given=>\"M.Cordeiro\"}" -- "{:id=>3832, :given=>\"Marilza C.\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+
+    "{:id=>3661, :given=>\"M.Cordeiro\"}" -- "{:id=>23666, :given=>\"Marileza Cordeiro\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+
+    "{:id=>3691, :given=>\"M.C.\"}" -- "{:id=>3776, :given=>\"Marilza Cordeiro\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+
+    "{:id=>3691, :given=>\"M.C.\"}" -- "{:id=>3832, :given=>\"Marilza C.\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+
+    "{:id=>3691, :given=>\"M.C.\"}" -- "{:id=>23666, :given=>\"Marileza Cordeiro\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+
+    "{:id=>3776, :given=>\"Marilza Cordeiro\"}" -- "{:id=>3832, :given=>\"Marilza C.\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+}

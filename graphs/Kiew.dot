@@ -1,0 +1,116 @@
+graph Collector__WeightedGraph {
+    "{:id=>6272, :given=>\"K.Y.\"}" [
+        fontsize = 8,
+        label = "{:id=>6272, :given=>\"K.Y.\"}"
+    ]
+
+    "{:id=>6350, :given=>\"K.Yee\"}" [
+        fontsize = 8,
+        label = "{:id=>6350, :given=>\"K.Yee\"}"
+    ]
+
+    "{:id=>6685, :given=>\"Kam Yee\"}" [
+        fontsize = 8,
+        label = "{:id=>6685, :given=>\"Kam Yee\"}"
+    ]
+
+    "{:id=>6767, :given=>\"K.\"}" [
+        fontsize = 8,
+        label = "{:id=>6767, :given=>\"K.\"}"
+    ]
+
+    "{:id=>7197, :given=>\"Kim Yee\"}" [
+        fontsize = 8,
+        label = "{:id=>7197, :given=>\"Kim Yee\"}"
+    ]
+
+    "{:id=>8444, :given=>\"Kam Xee\"}" [
+        fontsize = 8,
+        label = "{:id=>8444, :given=>\"Kam Xee\"}"
+    ]
+
+    "{:id=>8683, :given=>\"Kam Y.\"}" [
+        fontsize = 8,
+        label = "{:id=>8683, :given=>\"Kam Y.\"}"
+    ]
+
+    "{:id=>31133, :given=>\"KamYee\"}" [
+        fontsize = 8,
+        label = "{:id=>31133, :given=>\"KamYee\"}"
+    ]
+
+    "{:id=>6272, :given=>\"K.Y.\"}" -- "{:id=>6350, :given=>\"K.Yee\"}" [
+        fontsize = 8,
+        label = 0.85
+    ]
+
+    "{:id=>6272, :given=>\"K.Y.\"}" -- "{:id=>6685, :given=>\"Kam Yee\"}" [
+        fontsize = 8,
+        label = 0.95
+    ]
+
+    "{:id=>6272, :given=>\"K.Y.\"}" -- "{:id=>6767, :given=>\"K.\"}" [
+        fontsize = 8,
+        label = 0.55
+    ]
+
+    "{:id=>6272, :given=>\"K.Y.\"}" -- "{:id=>7197, :given=>\"Kim Yee\"}" [
+        fontsize = 8,
+        label = 0.85
+    ]
+
+    "{:id=>6272, :given=>\"K.Y.\"}" -- "{:id=>8683, :given=>\"Kam Y.\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+
+    "{:id=>6272, :given=>\"K.Y.\"}" -- "{:id=>31133, :given=>\"KamYee\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+
+    "{:id=>6350, :given=>\"K.Yee\"}" -- "{:id=>6685, :given=>\"Kam Yee\"}" [
+        fontsize = 8,
+        label = 0.85
+    ]
+
+    "{:id=>6350, :given=>\"K.Yee\"}" -- "{:id=>6767, :given=>\"K.\"}" [
+        fontsize = 8,
+        label = 0.55
+    ]
+
+    "{:id=>6350, :given=>\"K.Yee\"}" -- "{:id=>7197, :given=>\"Kim Yee\"}" [
+        fontsize = 8,
+        label = 0.85
+    ]
+
+    "{:id=>6350, :given=>\"K.Yee\"}" -- "{:id=>8683, :given=>\"Kam Y.\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+
+    "{:id=>6350, :given=>\"K.Yee\"}" -- "{:id=>31133, :given=>\"KamYee\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+
+    "{:id=>6685, :given=>\"Kam Yee\"}" -- "{:id=>6767, :given=>\"K.\"}" [
+        fontsize = 8,
+        label = 0.55
+    ]
+
+    "{:id=>6685, :given=>\"Kam Yee\"}" -- "{:id=>8683, :given=>\"Kam Y.\"}" [
+        fontsize = 8,
+        label = 0.8
+    ]
+
+    "{:id=>6767, :given=>\"K.\"}" -- "{:id=>7197, :given=>\"Kim Yee\"}" [
+        fontsize = 8,
+        label = 0.55
+    ]
+
+    "{:id=>6767, :given=>\"K.\"}" -- "{:id=>8444, :given=>\"Kam Xee\"}" [
+        fontsize = 8,
+        label = 0.55
+    ]
+}

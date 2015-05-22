@@ -1,0 +1,46 @@
+graph Collector__WeightedGraph {
+    "{:id=>6540, :given=>\"S.M.\"}" [
+        fontsize = 8,
+        label = "{:id=>6540, :given=>\"S.M.\"}"
+    ]
+
+    "{:id=>16145, :given=>\"S.\"}" [
+        fontsize = 8,
+        label = "{:id=>16145, :given=>\"S.\"}"
+    ]
+
+    "{:id=>16616, :given=>\"Sheila Mary\"}" [
+        fontsize = 8,
+        label = "{:id=>16616, :given=>\"Sheila Mary\"}"
+    ]
+
+    "{:id=>52919, :given=>\"Sheila\"}" [
+        fontsize = 8,
+        label = "{:id=>52919, :given=>\"Sheila\"}"
+    ]
+
+    "{:id=>6540, :given=>\"S.M.\"}" -- "{:id=>16145, :given=>\"S.\"}" [
+        fontsize = 8,
+        label = 0.65
+    ]
+
+    "{:id=>6540, :given=>\"S.M.\"}" -- "{:id=>16616, :given=>\"Sheila Mary\"}" [
+        fontsize = 8,
+        label = 0.85
+    ]
+
+    "{:id=>6540, :given=>\"S.M.\"}" -- "{:id=>52919, :given=>\"Sheila\"}" [
+        fontsize = 8,
+        label = 0.6
+    ]
+
+    "{:id=>16145, :given=>\"S.\"}" -- "{:id=>52919, :given=>\"Sheila\"}" [
+        fontsize = 8,
+        label = 0.6
+    ]
+
+    "{:id=>16616, :given=>\"Sheila Mary\"}" -- "{:id=>52919, :given=>\"Sheila\"}" [
+        fontsize = 8,
+        label = 0.9
+    ]
+}
