@@ -261,6 +261,7 @@ module Collector
 
       a.orcid_identifier = orcid
       a.save!
+      a.reload
       a.refresh_orcid_data
       Work.populate_citations
 

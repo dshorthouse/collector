@@ -17,12 +17,19 @@ class Agent < ActiveRecord::Base
   has_many :aliases, class_name: "Agent", foreign_key: "canonical_id"
   belongs_to :canonical, class_name: "Agent"
 
+  GENDER_HASH = {}
+
   def self.populate_orcids
     search_orcid
   end
 
   def self.populate_profiles
     search_profile
+  end
+
+  def self.populate_genders
+    rebuild_gender_hash
+    search_gender
   end
 
   def self.search_orcid
@@ -53,7 +60,7 @@ class Agent < ActiveRecord::Base
   end
 
   def self.search_profile
-    Agent.where("agents.orcid_matches = 1").find_each do |agent|
+    Agent.where("orcid_matches = 1").find_each do |agent|
       next if agent.processed_profile
       response = RestClient::Request.execute(
         method: :get,
@@ -61,6 +68,41 @@ class Agent < ActiveRecord::Base
         headers: { accept: 'application/orcid+json' }
       )
       parse_profile_orcid_response(agent, response)
+    end
+  end
+
+  def self.rebuild_gender_hash
+    puts "Rebuilding list..."
+    if Agent::GENDER_HASH.empty?
+      Agent.where("gender IS NOT NULL").pluck(:given, :gender).uniq.each do |a|
+        Agent::GENDER_HASH[a[0].split.first] = a[1]
+      end
+    end
+    puts "List rebuilt."
+  end
+
+  # Using data from https://github.com/guydavis/babynamemap/blob/master/db.sql.gz
+  def self.search_gender
+    Agent.where("length(given) > 1 AND gender IS NULL").find_each do |a|
+      first_name = a.given.split.first.strip
+      next if first_name.include? "."
+      gender = Agent::GENDER_HASH[first_name]
+      unless gender
+        searched = BabyName.where("name = %s" % BabyName.connection.quote(first_name))
+                           .pluck(:gender, :rating_avg)
+                           .map{ |n| { gender: n[0], rating: n[1].nil? ? 0 : n[1] } }
+        if searched.size == 1
+          gender = searched.first[:gender]
+        elsif searched.size > 1
+          gender = searched.sort_by{|k| k[:rating]}.reverse.first[:gender]
+        else
+          gender = "unknown"
+        end
+        Agent::GENDER_HASH[first_name] = gender
+        puts first_name + " = " + gender
+      end
+      a.gender = gender
+      a.save!
     end
   end
 
