@@ -9,7 +9,11 @@ if ARGV[0] == '--reset'
   graphs.reset
 end
 
+if ARGV[0] == '--write-graphics'
+  graphs.write_graphics = true
+end
+
 graphs.disambiguate
 puts 'Starting to reassign data'
 graphs.reassign_data
-puts 'Done reconciling agents'
+puts 'Done disambiguating agents'

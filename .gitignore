@@ -11,3 +11,4 @@ tags
 log/*.log
 config.yml
 public/files/*
+graphs/*

@@ -101,6 +101,7 @@ module Collector
               canonical_id: { type: 'integer', index: 'not_analyzed' },
               family: { type: 'string', search_analyzer: :family_search, index_analyzer: :family_index, omit_norms: true },
               given: { type: 'string', search_analyzer: :given_search, index_analyzer: :given_index, omit_norms: true },
+              gender: { type: 'string', index: 'not_analyzed' },
               aka: {
                 type: 'nested',
                 properties: {
@@ -173,7 +174,7 @@ module Collector
 
     def import_agents
       counter = 0
-      Agent.find_in_batches(batch_size: 50) do |group|
+      Agent.where("id = canonical_id").find_in_batches(batch_size: 25) do |group|
         agents = []
         group.each do |a|
           agents << {
@@ -184,6 +185,7 @@ module Collector
                           canonical_id: a.canonical_id,
                           family: a.family,
                           given: a.given,
+                          gender: a.gender,
                           aka: a.aka,
                           orcid: a.orcid_identifier,
                           email: a.email,
@@ -270,6 +272,7 @@ module Collector
                 canonical_id: a.canonical_id,
                 family: a.family,
                 given: a.given,
+                gender: a.gender,
                 aka: a.aka,
                 orcid: orcid,
                 email: a.email,

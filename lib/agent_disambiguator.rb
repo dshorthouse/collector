@@ -7,13 +7,17 @@ require 'rgl/dot'
 module Collector
   class AgentDisambiguator
 
+    attr_accessor :write_graphics
+    attr_accessor :cutoff_weight
+
     def initialize
       @graph = {}
       @family = nil
+      @cutoff_weight = 0.8
     end
 
     def reset
-      Agent.update_all({ canonical_id: :id })
+      Agent.connection.execute("UPDATE agents SET canonical_id = id")
     end
 
     def disambiguate
@@ -33,9 +37,10 @@ module Collector
           end
         end
         add_edges(agents)
-        deduce_canonicals
-        remove_isolates
-        #@graph.write_to_graphic_file('png', 'graphs/' + @family) if @graph.length > 2
+        write_graphic_file('raw') if @write_graphics
+        prune_graph
+        write_graphic_file('pruned') if @write_graphics
+        combine_subgraphs
       end
     end
 
@@ -44,36 +49,25 @@ module Collector
         similarity = name_similarity(pair.first, pair.second)
         vertex1 = { id: pair.first[:id], given: pair.first[:given] }
         vertex2 = { id: pair.second[:id], given: pair.second[:given] }
-        @graph.add_edge(vertex1, vertex2, similarity)
-        @graph.remove_edge(vertex1, vertex2) if similarity <= 0.5
+        @graph.add_edge(vertex1, vertex2, similarity) if similarity > 0
       end
     end
 
-    def deduce_canonicals
-      @graph.each_connected_component do |component|
-        next if component.length == 1
-        edges = subgraph_edges(component)
-        max_edges = (component.length*(component.length-1))/2
-        update_vertices(component) if edges.length == max_edges
+    def prune_graph
+      edges = graph_edges(@graph.vertices)
+      edges.each do |k,v|
+        @graph.remove_edge(k[0],k[1]) if v < @cutoff_weight
+      end
+      remove_isolates
+    end
 
-        if component.length == 3 && edges.length != max_edges
-          edges.each do |k,v|
-            if v < 0.8
-              @graph.remove_edge(k[0],k[1])
-              edges.delete k
-            end
-          end
-          update_vertices(edges.each_key.first) if !edges.empty?
-        end
-        if component.length > 3
-          #create cliques, set canonical_id
-          #could use @graph.cycles here somehow and incorporate their weights
-          #could try removing all vertices with 4+ edges then running through deduce_canonicals again
-        end
+    def write_graphic_file(type)
+      if @graph.length > 1
+        @graph.write_to_graphic_file('png', 'graphs/' + @family.gsub(/[^0-9A-Za-z.\-]/, '_') + "_" + type)
       end
     end
 
-    def subgraph_edges(vertices)
+    def graph_edges(vertices)
       edges = {}
       vertices.combination(2).each do |pair|
         if @graph.has_edge?(pair.first, pair.second)
@@ -83,16 +77,15 @@ module Collector
       edges
     end
 
-    def update_vertices(vertices)
-      sorted_vertices = vertices.sort_by { |g| g[:given].length }
-      ids = sorted_vertices.map {|v| v[:id] }
-      canonical = ids.pop
-      Agent.transaction do
-        agents = Agent.where(id: ids)
-        agents.update_all(canonical_id: canonical)
+    def combine_subgraphs
+      @graph.each_connected_component do |vertices|
+        sorted_vertices = vertices.sort_by { |g| g[:given].length }
+        ids = sorted_vertices.map {|v| v[:id] }
+        #make the longest given name the 'canonical' version
+        canonical = ids.pop
+        Agent.where(id: ids).update_all(canonical_id: canonical)
+        puts sorted_vertices.map {|v| v[:given] }.join(" | ") + " => " + [sorted_vertices.last[:given],@family].join(" ")
       end
-      puts sorted_vertices.map {|v| v[:given] }.join(" | ") + " => " + [sorted_vertices.last[:given],@family].join(" ")
-      vertices.each { |v| @graph.remove_vertex v }
     end
 
     def remove_isolates
@@ -173,11 +166,11 @@ module Collector
     def reassign_data
       Agent.where("id <> canonical_id").find_each do |a|
         puts "Reassigning data for #{a.given} #{a.family}"
-        OccurrenceDeterminer.update_all({ agent_id: a.canonical_id }, { agent_id: a.id })
-        OccurrenceRecorder.update_all({ agent_id: a.canonical_id }, { agent_id: a.id })
-        TaxonDeterminer.update_all({ agent_id: a.canonical_id }, { agent_id: a.id })
-        AgentWork.update_all({ agent_id: a.canonical_id }, { id: a.id })
-        AgentDescription.update_all({ agent_id: a.canonical_id }, { id: a.id })
+        OccurrenceDeterminer.where(agent_id: a.id).update_all(agent_id: a.canonical_id, original_agent_id: a.id)
+        OccurrenceRecorder.where(agent_id: a.id).update_all(agent_id: a.canonical_id, original_agent_id: a.id)
+        TaxonDeterminer.where(agent_id: a.id).update_all(agent_id: a.canonical_id, original_agent_id: a.id)
+        AgentWork.where(agent_id: a.id).update_all(agent_id: a.canonical_id, original_agent_id: a.id)
+        AgentDescription.where(agent_id: a.id).update_all(agent_id: a.canonical_id, original_agent_id: a.id)
       end
     end
 
