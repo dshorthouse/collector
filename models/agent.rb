@@ -191,7 +191,7 @@ class Agent < ActiveRecord::Base
   end
 
   def refresh_orcid_data
-    return if !orcid_identifier.present
+    return if !orcid_identifier.present?
     response = RestClient::Request.execute(
       method: :get,
       url: Sinatra::Application.settings.orcid_base_url + orcid_identifier + '/orcid-profile',
@@ -201,11 +201,7 @@ class Agent < ActiveRecord::Base
   end
 
   def aka
-    (Agent.where(canonical_id: id).where.not(id: id) | Agent.where(canonical_id: canonical_id).where.not(id: id)).map{|a| {id: a.id, family: a.family, given: a.given}}
-  end
-
-  def aka_ids
-    (Agent.where(canonical_id: id).where.not(id: id) | Agent.where(canonical_id: canonical_id).where.not(id: id)).map{|a| a.id }
+    (Agent.where(canonical_id: id).where.not(id: id) | Agent.where(canonical_id: canonical_id).where.not(id: id)).map{|a| {family: a.family, given: a.given}}
   end
 
 end

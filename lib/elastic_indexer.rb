@@ -105,7 +105,6 @@ module Collector
               aka: {
                 type: 'nested',
                 properties: {
-                  id: { type: 'integer', index: 'not_analyzed' },
                   family: { type: 'string', index: 'not_analyzed' },
                   given: { type: 'string', index: 'not_analyzed' }
                 }
