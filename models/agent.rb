@@ -187,7 +187,7 @@ class Agent < ActiveRecord::Base
   end
 
   def determined_families
-    determined_taxa.pluck(:id, :family).uniq.map{|f| { id: f[0], family: f[1] } }.sort_by { |a| a[:family] }
+    determined_taxa.group_by{|i| i }.map {|k, v| { id: k.id, family: k.family, count: v.count } }.sort_by { |a| a[:family] }
   end
 
   def refresh_orcid_data

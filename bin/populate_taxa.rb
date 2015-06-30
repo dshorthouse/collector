@@ -10,4 +10,5 @@ end
 
 puts 'Starting to populate taxa'
 Occurrence.populate_taxa
+Taxon.populate_metadata
 puts 'Done populating taxa'

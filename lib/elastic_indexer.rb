@@ -117,7 +117,8 @@ module Collector
               determined_families: {
                 properties: {
                   id: { type: 'integer', index: 'not_analyzed' },
-                  family: {type: 'string', index: 'not_analyzed' },
+                  family: { type: 'string', index: 'not_analyzed' },
+                  count: { type: 'integer', index: 'not_analyzed' }
                 }
               },
               recordings_with: {
@@ -156,12 +157,22 @@ module Collector
             properties: {
               id: { type: 'integer', index: 'not_analyzed' },
               family: { type: 'string', search_analyzer: :scientific_name_search, index_analyzer: :scientific_name_index, omit_norms: true },
+              common_name: { type: 'string', index: 'not_analyzed' },
+              image_data: {
+                properties: {
+                  mediaURL: { type: 'string', index: 'not_analyzed' },
+                  license: { type: 'string', index: 'not_analyzed' },
+                  rightsHolder: { type: 'string', index: 'not_analyzed' },
+                  source: { type: 'string', index: 'not_analyzed' }
+                }
+              },
               identifiedBy: {
                 type: 'nested',
                 properties: {
                   id: {type: 'integer', index: 'not_analyzed' },
                   family: { type: 'string', index: 'not_analyzed' },
-                  given: { type: 'string', index: 'not_analyzed' }
+                  given: { type: 'string', index: 'not_analyzed' },
+                  count: { type: 'integer', index: 'not_analyzed' }
                 }
               }
             }
@@ -245,7 +256,9 @@ module Collector
                       data: {
                         id: t.id,
                         family: t.family,
-                        identifiedBy: t.determinations.pluck(:id, :family, :given).uniq.map {|a| { id: a[0], family: a[1], given: a[2] } }
+                        common_name: t.common,
+                        image_data: t.image_data,
+                        identifiedBy: t.determinations.group_by{ |i| i }.map {|k, v| { id: k.id, given: k.given, family: k.family, count: v.count } }
                       }
                     }
                   }

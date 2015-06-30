@@ -57,7 +57,7 @@ p.byline{
 header {
   border-bottom:2px solid #CCC;
   margin-bottom:2em;
-  width:600px;
+  width:615px;
 }
 
 .contact-details{
@@ -67,7 +67,7 @@ header {
 }
 
 footer{
-  width:600px;
+  width:615px;
   margin-top:1em;
   border-top:2px solid #CCC;
   padding-top:0.75em;
@@ -288,6 +288,20 @@ margin-left:40px;
   right:0px;
 }
 
+/* TAXON */
+
+#taxon-image{
+  max-height:350px;
+}
+
+ol.ranked { 
+  list-style-type: decimal;
+  margin-left:2em;
+}
+
+ol.ranked li {
+  line-height:1.25em;
+}
 
 .clear:after{
   clear: both;

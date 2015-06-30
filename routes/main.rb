@@ -62,6 +62,11 @@ module Sinatra
             format_taxa.to_json
           end
 
+          app.get '/taxon/:id.json' do
+            taxon_profile(params[:id])
+            @result.to_json
+          end
+
           app.get '/taxon/:id' do
             taxon_profile(params[:id])
             haml :taxon

@@ -59,6 +59,13 @@
     %p None
 
 - if @result[:determined_families].size > 0
+  %h2 Top Families Identified (# Specimens)
+  %ol.ranked
+    - @result[:determined_families].sort_by { |a| a[:count] }.reverse.first(10).each do |t|
+      %li
+        %a{href: "/taxon/#{t[:family]}" }=  t[:family]
+        (#{number_with_delimiter(t[:count])})
+
   %h2 Families Identified
   %ul.determinations
     - @result[:determined_families].sort_by { |d| d[:family] }.each do |t|

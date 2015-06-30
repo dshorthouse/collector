@@ -12,6 +12,7 @@ development:
   orcid_token_url: 'https://api.sandbox.orcid.org/oauth/token'
   elastic_server: 'http://localhost:9200'
   elastic_index: 'collector'
+  eol_api: 'http://eol.org/api/'
 
 test:
   adapter: mysql2
@@ -42,3 +43,4 @@ production:
   orcid_token_url: ''
   elastic_server: 'http://localhost:9200'
   elastic_index: 'collector'
+  eol_api: 'http://eol.org/api/'

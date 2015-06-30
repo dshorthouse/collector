@@ -3,7 +3,25 @@
 
 %h1 #{@result[:family]}
 
+%p #{@result[:common_name]}
+
+- if @result[:image_data]
+  %a{href: @result[:image_data][:source]}
+    %img{src: @result[:image_data][:mediaURL], id: "taxon-image", alt: @result[:family] }
+  - if @result[:image_data][:rightsHolder]
+    %p
+      &copy; #{@result[:image_data][:rightsHolder]}
+      %a{href: @result[:image_data][:license] }= @result[:image_data][:license]
+
 #colleagues-wrapper
+  %h2 Top Determiners (# Specimens)
+  - if @result[:identifiedBy].size > 0
+    %ol.ranked
+      - @result[:identifiedBy].sort_by { |a| a[:count] }.reverse.first(10).each do |c|
+        %li
+          - name = [c[:given].presence, c[:family].presence]. join(" ")
+          %a{href: "/agent/#{c[:id]}" }= name
+          (#{number_with_delimiter(c[:count])})
   %h2 Identified By
   - if @result[:identifiedBy].size > 0
     %ul.collectors
