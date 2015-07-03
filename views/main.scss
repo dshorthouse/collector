@@ -49,6 +49,13 @@ p{
   line-height:1.5em;
 }
 
+label{
+  min-width:7em;
+  display:inline-block;
+  text-align:right;
+  font-weight:bold;
+}
+
 p.byline{
   color:#777;
   margin-top:0px;
@@ -84,11 +91,14 @@ footer{
   margin-bottom:1.75em;
 }
 #form-wrapper .search-agent{
-  height:3em;
   vertical-align:middle;
   margin-right:2em;
   font-size:1.25em;
 }
+#form-wrapper .search-agent div.inputs{
+  margin-bottom:1em;
+}
+#form-buttons{width:555px;text-align:right;}
 label input {
   margin-right:0.5em;
 }

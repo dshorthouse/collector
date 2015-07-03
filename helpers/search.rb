@@ -6,9 +6,11 @@ module Sinatra
 
       def execute_search(type = 'taxon,agent')
         @results = []
+        filters = []
         searched_term = params[:q]
         geo = params[:geo]
-        return if !(searched_term.present? || geo.present?)
+        taxon = params[:taxon]
+        return if !(searched_term.present? || geo.present? || taxon.present?)
 
         page = (params[:page] || 1).to_i
         search_size = (params[:per] || 13).to_i
@@ -71,12 +73,23 @@ module Sinatra
           end
           case geo
             when 'circle'
-              body[:filter] = { geo_distance: { coordinates: center, distance: radius } }
+              filters << { geo_distance: { coordinates: center, distance: radius } }
             when 'rectangle'
-              body[:filter] = { geo_bounding_box: { coordinates: { top_left: [bounds[1],bounds[2]], bottom_right: [bounds[3],bounds[0]] } } }
+              filters << { geo_bounding_box: { coordinates: { top_left: [bounds[1],bounds[2]], bottom_right: [bounds[3],bounds[0]] } } }
             when 'polygon'
-              body[:filter] = { geo_polygon: { coordinates: { points: polygon } } }
+              filters << { geo_polygon: { coordinates: { points: polygon } } }
           end
+        end
+
+        if taxon.present?
+          if !searched_term.present?
+            sort = "family"
+          end
+          filters << { term: { "determined_families.family" => taxon } }
+        end
+
+        if filters.size > 0
+          body[:filter] = { bool: { must: filters } }
         end
 
         from = (page -1) * search_size

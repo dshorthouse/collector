@@ -36,36 +36,32 @@ var Collector = (function($, window) {
       });
     },
     typeahead: function(){
-      $('.typeahead').typeahead({
+      $('#typeahead-agent').typeahead({
           minLength: 3,
           highlight: true
         },
         {
           name: 'agent',
           source : this.data_sources.agent.ttAdapter(),
-          display : 'name',
-          templates : {
-            header: '<h3 class="tt-menu-header">People</h3>'
-          }
-        },
-        {
-          name: 'taxon',
-          source : this.data_sources.taxon.ttAdapter(),
-          display : 'name',
-          templates : {
-            header: '<h3 class="tt-menu-header">Families</h3>'
-          }
+          display : 'name'
         }
         ).on('typeahead:select', function(obj, datum) {
           var id = datum.id;
-          if(datum.type == 'taxon') {
-            id = datum.name;
-          }
-          if(datum.type == 'agent' && datum.orcid) {
+          if(datum.orcid) {
             id = datum.orcid;
           }
-          window.location.href = '/' + datum.type + '/' + id;
-        }).focus().select();
+          window.location.href = '/agent/' + id;
+        });
+        $('#typeahead-taxon').typeahead({
+            minLength: 3,
+            highlight: true
+          },
+          {
+            name: 'taxon',
+            source : this.data_sources.taxon.ttAdapter(),
+            display : 'name'
+          }
+        );
     },
     getParameterByName: function(name) {
         name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
@@ -184,7 +180,12 @@ var Collector = (function($, window) {
       },
       activateReset: function() {
         var self = this;
-        $('#reset_form').on('click', function() { self.clearOverlays(); });
+        $('#reset_form').on('click', function() {
+          self.clearOverlays();
+          $(':input').not(':button, :submit, :reset, :hidden').val('');
+          $('#typeahead-agent').typeahead('val', '');
+          $('#typeahead-taxon').typeahead('val', '');
+        });
       }
   };
 

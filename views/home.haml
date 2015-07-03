@@ -17,9 +17,16 @@
 %form{ id: "search_form", method: "get", action: "/", "accept-charset" => "UTF-8", class: "clear" }
   #form-wrapper.clear
     %div.search-agent
-      %input.typeahead{type: :text, name: "q", placeholder: "Terry Wheeler", value: "#{params[:q]}", size: 30}
-      %input.form-button.submit-button{type: :submit, value: "Search"}
-      %input.form-button.submit-button{id: "reset_form", type: :reset, value: "Reset"}
+      %div.inputs
+        %label{for: "typeahead-taxon"}= "Collector"
+        %input.typeahead{id: "typeahead-agent", type: :text, name: "q", placeholder: "Terry Wheeler", value: "#{params[:q]}", size: 30}
+      %div.inputs
+        %label{for: "typeahead-taxon"}= "Taxon Family"
+        %input.typeahead{id: "typeahead-taxon", type: :text, name: "taxon", placeholder: "Sarcophagidae", value: "#{params[:taxon]}", size: 30}
+      %div{id: "form-buttons" }
+        %input.form-button.submit-button{type: :submit, value: "Search"}
+        %input.form-button.submit-button{id: "reset_form", type: :reset, value: "Reset"}
+
       %input{type: :hidden, name: "geo", id: "geo_type", value: "#{params[:geo]}"}
       %input{type: :hidden, name: "c", id: "geo_center", value: "#{params[:c]}"}
       %input{type: :hidden, name: "r", id: "geo_radius", value: "#{params[:r]}"}

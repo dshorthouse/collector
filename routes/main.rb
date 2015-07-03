@@ -11,7 +11,7 @@ module Sinatra
             if session[:omniauth]
               @orcid = session[:omniauth][:uid]
             end
-            execute_search
+            execute_search('agent')
             haml :home
           end
 
