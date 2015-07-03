@@ -2,6 +2,9 @@ class Taxon < ActiveRecord::Base
   has_many :determinations, :through => :taxon_determiners, :source => :agent
   has_many :taxon_determiners
 
+  has_many :occurrences, :through => :taxon_occurrences, :source => :occurrence
+  has_many :taxon_occurrences
+
   def self.populate_metadata
     Taxon.where("common IS NULL").find_each do |t|
       search = URI::encode(t.family)
@@ -48,6 +51,12 @@ class Taxon < ActiveRecord::Base
     content = JSON.parse(image, :symbolize_names => true) rescue nil
     return if content.nil?
     { mediaURL: content[:eolMediaURL], license: content[:license], rightsHolder: content[:rightsHolder], source: content[:source] }
+  end
+
+  def occurrence_coordinates
+    occurrences.pluck(:decimalLongitude, :decimalLatitude)
+              .compact.uniq
+              .map{ |c| [c[0].to_f, c[1].to_f] }
   end
 
 end

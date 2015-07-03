@@ -5,6 +5,9 @@ class Occurrence < ActiveRecord::Base
   has_many :recorders, :through => :occurrence_recorders, :source => :agent
   has_many :occurrence_recorders
 
+  has_many :taxa, :through => :taxon_occurrences, :source => :taxon
+  has_many :taxon_occurrences
+
   def self.populate_data(infile)
     # data file downloaded and extracted from http://data.canadensys.net
     sql = "LOAD DATA LOCAL INFILE '#{infile}' 
@@ -63,8 +66,13 @@ class Occurrence < ActiveRecord::Base
     Occurrence.where("identifiedBy IS NOT NULL AND family <> ''").find_each do |o|
       count += 1
 
-      o.occurrence_determiners.each do |d|
-        save_taxon(o.family, d.agent_id)
+      Occurrence.transaction do
+        taxon = Taxon.find_or_create_by(family: o.family)
+        TaxonOccurrence.create(taxon_id: taxon.id, occurrence_id: o.id)
+
+        o.occurrence_determiners.each do |d|
+          save_taxon_determiner(taxon.id, d.agent_id)
+        end
       end
 
       puts "Parsed %s occurrences for taxa" % count if count % 1000 == 0
@@ -72,10 +80,8 @@ class Occurrence < ActiveRecord::Base
   end
 
   def self.save_agent(name, id, type)
-
     return if name.family.nil? || name.family.length < 3
 
-    agent_id = nil
     family = name.family.to_s
     given = name.given.to_s
 
@@ -93,16 +99,9 @@ class Occurrence < ActiveRecord::Base
     end
   end
 
-  def self.save_taxon(family, agent_id)
-
-    return if family.nil? || agent_id.nil?
-
-    family_id = nil
-
-    Occurrence.transaction do
-      taxon = Taxon.find_or_create_by(family: family)
-      TaxonDeterminer.create(taxon_id: taxon.id, agent_id: agent_id)
-    end
+  def self.save_taxon_determiner(taxon_id, agent_id)
+    return if taxon_id.nil? || agent_id.nil?
+    TaxonDeterminer.create(taxon_id: taxon_id, agent_id: agent_id)
   end
 
   def coordinates

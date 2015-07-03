@@ -5,6 +5,7 @@ require_relative '../environment.rb'
 if ARGV[0] == '--truncate'
   puts "Truncating data"
   Occurrence.connection.execute("TRUNCATE TABLE taxa")
+  Occurrence.connection.execute("TRUNCATE TABLE taxon_occurrences")
   Occurrence.connection.execute("TRUNCATE TABLE taxon_determiners")
 end
 

@@ -174,7 +174,8 @@ module Collector
                   given: { type: 'string', index: 'not_analyzed' },
                   count: { type: 'integer', index: 'not_analyzed' }
                 }
-              }
+              },
+              coordinates: { type: 'geo_point', lat_lon: true, fielddata: { format: 'compressed', precision: "5km" }, index: 'not_analyzed' },
             }
           }
         }
@@ -258,7 +259,8 @@ module Collector
                         family: t.family,
                         common_name: t.common,
                         image_data: t.image_data,
-                        identifiedBy: t.determinations.group_by{ |i| i }.map {|k, v| { id: k.id, given: k.given, family: k.family, count: v.count } }
+                        identifiedBy: t.determinations.group_by{ |i| i }.map {|k, v| { id: k.id, given: k.given, family: k.family, count: v.count } },
+                        coordinates: t.occurrence_coordinates
                       }
                     }
                   }
