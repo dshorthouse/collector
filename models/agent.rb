@@ -41,7 +41,7 @@ class Agent < ActiveRecord::Base
           search = 'family-name:' + URI::encode(agent.family) + '+AND+given-names:' + URI::encode(agent.given)
           response = RestClient::Request.execute(
             method: :get,
-            url: Sinatra::Application.settings.orcid_base_url + 'search/orcid-bio?q=' + search,
+            url: Sinatra::Application.settings.orcid_api_url + 'search/orcid-bio?q=' + search,
             headers: { accept: 'application/orcid+json' }
           )
           parse_search_orcid_response(agent, response)
@@ -64,7 +64,7 @@ class Agent < ActiveRecord::Base
       next if agent.processed_profile
       response = RestClient::Request.execute(
         method: :get,
-        url: Sinatra::Application.settings.orcid_base_url + agent.orcid_identifier + '/orcid-profile',
+        url: Sinatra::Application.settings.orcid_api_url + agent.orcid_identifier + '/orcid-profile',
         headers: { accept: 'application/orcid+json' }
       )
       parse_profile_orcid_response(agent, response)
@@ -194,7 +194,7 @@ class Agent < ActiveRecord::Base
     return if !orcid_identifier.present?
     response = RestClient::Request.execute(
       method: :get,
-      url: Sinatra::Application.settings.orcid_base_url + orcid_identifier + '/orcid-profile',
+      url: Sinatra::Application.settings.orcid_api_url + orcid_identifier + '/orcid-profile',
       headers: { accept: 'application/orcid+json' }
     )
     self.class.parse_profile_orcid_response(self, response)

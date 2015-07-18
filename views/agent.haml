@@ -6,6 +6,11 @@
   %script{src: 'https://www.google.com/jsapi', type: 'text/javascript' }
   %script{src: 'http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js', type: 'text/javascript' }
   %script{src: 'http://maps.stamen.com/js/tile.stamen.js?v1.2.4', type: 'text/javascript' }
+  
+  %script{src: 'http://d3js.org/d3.v3.js', type: 'text/javascript' }
+  %script{src: 'http://cpettitt.github.io/project/dagre-d3/v0.1.5/dagre-d3.min.js', type: 'text/javascript' }
+  %script{src: 'http://cpettitt.github.io/project/graphlib-dot/v0.4.10/graphlib-dot.min.js', type: 'text/javascript' }
+  
   %script{src: '/javascript/leaflet-dvf.min.js', type: 'text/javascript' }
   %script{src: '/javascript/geohash.js', type: 'text/javascript' }
   %script{src: '/javascript/agent.js', type: 'text/javascript' }
@@ -55,6 +60,7 @@
         %li
           - name = [c[:given].presence, c[:family].presence]. join(" ")
           %a{href: "/agent/#{c[:id]}" }=  name
+    %svg{id: "social-graph"}
   - else
     %p None
 

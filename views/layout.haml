@@ -16,7 +16,7 @@
 
       - if @orcid
         -# %p
-          -# %a{ href: "/orcid_profile" } Connect to ORCID API to fetch full profile data as JSON
+          -# %a{ href: "/orcid_profile" } #{@orcid["name"]}
         -# %p
           -# %a{ href: "/logout" } Logout
       - else

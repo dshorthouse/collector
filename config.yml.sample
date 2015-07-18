@@ -4,7 +4,7 @@ development:
   username: root
   password:
   database: collector_dev
-  orcid_base_url: 'http://pub.orcid.org/v1.2/'
+  orcid_api_url: 'http://pub.orcid.org/v1.2/'
   orcid_key: ''
   orcid_secret: ''
   orcid_site: 'https://sandbox.orcid.org'
@@ -20,7 +20,7 @@ test:
   username: root
   password:
   database: collector_test
-  orcid_base_url: 'http://pub.orcid.org/v1.2/'
+  orcid_api_url: 'http://pub.orcid.org/v1.2/'
   orcid_key: ''
   orcid_secret: ''
   orcid_site: 'https://sandbox.orcid.org'
@@ -35,7 +35,7 @@ production:
   username: root
   password:
   database: collector
-  orcid_base_url: 'http://pub.orcid.org/v1.2/'
+  orcid_api_url: 'http://pub.orcid.org/v1.2/'
   orcid_key: ''
   orcid_secret: ''
   orcid_site: ''

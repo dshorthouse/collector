@@ -4,6 +4,21 @@ module Sinatra
   module Collector
     module Helpers
 
+      def set_session
+        if session[:omniauth]
+          @orcid = session[:omniauth]
+        end
+      end
+
+      def get_orcid_profile(uid)
+        response = RestClient::Request.execute(
+          method: :get,
+          url: Sinatra::Application.settings.orcid_api_url + uid + '/orcid-profile',
+          headers: { accept: 'application/orcid+json' }
+        )
+        JSON.parse(response, :symbolize_names => true)[:"orcid-profile"]
+      end
+
       def paginate(collection)
           options = {
            inner_window: 3,

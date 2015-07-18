@@ -63,7 +63,7 @@ module Collector
 
     def write_graphic_file(type)
       if @graph.length > 1
-        @graph.write_to_graphic_file('png', 'graphs/' + @family.gsub(/[^0-9A-Za-z.\-]/, '_') + "_" + type)
+        @graph.write_to_graphic_file('png', 'public/images/graphs/' + @family.gsub(/[^0-9A-Za-z.\-]/, '_') + "_" + type)
       end
     end
 

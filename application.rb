@@ -15,11 +15,14 @@ class COLLECTOR < Sinatra::Base
 
   use OmniAuth::Builder do
     provider :orcid, settings.orcid_key, settings.orcid_secret,
+      :authorize_params => {
+        :scope => '/authenticate'
+      },
       :client_options => {
         :site => settings.orcid_site, 
         :authorize_url => settings.orcid_authorize_url,
         :token_url => settings.orcid_token_url,
-        :scope => '/orcid-bio/read-limited'
+        :scope => '/authenticate'
       }
   end
 

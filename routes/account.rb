@@ -7,10 +7,8 @@ module Sinatra
 
         def self.registered(app)
           app.get '/orcid_profile' do
-            client = OAuth2::Client.new app.settings.orcid_key, app.settings.orcid_secret, :site  => app.settings.orcid_site
-            atoken = OAuth2::AccessToken.new client, session[:omniauth]['credentials']['token']
-            response = atoken.get "/#{session[:omniauth]['uid']}/orcid-profile", :headers => {'Accept' => 'application/json'}
-            response.body
+            set_session
+            get_orcid_profile(@orcid[:uid]).to_json
           end
 
           app.get '/logout' do
@@ -19,7 +17,10 @@ module Sinatra
           end
 
           app.get '/auth/orcid/callback' do
-            session[:omniauth] = request.env['omniauth.auth']
+            session_data = request.env['omniauth.auth']
+            names = get_orcid_profile(session_data["uid"])[:"orcid-bio"][:"personal-details"]
+            session_data[:name] = [names[:"given-names"][:value], names[:"family-name"][:value]].join(" ")
+            session[:omniauth] = session_data
             redirect '/'
           end
         end

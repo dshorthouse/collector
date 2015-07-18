@@ -8,9 +8,7 @@ module Sinatra
         def self.registered(app)
 
           app.get '/' do
-            if session[:omniauth]
-              @orcid = session[:omniauth][:uid]
-            end
+            set_session
             execute_search('agent')
             haml :home
           end
@@ -32,6 +30,7 @@ module Sinatra
           end
 
           app.get '/agent/:id' do
+            set_session
             agent_profile(params[:id])
             if @result[:id] != @result[:canonical_id]
               redirect to('/agent/' + @result[:canonical_id].to_s )
@@ -68,6 +67,7 @@ module Sinatra
           end
 
           app.get '/taxon/:id' do
+            set_session
             taxon_profile(params[:id])
             haml :taxon
           end
