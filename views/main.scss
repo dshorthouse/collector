@@ -299,24 +299,9 @@ margin-left:40px;
 }
 
 #social-graph {
-    overflow: hidden;
-    margin-top:10px;
-}
-
-#social-graph .node rect {
-    stroke: #333;
-    stroke-width: 1.5px;
-    fill: #fff;
-}
-
-#social-graph .edgeLabel rect {
-    fill: #fff;
-}
-
-#social-graph .edgePath {
-    stroke: #333;
-    stroke-width: 1.5px;
-    fill: none;
+  height: 400px;
+  width:100%;
+  margin-top:10px;
 }
 
 /* TAXON */

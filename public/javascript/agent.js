@@ -185,48 +185,46 @@ var Agent = (function($, window) {
       $.ajax({
         url: '/images/graphs/' + this.id + '.dot',
         success: function(data) {
-          var g = graphlibDot.parse(data),
-              renderer = new dagreD3.Renderer(),
-              margin = {top: 5, right: 5, bottom: 5, left: 5},
-              width = window.innerWidth - 50 - margin.left - margin.right,
-              height = 250 - margin.top - margin.bottom,
-              zoom = d3.behavior.zoom()
-                    .scaleExtent([-3, 10])
-                    .on("zoom", zoomed),
-              drag = d3.behavior.drag()
-                    .origin(function(d) { return d; })
-                    .on("dragstart", dragstarted)
-                    .on("drag", dragged)
-                    .on("dragend", dragended),
-              svg = d3.select($('#social-graph')[0])
-                    .attr("width", width + margin.left + margin.right)
-                    .attr("height", height + margin.top + margin.bottom)
-                    .append("g")
-                    .attr("transform", "translate(" + margin.left + "," + margin.right + ")")
-                    .call(zoom),
-              rect = svg.append("rect")
-                    .attr("width", width)
-                    .attr("height", height)
-                    .style("fill", "none")
-                    .style("pointer-events", "all"),
-              container = svg.append("g");
-
-          container.call(drag);
-          renderer.run(g, container);
-
-          function zoomed() {
-            container.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-          }
-          function dragstarted() {
-            d3.event.sourceEvent.stopPropagation();
-            d3.select(this).classed("dragging", true); 
-          }
-          function dragged() {
-            d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y);
-          }
-          function dragended() {
-           d3.select(this).classed("dragging", false); 
-          }
+          var container = $('#social-graph')[0];
+          var parsedData = vis.network.convertDot(data);
+          console.log(parsedData);
+          var edges = $.map(parsedData.edges, function(n) {
+            n['value'] = n.label;
+            return n;
+          });
+          var data = {
+                nodes: parsedData.nodes,
+                edges: edges
+              },
+              options = {
+                autoResize: true,
+                height: '100%',
+                width: '100%',
+                physics: true,
+                nodes: {
+                  color: {
+                    border: '#111',
+                    background: '#FFF'
+                  },
+                  font: {
+                    size: 14
+                  }
+                },
+                edges: {
+                  smooth: {
+                    type: 'continuous'
+                  },
+                  color: {
+                    color: '#ccc'
+                  },
+                  scaling: {
+                    min: 1,
+                    max: 10,
+                    label: false
+                  }
+                }
+              };
+          var network = new vis.Network(container, data, options);
         },
         error: function() {
           $('#social-graph').height(0);
