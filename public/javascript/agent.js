@@ -203,7 +203,11 @@ var Agent = (function($, window) {
                 nodes: {
                   color: {
                     border: '#111',
-                    background: '#FFF'
+                    background: '#FFF',
+                    highlight: {
+                      background: '#FFFFCC',
+                      border: '#777'
+                    }
                   },
                   font: {
                     size: 14
