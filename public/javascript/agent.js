@@ -187,7 +187,6 @@ var Agent = (function($, window) {
         success: function(data) {
           var container = $('#social-graph')[0];
           var parsedData = vis.network.convertDot(data);
-          console.log(parsedData);
           var edges = $.map(parsedData.edges, function(n) {
             n['value'] = n.label;
             return n;
@@ -225,6 +224,7 @@ var Agent = (function($, window) {
                 }
               };
           var network = new vis.Network(container, data, options);
+          network.fit({animation: {offset: {x:300,y:300}, duration: 3000}});
         },
         error: function() {
           $('#social-graph').height(0);

@@ -10,6 +10,7 @@ module Collector
     def initialize(edgelist_class = Set, *other_graphs)
       super
       @weights = {}
+      @attributes = {}
     end
 
     # Create a graph from an array of [source, target, weight] triples.
@@ -46,6 +47,14 @@ module Collector
       @weights[[u,v]] = w
     end
 
+    def add_vertex_attributes(v, a)
+      @attributes[v] = a
+    end
+
+    def vertex_attributes(v)
+      @attributes[v] || {}
+    end
+
     # Edge weight
     #
     # [_u_] source vertex
@@ -76,6 +85,16 @@ module Collector
       result
     end
 
+    # Create a dot file to depict the graph's vertices with decorated edges
+    def write_to_dot_file(dotfile="graph")
+      src = dotfile + ".dot"
+
+      File.open(src, 'w') do |f|
+        f << self.to_dot_graph.to_s << "\n"
+      end
+      src
+    end
+
     # Create a dot file and png to depict the graph's vertices with decorated edges
     def write_to_graphic_file(fmt='png', dotfile="graph")
       src = dotfile + ".dot"
@@ -97,11 +116,13 @@ module Collector
 
       each_vertex do |v|
         name = v.to_s
-        graph << RGL::DOT::Node.new(
-            'name'     => name,
-            'fontsize' => fontsize,
-            'label'    => name
-        )
+        options = {
+          'name'     => name,
+          'fontsize' => fontsize,
+          'label'    => name
+        }
+        options.merge! vertex_attributes(v)
+        graph << RGL::DOT::Node.new(options)
       end
 
       each_edge do |u, v|
