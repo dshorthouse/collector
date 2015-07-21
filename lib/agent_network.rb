@@ -19,6 +19,7 @@ module Collector
       end
       collect_agents(@agent)
       add_edges
+      add_attributes
       if @graph.size > 2
         write_dot_file
         puts "Created graph for #{[@agent.given, @agent.family].join(' ')} (#{@agent.id})"
@@ -38,19 +39,21 @@ module Collector
       end
     end
 
+    def add_attributes
+      @agents.each do |a|
+        vertex = [a.given, a.family].join(" ")
+        if !a.gender.nil? && @graph.has_vertex?(vertex)
+          color = (a.gender == 'male') ? "#CCE5FF" : "#FFCCCC"
+          @graph.add_vertex_attributes(vertex, { "fillcolor" => color })
+        end
+      end
+    end
+
     def add_edge(agent1, agent2)
       vertex1 = [agent1.given, agent1.family].join(" ")
       vertex2 = [agent2.given, agent2.family].join(" ")
       common = agent1.recordings.pluck(:id) & agent2.recordings.pluck(:id)
       @graph.add_edge(vertex1, vertex2, common.size) if common.size > 1
-      if !agent1.gender.nil?
-        color = (agent1.gender == 'male') ? "#CCE5FF" : "#FFCCCC"
-        @graph.add_vertex_attributes(vertex1, { "fillcolor" => color })
-      end
-      if !agent2.gender.nil?
-        color = (agent2.gender == 'male') ? "#CCE5FF" : "#FFCCCC"
-        @graph.add_vertex_attributes(vertex2, { "fillcolor" => color })
-      end
     end
 
     def write_dot_file
