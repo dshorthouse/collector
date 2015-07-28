@@ -196,27 +196,7 @@ var Agent = (function($, window) {
                 edges: edges
               },
               options = {
-                autoResize: true,
-                height: '100%',
-                width: '100%',
-                physics: true,
-                nodes: {
-                  color: {
-                    border: '#111',
-                    background: '#FFF',
-                    highlight: {
-                      background: '#FFFFCC',
-                      border: '#777'
-                    }
-                  },
-                  font: {
-                    size: 14
-                  }
-                },
                 edges: {
-                  smooth: {
-                    type: 'continuous'
-                  },
                   color: {
                     color: '#ccc'
                   },
@@ -228,7 +208,6 @@ var Agent = (function($, window) {
                 }
               };
           var network = new vis.Network(container, data, options);
-          network.fit({animation: {offset: {x:300,y:300}, duration: 3000}});
         },
         error: function() {
           $('#social-graph').height(0);

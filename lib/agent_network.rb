@@ -41,10 +41,18 @@ module Collector
 
     def add_attributes
       @agents.each do |a|
+        options = {}
         vertex = [a.given, a.family].join(" ")
-        if !a.gender.nil? && @graph.has_vertex?(vertex)
-          color = (a.gender == 'male') ? "#CCE5FF" : "#FFCCCC"
-          @graph.add_vertex_attributes(vertex, { "fillcolor" => color })
+        if @graph.has_vertex?(vertex)
+          options["fillcolor"] = "#E3E3E3"
+          if !a.gender.nil?
+            options["fillcolor"] = (a.gender == 'male') ? "#CCE5FF" : "#FFCCCC"
+          end
+          if a == @agent
+            options["fontsize"] = 12
+            options["fillcolor"] = "#F1F1F1"
+          end
+          @graph.add_vertex_attributes(vertex, options)
         end
       end
     end
