@@ -26,6 +26,8 @@ class COLLECTOR < Sinatra::Base
       }
   end
 
+  use Rack::GoogleAnalytics, :tracker => settings.google_analytics
+
   helpers WillPaginate::Sinatra::Helpers
   helpers Sinatra::ContentFor
   helpers Sinatra::Collector::Helpers
