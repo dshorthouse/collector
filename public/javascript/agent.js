@@ -196,6 +196,17 @@ var Agent = (function($, window) {
                 edges: edges
               },
               options = {
+                physics: {
+                  stabilization: true
+                },
+                interaction: {
+                  dragNodes: false
+                },
+                nodes: {
+                  color: {
+                    border: '#ccc'
+                  }
+                },
                 edges: {
                   color: {
                     color: '#ccc'
@@ -208,6 +219,7 @@ var Agent = (function($, window) {
                 }
               };
           var network = new vis.Network(container, data, options);
+          network.fit();
         },
         error: function() {
           $('#social-graph').height(0);
