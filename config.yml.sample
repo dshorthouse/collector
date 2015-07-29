@@ -13,6 +13,7 @@ development:
   elastic_server: 'http://localhost:9200'
   elastic_index: 'collector'
   eol_api: 'http://eol.org/api/'
+  google_analytcis: ''
 
 test:
   adapter: mysql2
@@ -28,6 +29,7 @@ test:
   orcid_token_url: 'https://api.sandbox.orcid.org/oauth/token'
   elastic_server: 'http://localhost:9200'
   elastic_index: 'collector'
+  google_analytics: ''
 
 production:
   adapter: mysql2
@@ -44,3 +46,4 @@ production:
   elastic_server: 'http://localhost:9200'
   elastic_index: 'collector'
   eol_api: 'http://eol.org/api/'
+  google_analytics: ''
