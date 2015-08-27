@@ -184,6 +184,7 @@ DEPENDENCIES
   htmlentities
   mysql2
   namae
+  nokogiri
   oauth2
   omniauth-orcid
   rack-google-analytics

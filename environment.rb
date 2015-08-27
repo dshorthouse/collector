@@ -28,6 +28,7 @@ require 'oauth2'
 require 'biodiversity'
 require 'require_all'
 require 'rack-google-analytics'
+require 'nokogiri'
 
 require_all 'lib'
 require_all 'helpers'

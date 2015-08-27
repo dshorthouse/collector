@@ -11,17 +11,17 @@
   %body
     %header
       %a{ href: '/', id: 'logo' }
-        %img{ src: '/images/logo.png', title: 'Collector' }
+        %img{ src: '/images/logo.png', title: 'Collector', alt: 'Collector' }
       %h1 Collector
 
-      - if @orcid
-        -# %p
-          -# %a{ href: "/orcid_profile" } #{@orcid["name"]}
-        -# %p
-          -# %a{ href: "/logout" } Logout
-      - else
-        -# %p
-          -# %a{ href: "/auth/orcid" } Log in with my ORCiD
+      -# #account
+        - if authorized?
+          = succeed " / " do
+            %a{ href: "/orcid_profile" } #{@orcid["name"]}
+          %a{ href: "/logout" } Logout
+        - else
+          %a{ href: "/auth/orcid" } Log in with ORCID
+
       %p.byline Search and explore collectors and determiners of biological specimens in Canada.
     = yield
     %footer

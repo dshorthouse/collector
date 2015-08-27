@@ -7,8 +7,11 @@ module Sinatra
 
         def self.registered(app)
 
-          app.get '/' do
+          app.before do
             set_session
+          end
+
+          app.get '/' do
             execute_search('agent')
             haml :home
           end
@@ -30,7 +33,6 @@ module Sinatra
           end
 
           app.get '/agent/:id' do
-            set_session
             agent_profile(params[:id])
             if @result[:id] != @result[:canonical_id]
               redirect to('/agent/' + @result[:canonical_id].to_s )
@@ -39,6 +41,15 @@ module Sinatra
               redirect to('/agent/' + @result[:orcid] )
             end
             haml :agent
+          end
+
+          app.put '/agent/:id' do
+            protected!
+            agent = Agent.find(params[:id])
+            request.body.rewind
+            request_payload = JSON.parse(request.body.read, :symbolize_names => true)
+            agent.update(request_payload)
+            agent.update_search(request_payload)
           end
 
           app.get '/agent/:id/activity.json' do

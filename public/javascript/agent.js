@@ -17,6 +17,7 @@ var Agent = (function($, window) {
       this.createCharts();
       this.createMap();
       this.createGraph();
+      this.enableEdit();
     },
     getActivity: function(zoom) {
       var self = this;
@@ -225,6 +226,32 @@ var Agent = (function($, window) {
           $('#social-graph').height(0);
         } 
       });
+    },
+    enableEdit: function() {
+      var self = this, obj = {};
+
+      $('#agent-title span')
+        .on("blur", function() {
+          obj[$(this).attr("data")] = $(this).text();
+          $.ajax({
+            type : 'PUT',
+            data : JSON.stringify(obj),
+            url  : '/agent/' + self.id,
+            dataType : 'json',
+            success : function(response) {
+            },
+            error : function(xhr, ajaxOptions, thrownError) {
+              alert(xhr.responseText);
+            }
+          });
+        })
+        .on('keydown', function(e) {
+          var code = e.keyCode || e.which;
+          if(code === 13 || code === 40) {
+            e.preventDefault();
+            $(this).next().focus();
+          }
+        });
     }
   };
 

@@ -14,6 +14,9 @@ class Agent < ActiveRecord::Base
   has_many :works, :through => :agent_works
   has_many :agent_works
 
+  has_many :barcodes, :through => :agent_barcodes
+  has_many :agent_barcodes
+
   has_many :aliases, class_name: "Agent", foreign_key: "canonical_id"
   belongs_to :canonical, class_name: "Agent"
 
@@ -202,6 +205,15 @@ class Agent < ActiveRecord::Base
 
   def aka
     (Agent.where(canonical_id: id).where.not(id: id) | Agent.where(canonical_id: canonical_id).where.not(id: id)).map{|a| {family: a.family, given: a.given}}
+  end
+
+  #TODO: case when updated agent given + family already exists - do we merge instead w/ or w/o warning?
+  #TODO: must update all instances where old name is present in recordings_with
+  def update_search(params)
+    client = Elasticsearch::Client.new
+    params[:id] = id
+    doc = { doc: params }
+    client.update index: Sinatra::Application.settings.elastic_index, type: 'agent', id: id, body: doc
   end
 
 end

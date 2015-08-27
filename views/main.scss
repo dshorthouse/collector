@@ -6,7 +6,7 @@ body{
   line-height:1em;
   margin:0px;
   padding:20px;
-  min-width:900px;
+  min-width:620px;
 }
 h1{
   font-size:2em;
@@ -64,7 +64,13 @@ p.byline{
 header {
   border-bottom:2px solid #CCC;
   margin-bottom:2em;
-  width:615px;
+  position:relative;
+}
+
+#account{
+  position:absolute;
+  top:0px;
+  right:0px;
 }
 
 .contact-details{
@@ -74,7 +80,6 @@ header {
 }
 
 footer{
-  width:615px;
   margin-top:1em;
   border-top:2px solid #CCC;
   padding-top:0.75em;
@@ -245,8 +250,10 @@ label input {
   width: 600px; height: 250px;
 }
 
-ul.collectors, ul.determinations, ul.descriptions, ul.agent-examples, ul.taxon-examples, ul.location-examples, ul.aka { list-style: none outside none; }
-ul.determinations li, ul.collectors li, ul.descriptions li, ul.agent-examples li, ul.taxon-examples li, ul.location-examples li {
+p.sums{font-weight:bold;}
+
+ul.collectors, ul.determinations, ul.descriptions, ul.agent-examples, ul.taxon-examples, ul.location-examples, ul.aka, ul.barcodes { list-style: none outside none; }
+ul.determinations li, ul.collectors li, ul.descriptions li, ul.agent-examples li, ul.taxon-examples li, ul.location-examples li, ul.barcodes li {
   border:1px solid #E0E0E0;
   border-radius:3px;
   display:inline;
@@ -262,8 +269,8 @@ ul.aka li {
   line-height:2.25em;
 }
 
-ul.determinations li:hover, ul.collectors li:hover, ul.agent-examples li:hover, ul.taxon-examples li:hover, ul.location-examples li:hover { border-radius:3px; border:1px solid #246D80; }
-ul.collectors li:hover a, ul.determinations li:hover a, ul.agent-examples li:hover a, ul.taxon-examples li:hover a, ul.location-examples li:hover a { color:#FFF; }
+ul.determinations li:hover, ul.collectors li:hover, ul.agent-examples li:hover, ul.taxon-examples li:hover, ul.location-examples li:hover, ul.barcodes li:hover { border-radius:3px; border:1px solid #246D80; }
+ul.collectors li:hover a, ul.determinations li:hover a, ul.agent-examples li:hover a, ul.taxon-examples li:hover a, ul.location-examples li:hover a, ul.barcodes li:hover a { color:#FFF; }
 
 ul.determinations li, ul.taxon-examples li { background-color:#F0FFF0; }
 ul.determinations li:hover, ul.taxon-examples li:hover { background-color:#3CB371; }
@@ -271,6 +278,8 @@ ul.collectors li, ul.agent-examples li { background-color:#F0F0F0; }
 ul.collectors li:hover, ul.agent-examples li:hover { background-color:#246D80; }
 ul.location-examples li { background-color:#FFE0FF; }
 ul.location-examples li:hover { background-color:#DD6D80; }
+ul.barcodes li { background-color: #FFEFD8; }
+ul.barcodes li:hover { background-color: #F57208; }
 
 #recordings-chart, #recordings-map {
   float:left;

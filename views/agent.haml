@@ -20,7 +20,9 @@
 -content_for :title do
   #{@result[:given]} #{@result[:family]}
 
-%h1 #{@result[:given]} #{@result[:family]}
+%h1{id: "agent-title"}
+  %span{contenteditable: authorized? ? "true" : "false", data: "given" }= @result[:given]
+  %span{contenteditable: authorized? ? "true" : "false", data: "family" }= @result[:family]
 
 .contact-details #{@result[:position]}
 .contact-details #{@result[:affiliation]}
@@ -53,6 +55,7 @@
 
 #colleagues-wrapper
   %h2 Fellow Collectors
+  %p.sums Total: #{@result[:recordings_with].size}
   - if @result[:recordings_with].size > 0
     %ul.collectors
       - @result[:recordings_with].sort_by { |a| a[:family] }.each do |c|
@@ -72,6 +75,7 @@
         (#{number_with_delimiter(t[:count])})
 
   %h2 Families Identified
+  %p.sums Total: #{@result[:determined_families].size}
   %ul.determinations
     - @result[:determined_families].sort_by { |d| d[:family] }.each do |t|
       %li
@@ -85,16 +89,24 @@
 #description-wrapper
   - if @result[:named_species].size > 0
     %h2 Species Described
+    %p.sums Total: #{@result[:named_species].size}
     %ul.descriptions
       - @result[:named_species].each do |s|
         %li #{s[:scientificName]}
 
 #publications-wrapper
-  %h2 Publications
-
   - if @result[:works].size > 0
+    %h2 Publications
+    %p.sums Total: #{@result[:works].size}
     - @result[:works].each do |w|
       %div.citation
         %a{href: "http://dx.doi.org/#{w[:doi]}" }= w[:citation]
-  - else
-    %p No publications recorded
+
+#barcodes-wrapper
+  - if @result[:barcodes].size > 0
+    %h2 Barcode of Life Specimen Citations
+    %p.sums Total: #{@result[:barcodes].size}
+    %ul.barcodes
+      - @result[:barcodes].sort_by{|b| b[:processid] }.each do |b|
+        %li
+          %a{href: "http://www.boldsystems.org/index.php/Public_RecordView?processid=#{b[:processid]}"}= b[:processid]

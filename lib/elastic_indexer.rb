@@ -135,6 +135,13 @@ module Collector
                   citation: { type: 'string', index: 'not_analyzed' }
                 }
               },
+              barcodes: {
+                properties: {
+                  processid: { type: 'string', index: 'not_analyzed' },
+                  bin_uri: { type: 'string', index: 'not_analyzed' },
+                  catalognum: { type: 'string', index: 'not_analyzed' }
+                }
+              },
               named_species: {
                 properties: {
                   scientificName: { type: 'string', index: 'not_analyzed' },
@@ -206,6 +213,7 @@ module Collector
                           recordings_with: a.recordings_with,
                           determined_families: a.determined_families,
                           works: a.works.pluck(:doi,:citation).uniq.map{ |c| { doi: c[0], citation: c[1] } },
+                          barcodes: a.barcodes.pluck(:processid,:bin_uri).uniq.map{ |b| { processid: b[0], bin_uri: b[1] } },
                           named_species: a.descriptions
                         }
                       }
@@ -271,7 +279,12 @@ module Collector
       end
     end
 
-    def update_agent(id, orcid)
+    def update_agent(id, params)
+      a = Agent.find(id)
+      return if !a.present?
+    end
+
+    def upgrade_agent(id, orcid)
       a = Agent.find(id)
       return if !a.present?
 
@@ -296,6 +309,7 @@ module Collector
                 recordings_with: a.recordings_with,
                 determined_families: a.determined_families,
                 works: a.works.pluck(:doi,:citation).uniq.map{ |c| { doi: c[0], citation: c[1] } },
+                barcodes: a.barcodes.pluck(:processid,:bin_uri).uniq.map{ |b| { processid: b[0], bin_uri: b[1] } },
                 named_species: a.descriptions
               }
 

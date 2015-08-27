@@ -19,6 +19,15 @@ module Sinatra
         JSON.parse(response, :symbolize_names => true)[:"orcid-profile"]
       end
 
+      def protected!
+        return if authorized?
+        halt 401, "Not authorized\n"
+      end
+
+      def authorized?
+        defined? @orcid
+      end
+
       def paginate(collection)
           options = {
            inner_window: 3,

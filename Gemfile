@@ -21,6 +21,7 @@ gem 'oauth2'
 gem 'require_all'
 gem 'rgl'
 gem 'rack-google-analytics'
+gem 'nokogiri'
 
 group :production do
 end
