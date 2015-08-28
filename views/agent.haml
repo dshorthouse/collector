@@ -45,7 +45,7 @@
     %h2 Collecting Activity
     #recordings
 
-- if @result[:aka].size > 0
+- if @result[:aka] && @result[:aka].size > 0
   #aka-wrapper
     %h2 Other Recognized Names
     %ul.aka
@@ -54,19 +54,17 @@
         %li #{name}
 
 #colleagues-wrapper
-  %h2 Fellow Collectors
-  %p.sums Total: #{@result[:recordings_with].size}
   - if @result[:recordings_with].size > 0
+    %h2 Fellow Collectors
+    %p.sums Total: #{@result[:recordings_with].size}
     %ul.collectors
       - @result[:recordings_with].sort_by { |a| a[:family] }.each do |c|
         %li
           - name = [c[:given].presence, c[:family].presence]. join(" ")
           %a{href: "/agent/#{c[:id]}" }=  name
     #social-graph
-  - else
-    %p None
 
-- if @result[:determined_families].size > 0
+- if @result[:determined_families] && @result[:determined_families].size > 0
   %h2 Top Families Identified (# Specimens)
   %ol.ranked
     - @result[:determined_families].sort_by { |a| a[:count] }.reverse.first(10).each do |t|
@@ -87,7 +85,7 @@
     #determinations
 
 #description-wrapper
-  - if @result[:named_species].size > 0
+  - if @result[:named_species] && @result[:named_species].size > 0
     %h2 Species Described
     %p.sums Total: #{@result[:named_species].size}
     %ul.descriptions
@@ -95,7 +93,7 @@
         %li #{s[:scientificName]}
 
 #publications-wrapper
-  - if @result[:works].size > 0
+  - if @result[:works] && @result[:works].size > 0
     %h2 Publications
     %p.sums Total: #{@result[:works].size}
     - @result[:works].each do |w|
@@ -103,7 +101,7 @@
         %a{href: "http://dx.doi.org/#{w[:doi]}" }= w[:citation]
 
 #barcodes-wrapper
-  - if @result[:barcodes].size > 0
+  - if @result[:barcodes] && @result[:barcodes].size > 0
     %h2 Barcode of Life Specimen Citations
     %p.sums Total: #{@result[:barcodes].size}
     %ul.barcodes
