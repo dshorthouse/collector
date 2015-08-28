@@ -279,42 +279,29 @@ module Collector
       end
     end
 
-    def update_agent(id, params)
-      a = Agent.find(id)
-      return if !a.present?
-    end
+    def update_agent(a)
+      doc = {
+        doc: {
+          id: a.id,
+          canonical_id: a.canonical_id,
+          family: a.family,
+          given: a.given,
+          gender: a.gender,
+          aka: a.aka,
+          orcid: a.orcid_identifier,
+          email: a.email,
+          position: a.position,
+          affiliation: a.affiliation,
+          coordinates: a.recordings_coordinates,
+          recordings_with: a.recordings_with,
+          determined_families: a.determined_families,
+          works: a.works.pluck(:doi,:citation).uniq.map{ |c| { doi: c[0], citation: c[1] } },
+          barcodes: a.barcodes.pluck(:processid,:bin_uri).uniq.map{ |b| { processid: b[0], bin_uri: b[1] } },
+          named_species: a.descriptions
+        }
+      }
 
-    def upgrade_agent(id, orcid)
-      a = Agent.find(id)
-      return if !a.present?
-
-      a.orcid_identifier = orcid
-      a.save!
-      a.reload
-      a.refresh_orcid_data
-      Work.populate_citations
-
-      body = {
-                id: a.id,
-                canonical_id: a.canonical_id,
-                family: a.family,
-                given: a.given,
-                gender: a.gender,
-                aka: a.aka,
-                orcid: orcid,
-                email: a.email,
-                position: a.position,
-                affiliation: a.affiliation,
-                coordinates: a.recordings_coordinates,
-                recordings_with: a.recordings_with,
-                determined_families: a.determined_families,
-                works: a.works.pluck(:doi,:citation).uniq.map{ |c| { doi: c[0], citation: c[1] } },
-                barcodes: a.barcodes.pluck(:processid,:bin_uri).uniq.map{ |b| { processid: b[0], bin_uri: b[1] } },
-                named_species: a.descriptions
-              }
-
-      @client.delete index: @settings.elastic_index, type: 'agent', id: id rescue nil
-      @client.create index: @settings.elastic_index, type: 'agent', id: id, body: body
+      @client.update index: @settings.elastic_index, type: 'agent', id: a.id, body: doc
     end
 
     def refresh
