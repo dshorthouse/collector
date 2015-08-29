@@ -7,6 +7,7 @@ class Barcode < ActiveRecord::Base
   def self.search_barcodes
     Agent.where("given <> ''").where(processed_barcodes: nil).find_each do |agent|
       barcodes = []
+      tmp_file = "/tmp/%s.xml" % agent.id
       name = agent.given + " " + agent.family
       puts agent.id.to_s + ": " + name
 
@@ -16,12 +17,11 @@ class Barcode < ActiveRecord::Base
       }
 
       url = URI(Sinatra::Application.settings.bold_api_url)
-      tmp_file = "/tmp/%s.xml" % agent.id
 
       Net::HTTP.start(url.host.downcase) do |http|
         resp = http.get([url.path, URI.encode_www_form(params)].join("?"))
         open(tmp_file, "wb") do |file|
-            file.write(resp.body)
+          file.write(resp.body)
         end
       end
 
