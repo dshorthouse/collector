@@ -29,6 +29,7 @@ require 'biodiversity'
 require 'require_all'
 require 'rack-google-analytics'
 require 'nokogiri'
+require 'uri'
 
 require_all 'lib'
 require_all 'helpers'

@@ -11,29 +11,27 @@ class Barcode < ActiveRecord::Base
       puts agent.id.to_s + ": " + name
 
       params = {
-        :params => {
-          :researchers => name,
-          :format => 'xml' 
-        }
+        :researchers => name,
+        :format => 'xml'
       }
+      url = [Sinatra::Application.settings.bold_api_url, "?", URI.encode_www_form(params)].join
 
-      RestClient.get(Sinatra::Application.settings.bold_api_url, params) do |response, request, result, &block|
-        xml = Nokogiri::XML.parse(response)
-        xml.xpath("//record").each do |record|
-          processid = nil
-          bin_uri = nil
-          catalognum = nil
-          record.children.each do |element|
-            processid = element.text if element.name == 'processid'
-            bin_uri = element.text if element.name == 'bin_uri'
-            if element.name == 'specimen_identifiers'
-              element.children.each do |sid|
-                catalognum = sid.text if sid.name == 'catalognum'
-              end
+      response = RestClient::Request.execute(method: :get, url: url, timeout: 9000000)
+      xml = Nokogiri::XML.parse(response)
+      xml.xpath("//record").each do |record|
+        processid = nil
+        bin_uri = nil
+        catalognum = nil
+        record.children.each do |element|
+          processid = element.text if element.name == 'processid'
+          bin_uri = element.text if element.name == 'bin_uri'
+          if element.name == 'specimen_identifiers'
+            element.children.each do |sid|
+              catalognum = sid.text if sid.name == 'catalognum'
             end
           end
-          barcodes << { processid: processid, bin_uri: bin_uri, catalognum: catalognum } if processid
         end
+        barcodes << { processid: processid, bin_uri: bin_uri, catalognum: catalognum } if processid
       end
 
       Barcode.transaction do
