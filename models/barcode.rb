@@ -14,25 +14,39 @@ class Barcode < ActiveRecord::Base
         :researchers => name,
         :format => 'xml'
       }
-      url = [Sinatra::Application.settings.bold_api_url, "?", URI.encode_www_form(params)].join
 
-      response = RestClient::Request.execute(method: :get, url: url, timeout: 9000000)
-      xml = Nokogiri::XML.parse(response)
-      xml.xpath("//record").each do |record|
-        processid = nil
-        bin_uri = nil
-        catalognum = nil
-        record.children.each do |element|
-          processid = element.text if element.name == 'processid'
-          bin_uri = element.text if element.name == 'bin_uri'
-          if element.name == 'specimen_identifiers'
-            element.children.each do |sid|
-              catalognum = sid.text if sid.name == 'catalognum'
+      url = URI(Sinatra::Application.settings.bold_api_url)
+      tmp_file = "/tmp/%s.xml" % agent.id
+
+      Net::HTTP.start(url.host.downcase) do |http|
+        resp = http.get([url.path, URI.encode_www_form(params)].join("?"))
+        open(tmp_file, "wb") do |file|
+            file.write(resp.body)
+        end
+      end
+
+      file_size = File.stat(tmp_file).size
+
+      if file_size > 0 && file_size < 20000000
+        xml = Nokogiri::XML.parse(File.open(tmp_file))
+        xml.xpath("//record").each do |record|
+          processid = nil
+          bin_uri = nil
+          catalognum = nil
+          record.children.each do |element|
+            processid = element.text if element.name == 'processid'
+            bin_uri = element.text if element.name == 'bin_uri'
+            if element.name == 'specimen_identifiers'
+              element.children.each do |sid|
+                catalognum = sid.text if sid.name == 'catalognum'
+              end
             end
           end
+          barcodes << { processid: processid, bin_uri: bin_uri, catalognum: catalognum } if processid
         end
-        barcodes << { processid: processid, bin_uri: bin_uri, catalognum: catalognum } if processid
       end
+
+      File.delete(tmp_file)
 
       Barcode.transaction do
         barcodes.each do |b|
