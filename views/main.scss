@@ -313,6 +313,12 @@ margin-left:40px;
   margin-top:10px;
 }
 
+#social-graph-large {
+  height: 600px;
+  width:100%;
+  margin-top:10px;
+}
+
 .node {
   stroke: #fff;
   stroke-width: 1.5px;
@@ -321,6 +327,11 @@ margin-left:40px;
 .edge {
   stroke: #999;
   stroke-opacity: 0;
+}
+
+.edges {
+  stroke: #999;
+  stroke-opacity: 0.4;
 }
 
 .edgelabel {

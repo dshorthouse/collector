@@ -226,7 +226,7 @@ var Agent = (function($, window) {
           }
         });
 
-        var linearScale = d3.scale.sqrt().domain([1,d3.max(maxEdges)]).range([10,25]);
+        var sqrtScale = d3.scale.sqrt().domain([1,d3.max(maxEdges)]).range([10,25]);
 
         function isConnected(a, b) {
           return linkedByIndex[a.index + "," + b.index] || linkedByIndex[b.index + "," + a.index] || a.index == b.index;
@@ -299,7 +299,7 @@ var Agent = (function($, window) {
         var node = gnodes.append("circle")
             .attr("class", "node")
             .attr("r", function(d) {
-              return (d.id === self.id) ? 14 : linkedByIndex["0,"+d.index] ? linearScale(linkedByIndex["0,"+d.index]) : 10;
+              return (d.id === self.id) ? 14 : linkedByIndex["0,"+d.index] ? sqrtScale(linkedByIndex["0,"+d.index]) : 10;
             })
             .style("fill", function(d) {
               return (d.id === self.id) ? highlight_color : (d.gender === "male") 
