@@ -1,5 +1,5 @@
 # Collector
-Sinatra app to parse people names from biodiversity occurrence data
+Sinatra app to parse people names from biodiversity occurrence data, apply basic regular expressions and heuristics to disambiguate them, and connect them to external resources like ORCID & BOLD.
 
 [![Build Status](https://travis-ci.org/dshorthouse/collector.svg?branch=master)](https://travis-ci.org/dshorthouse/collector)
 

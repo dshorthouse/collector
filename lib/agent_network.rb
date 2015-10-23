@@ -13,7 +13,7 @@ module Collector
       @agents = []
     end
 
-    def build
+    def build(type = "dot")
       if @agent.id != @agent.canonical_id
         @agent = Agent.find(@agent.canonical_id)
       end
@@ -21,7 +21,11 @@ module Collector
       add_edges
       add_attributes
       if @graph.size > 2
-        write_dot_file
+        if type == "dot"
+          write_dot_file
+        else
+          write_d3_file
+        end
         puts "Created graph for #{[@agent.given, @agent.family].join(' ')} (#{@agent.id})"
       end
     end
@@ -44,13 +48,9 @@ module Collector
         options = {}
         vertex = [a.given, a.family].join(" ")
         if @graph.has_vertex?(vertex)
-          options["fillcolor"] = "#E3E3E3"
+          options["id"] = a.id
           if !a.gender.nil?
-            options["fillcolor"] = (a.gender == 'male') ? "#CCE5FF" : "#FFCCCC"
-          end
-          if a == @agent
-            options["fontsize"] = 12
-            options["fillcolor"] = "#F1F1F1"
+            options["gender"] = a.gender
           end
           @graph.add_vertex_attributes(vertex, options)
         end
@@ -66,6 +66,10 @@ module Collector
 
     def write_dot_file
       @graph.write_to_dot_file("public/images/graphs/#{@agent.id}")
+    end
+
+    def write_d3_file
+      @graph.write_to_d3_file("public/images/graphs/#{@agent.id}")
     end
 
   end

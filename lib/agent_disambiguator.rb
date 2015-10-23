@@ -92,6 +92,7 @@ module Collector
       @graph.isolates.each { |v| @graph.remove_vertex v }
     end
 
+    # TODO: not flexible enough to accommodate more nuances in score
     def name_similarity(agent1, agent2)
       given1 = agent1[:given]
       given2 = agent2[:given]
@@ -106,7 +107,7 @@ module Collector
       shared_ids = agent1[:determined_families] & agent2[:determined_families]
       shared_ids_boost = (shared_ids.size > 0) ? 0.05 : 0
 
-      #Exact match - not going to happen with these data
+      #Exact match - not going to happen with these data, but here anyway
       if given1 == given2
         return 1
       end

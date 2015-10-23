@@ -95,6 +95,26 @@ module Collector
       src
     end
 
+    def write_to_d3_file(d3file="d3")
+      src = d3file + ".json"
+
+      File.open(src, 'w') do |f|
+        f << self.to_d3_graph.to_json
+      end
+      src
+    end
+
+    def to_d3_graph
+      nodes = []
+      each_vertex do |v|
+        options = { 'name' => v.to_s }
+        options.merge! vertex_attributes(v)
+        nodes << options
+      end
+      links = edges.map{ |e| { source: vertices.index(e.source), target: vertices.index(e.target), value: e.weight } }
+      { nodes: nodes, edges: links }
+    end
+
     # Create a dot file and png to depict the graph's vertices with decorated edges
     def write_to_graphic_file(fmt='png', dotfile="graph")
       src = dotfile + ".dot"

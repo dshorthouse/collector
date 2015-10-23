@@ -313,6 +313,20 @@ margin-left:40px;
   margin-top:10px;
 }
 
+.node {
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+
+.edge {
+  stroke: #999;
+  stroke-opacity: 0;
+}
+
+.edgelabel {
+  fill-opacity: 0;
+}
+
 /* TAXON */
 
 #taxon-image{

@@ -67,6 +67,10 @@ module Sinatra
             @results.to_json
           end
 
+          app.get '/graph' do
+            haml :graph
+          end
+
           app.get '/taxon.json' do
             execute_search('taxon')
             format_taxa.to_json

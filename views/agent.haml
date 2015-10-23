@@ -8,8 +8,8 @@
   %script{src: 'http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js', type: 'text/javascript' }
   %script{src: 'http://maps.stamen.com/js/tile.stamen.js?v1.2.4', type: 'text/javascript' }
 
-  %script{src: '/javascript/vis.min.js', type: 'text/javascript' }
-  
+  %script{src: 'https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js', type: 'text/javascript' }
+
   %script{src: '/javascript/leaflet-dvf.min.js', type: 'text/javascript' }
   %script{src: '/javascript/geohash.js', type: 'text/javascript' }
   %script{src: '/javascript/agent.js', type: 'text/javascript' }
@@ -94,7 +94,7 @@
 
 #publications-wrapper
   - if @result[:works] && @result[:works].size > 0
-    %h2 Publications
+    %h2 Publications With DOIs
     %p.sums Total: #{@result[:works].size}
     - @result[:works].each do |w|
       %div.citation
