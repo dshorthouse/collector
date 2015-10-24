@@ -11,12 +11,16 @@ options[:type] = "d3"
 OptionParser.new do |opts|
   opts.banner = "Usage:agent_network.rb [options]"
 
-  opts.on("-a", "--all-agents", "Update all agents search with new data") do |a|
+  opts.on("-e", "--all-agents", "Generate graph files for all agents") do |a|
     options[:all_agents] = true
   end
 
-  opts.on("-i", "--agent-id N", Integer, "Update single agent with new data") do |a|
+  opts.on("-a", "--agent-id N", Integer, "Generate graph file for single agent") do |a|
     options[:agent_id] = a
+  end
+
+  opts.on("-n", "--whole-network", "Generate graph file for entire network") do |a|
+    options[:whole_network] = true
   end
 
   opts.on("-t", "--type [TYPE]", "Type of output, options are dot or d3") do |t|
@@ -32,7 +36,12 @@ OptionParser.new do |opts|
 
 end.parse!
 
-if options[:all_agents]
+if options[:whole_network]
+  puts 'Starting to create graph for whole network as ' + options[:type]
+  graph = Collector::WholeNetwork.new
+  graph.build(options[:type])
+  puts 'Done creating whole network'
+elsif options[:all_agents]
   puts 'Starting to create all agent network graphs as ' + options[:type]
   Agent.where("id = canonical_id").find_each do |agent|
     graph = Collector::AgentNetwork.new(agent.id)

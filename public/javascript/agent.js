@@ -282,9 +282,9 @@ var Agent = (function($, window) {
             .style("pointer-events", "none")
             .attr({'class':'edgelabel',
                        'id':function(d,i){return 'edgelabel'+i},
-                       'dx':80,
+                       'dx':40,
                        'dy':0,
-                       'font-size':12});
+                       'font-size':10});
 
         edgelabels.append('textPath')
             .attr('xlink:href',function(d,i) { return '#edgepath'+i })

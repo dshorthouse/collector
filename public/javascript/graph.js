@@ -35,10 +35,10 @@ var Graph = (function($, window) {
 
       var force = d3.layout.force()
           .charge(-250)
-          .linkDistance(10)
+          .linkDistance(5)
           .size([width, height]);
 
-      d3.json("/images/graphs/2.json", function(error, graph) {
+      d3.json("/images/graphs/graph.json", function(error, graph) {
         if (error) { throw error; }
 
         var linearScale = d3.scale.linear().domain([1,5000]).range([1,3]);
@@ -64,8 +64,7 @@ var Graph = (function($, window) {
             .attr("class", "node")
             .attr("r", 10)
             .style("fill", function(d) {
-              return (d.id === self.id) ? highlight_color : (d.gender === "male") 
-                                        ? "lightskyblue" : (d.gender === "female") 
+              return (d.gender === "male") ? "lightskyblue" : (d.gender === "female") 
                                         ? "lightpink" : "lightgrey";
             })
             .call(force.drag);
