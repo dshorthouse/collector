@@ -214,7 +214,7 @@ var Agent = (function($, window) {
           .linkDistance(80)
           .size([width, height]);
 
-      d3.json("/images/graphs/" + this.id + ".json", function(error, graph) {
+      d3.json("/images/graphs/agents/" + this.id + ".json", function(error, graph) {
         if (error) { throw error; }
 
         var linkedByIndex = {};

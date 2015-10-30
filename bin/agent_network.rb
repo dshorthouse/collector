@@ -19,8 +19,16 @@ OptionParser.new do |opts|
     options[:agent_id] = a
   end
 
-  opts.on("-n", "--whole-network", "Generate graph file for entire network") do |a|
-    options[:whole_network] = true
+  opts.on("-n", "--whole-network", "Generate graph file for entire social network") do |a|
+    options[:social_network] = true
+  end
+
+  opts.on("-k", "--kingdom [KINGDOM]", "Generate graph file for Kingdoms") do |k|
+    options[:kingdom] = k
+  end
+
+  opts.on("-p", "--phylum [PHYLUM]", "Generate graph file for Phyla") do |p|
+    options[:phylum] = p
   end
 
   opts.on("-t", "--type [TYPE]", "Type of output, options are dot or d3") do |t|
@@ -36,11 +44,21 @@ OptionParser.new do |opts|
 
 end.parse!
 
-if options[:whole_network]
+if options[:social_network]
   puts 'Starting to create graph for whole network as ' + options[:type]
-  graph = Collector::WholeNetwork.new
+  graph = Collector::SocialNetwork.new
   graph.build(options[:type])
   puts 'Done creating whole network'
+elsif options[:kingdom]
+  puts 'Starting to create graph for Kingdoms as ' + options[:type]
+  graph = Collector::KingdomNetwork.new(options[:kingdom])
+  graph.build(options[:type])
+  puts 'Done creating Kingdom networks'
+elsif options[:phylum]
+  puts 'Starting to create graph for Phyla as ' + options[:type]
+  graph = Collector::PhylumNetwork.new(options[:phylum])
+  graph.build(options[:type])
+  puts 'Done creating Phylum networks'
 elsif options[:all_agents]
   puts 'Starting to create all agent network graphs as ' + options[:type]
   Agent.where("id = canonical_id").find_each do |agent|

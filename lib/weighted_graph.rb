@@ -159,7 +159,7 @@ module Collector
 
   end
 
-  # An un directed edge that can display its weight as part of stringification.
+  # An undirected edge that can display its weight as part of stringification.
   class WeightedEdge < RGL::Edge::UnDirectedEdge
     
     # [_u_] source vertex

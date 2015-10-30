@@ -67,7 +67,12 @@ module Sinatra
             @results.to_json
           end
 
-          app.get '/graph' do
+          app.get '/graph/:rank/:taxon' do
+            ranks = ['kingdom', 'phylum', 'class', 'order', 'family']
+            if ranks.include? params[:rank]
+              @rank = params[:rank]
+            end
+            @taxon = params[:taxon]
             haml :graph
           end
 

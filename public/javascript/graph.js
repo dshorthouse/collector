@@ -5,7 +5,13 @@ var Graph = (function($, window) {
 
   var _private = {
 
-    init: function(id) {
+    rank: "",
+    taxon: "",
+
+    init: function(obj) {
+      console.log(obj);
+      this.rank = obj["rank"];
+      this.taxon = obj["taxon"];
       this.createGraph();
     },
     createGraph: function() {
@@ -38,7 +44,7 @@ var Graph = (function($, window) {
           .linkDistance(5)
           .size([width, height]);
 
-      d3.json("/images/graphs/graph.json", function(error, graph) {
+      d3.json("/images/graphs/" + self.rank + "/" + self.taxon + ".json", function(error, graph) {
         if (error) { throw error; }
 
         var linearScale = d3.scale.linear().domain([1,5000]).range([1,3]);
@@ -105,8 +111,8 @@ var Graph = (function($, window) {
   };
 
   return {
-    init: function(id) {
-      _private.init(id);
+    init: function(obj) {
+      _private.init(obj);
     }
   };
 

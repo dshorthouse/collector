@@ -5,12 +5,12 @@
   %script{src: 'https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js', type: 'text/javascript' }
   %script{src: '/javascript/graph.js', type: 'text/javascript' }
   :javascript
-    $(function() { Graph.init(); });
+    $(function() { Graph.init({rank: '#{@rank}', taxon: '#{@taxon}'}); });
 
 -content_for :title do
   Collector Graph
 
 %h1{id: "agent-title"}
-  %span Collectors Social Graph
+  %span Collectors Graph for #{@taxon.capitalize}
 
 #social-graph-large
