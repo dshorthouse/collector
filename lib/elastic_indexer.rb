@@ -114,6 +114,7 @@ module Collector
               position: { type: 'string', index: 'not_analyzed' },
               affiliation: { type: 'string', index: 'not_analyzed' },
               coordinates: { type: 'geo_point', lat_lon: true, fielddata: { format: 'compressed', precision: "5km" }, index: 'not_analyzed' },
+              determinations_count: { type: 'integer', index: 'not_analyzed' },
               determined_families: {
                 properties: {
                   id: { type: 'integer', index: 'not_analyzed' },
@@ -121,6 +122,7 @@ module Collector
                   count: { type: 'integer', index: 'not_analyzed' }
                 }
               },
+              recordings_count: { type: 'integer', index: 'not_analyzed' },
               recordings_with: {
                 type: 'nested',
                 properties: {
@@ -210,7 +212,9 @@ module Collector
                           position: a.position,
                           affiliation: a.affiliation,
                           coordinates: a.recordings_coordinates,
+                          recordings_count: a.recordings.size,
                           recordings_with: a.recordings_with,
+                          determinations_count: a.determinations.size,
                           determined_families: a.determined_families,
                           works: a.works.pluck(:doi,:citation).uniq.map{ |c| { doi: c[0], citation: c[1] } },
                           barcodes: a.barcodes.pluck(:processid,:bin_uri).uniq.map{ |b| { processid: b[0], bin_uri: b[1] } },
@@ -293,7 +297,9 @@ module Collector
           position: a.position,
           affiliation: a.affiliation,
           coordinates: a.recordings_coordinates,
+          recordings_count: a.recordings.size,
           recordings_with: a.recordings_with,
+          determinations_count: a.determinations.size,
           determined_families: a.determined_families,
           works: a.works.pluck(:doi,:citation).uniq.map{ |c| { doi: c[0], citation: c[1] } },
           barcodes: a.barcodes.pluck(:processid,:bin_uri).uniq.map{ |b| { processid: b[0], bin_uri: b[1] } },
