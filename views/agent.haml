@@ -43,6 +43,7 @@
 
   #recordings-chart
     %h2 Collecting Activity
+    %p.sums Total: #{number_with_delimiter(@result[:recordings_count])}
     #recordings
 
 - if @result[:aka] && @result[:aka].size > 0
@@ -73,7 +74,7 @@
         (#{number_with_delimiter(t[:count])})
 
   %h2 Families Identified
-  %p.sums Total: #{@result[:determined_families].size}
+  %p.sums Total: #{number_with_delimiter(@result[:determined_families].size)}
   %ul.determinations
     - @result[:determined_families].sort_by { |d| d[:family] }.each do |t|
       %li
@@ -82,6 +83,7 @@
 #determinations-wrapper
   #identifications.chart
     %h2 Identification Activity
+    %p.sums Total: #{number_with_delimiter(@result[:determinations_count])}
     #determinations
 
 #description-wrapper
