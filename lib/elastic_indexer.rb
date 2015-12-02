@@ -149,6 +149,12 @@ module Collector
                   scientificName: { type: 'string', index: 'not_analyzed' },
                   year: { type: 'date', format: 'year' }
                 }
+              },
+              datasets: {
+                properties: {
+                  doi: { type: 'string', index: 'not_analyzed' },
+                  title: { type: 'string', index: 'not_analyzed' }
+                }
               }
             }
           },
@@ -218,7 +224,8 @@ module Collector
                           determined_families: a.determined_families,
                           works: a.works.pluck(:doi,:citation).uniq.map{ |c| { doi: c[0], citation: c[1] } },
                           barcodes: a.barcodes.pluck(:processid,:bin_uri).uniq.map{ |b| { processid: b[0], bin_uri: b[1] } },
-                          named_species: a.descriptions
+                          named_species: a.descriptions,
+                          datasets: a.datasets.pluck(:doi,:title).uniq.map{ |d| { doi: d[0], title: d[1] } }
                         }
                       }
                     }
@@ -303,7 +310,8 @@ module Collector
           determined_families: a.determined_families,
           works: a.works.pluck(:doi,:citation).uniq.map{ |c| { doi: c[0], citation: c[1] } },
           barcodes: a.barcodes.pluck(:processid,:bin_uri).uniq.map{ |b| { processid: b[0], bin_uri: b[1] } },
-          named_species: a.descriptions
+          named_species: a.descriptions,
+          datasets: a.datasets.pluck(:doi,:title).uniq.map{ |d| { doi: d[0], title: d[1] } }
         }
       }
 

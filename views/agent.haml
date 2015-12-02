@@ -100,7 +100,15 @@
     %p.sums Total: #{@result[:works].size}
     - @result[:works].each do |w|
       %div.citation
-        %a{href: "http://dx.doi.org/#{w[:doi]}" }= w[:citation]
+        %a{href: "http://doi.org/#{w[:doi]}" }= w[:citation]
+
+#datasets-wrapper
+  - if @result[:datasets] && @result[:datasets].size > 0
+    %h2 Datasets With DOIs
+    %p.sums Total: #{@result[:datasets].size}
+    - @result[:datasets].each do |d|
+      %div.citation
+        %a{href: "http://doi.org/#{d[:doi]}" }= d[:title]
 
 #barcodes-wrapper
   - if @result[:barcodes] && @result[:barcodes].size > 0

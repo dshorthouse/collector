@@ -173,6 +173,7 @@ module Collector
         AgentWork.where(agent_id: a.id).update_all(agent_id: a.canonical_id, original_agent_id: a.id)
         AgentDescription.where(agent_id: a.id).update_all(agent_id: a.canonical_id, original_agent_id: a.id)
         AgentBarcode.where(agent_id: a.id).update_all(agent_id: a.canonical_id, original_agent_id: a.id)
+        AgentDataset.where(agent_id: a.id).update_all(agent_id: a.canonical_id, original_agent_id: a.id)
       end
     end
 

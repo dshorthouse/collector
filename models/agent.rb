@@ -17,6 +17,9 @@ class Agent < ActiveRecord::Base
   has_many :barcodes, :through => :agent_barcodes
   has_many :agent_barcodes
 
+  has_many :datasets, :through => :agent_datasets
+  has_many :agent_datasets
+
   has_many :aliases, class_name: "Agent", foreign_key: "canonical_id"
   belongs_to :canonical, class_name: "Agent"
 
