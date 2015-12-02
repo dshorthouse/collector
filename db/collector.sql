@@ -1,34 +1,12 @@
--- phpMyAdmin SQL Dump
--- version 4.2.9.1
--- http://www.phpmyadmin.net
---
--- Host: localhost
--- Generation Time: Aug 27, 2015 at 04:11 PM
--- Server version: 5.6.21
--- PHP Version: 5.5.19
-
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
-
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8 */;
 
---
--- Database: `collector`
---
-CREATE DATABASE IF NOT EXISTS `collector` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-USE `collector`;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `agents`
---
-
-DROP TABLE IF EXISTS `agents`;
 CREATE TABLE IF NOT EXISTS `agents` (
 `id` int(11) NOT NULL,
   `canonical_id` int(11) DEFAULT NULL,
@@ -41,30 +19,24 @@ CREATE TABLE IF NOT EXISTS `agents` (
   `position` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `affiliation` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `processed_profile` tinyint(1) DEFAULT NULL,
-  `processed_barcodes` tinyint(1) DEFAULT NULL
+  `processed_barcodes` tinyint(1) DEFAULT NULL,
+  `processed_datasets` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=59490 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `agent_barcodes`
---
-
-DROP TABLE IF EXISTS `agent_barcodes`;
 CREATE TABLE IF NOT EXISTS `agent_barcodes` (
 `id` int(11) NOT NULL,
   `agent_id` int(11) NOT NULL,
   `barcode_id` int(11) NOT NULL,
   `original_agent_id` int(11) DEFAULT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=8702 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=226560 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `agent_datasets` (
+`id` int(11) NOT NULL,
+  `agent_id` int(11) NOT NULL,
+  `dataset_id` int(11) NOT NULL,
+  `original_agent_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB AUTO_INCREMENT=132425 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
---
--- Table structure for table `agent_descriptions`
---
-
-DROP TABLE IF EXISTS `agent_descriptions`;
 CREATE TABLE IF NOT EXISTS `agent_descriptions` (
 `id` int(11) NOT NULL,
   `agent_id` int(11) NOT NULL,
@@ -72,27 +44,13 @@ CREATE TABLE IF NOT EXISTS `agent_descriptions` (
   `original_agent_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=107 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `agent_works`
---
-
-DROP TABLE IF EXISTS `agent_works`;
 CREATE TABLE IF NOT EXISTS `agent_works` (
 `id` int(11) NOT NULL,
   `agent_id` int(11) NOT NULL,
   `work_id` int(11) NOT NULL,
   `original_agent_id` int(11) DEFAULT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=7337 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7386 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `baby_names`
---
-
-DROP TABLE IF EXISTS `baby_names`;
 CREATE TABLE IF NOT EXISTS `baby_names` (
 `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
@@ -103,40 +61,25 @@ CREATE TABLE IF NOT EXISTS `baby_names` (
   `is_popular` tinyint(1) DEFAULT '0'
 ) ENGINE=MyISAM AUTO_INCREMENT=129187 DEFAULT CHARSET=latin1;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `barcodes`
---
-
-DROP TABLE IF EXISTS `barcodes`;
 CREATE TABLE IF NOT EXISTS `barcodes` (
 `id` int(11) NOT NULL,
   `processid` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `bin_uri` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `catalognum` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=8550 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=218920 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `datasets` (
+`id` int(11) NOT NULL,
+  `doi` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `title` text COLLATE utf8_unicode_ci NOT NULL
+) ENGINE=InnoDB AUTO_INCREMENT=36495 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
---
--- Table structure for table `descriptions`
---
-
-DROP TABLE IF EXISTS `descriptions`;
 CREATE TABLE IF NOT EXISTS `descriptions` (
 `id` int(11) NOT NULL,
   `scientificName` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `year` int(11) DEFAULT NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=850 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `occurrences`
---
-
-DROP TABLE IF EXISTS `occurrences`;
 CREATE TABLE IF NOT EXISTS `occurrences` (
   `id` int(11) NOT NULL,
   `acceptedNameUsage` text COLLATE utf8_unicode_ci,
@@ -239,13 +182,6 @@ CREATE TABLE IF NOT EXISTS `occurrences` (
   `year` text COLLATE utf8_unicode_ci
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `occurrence_determiners`
---
-
-DROP TABLE IF EXISTS `occurrence_determiners`;
 CREATE TABLE IF NOT EXISTS `occurrence_determiners` (
 `id` int(11) NOT NULL,
   `occurrence_id` int(11) NOT NULL,
@@ -253,13 +189,6 @@ CREATE TABLE IF NOT EXISTS `occurrence_determiners` (
   `original_agent_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=1409931 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `occurrence_recorders`
---
-
-DROP TABLE IF EXISTS `occurrence_recorders`;
 CREATE TABLE IF NOT EXISTS `occurrence_recorders` (
 `id` int(11) NOT NULL,
   `occurrence_id` int(11) NOT NULL,
@@ -267,38 +196,21 @@ CREATE TABLE IF NOT EXISTS `occurrence_recorders` (
   `original_agent_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=3187587 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `schema_migrations`
---
-
-DROP TABLE IF EXISTS `schema_migrations`;
 CREATE TABLE IF NOT EXISTS `schema_migrations` (
   `version` varchar(255) COLLATE utf8_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `taxa`
---
-
-DROP TABLE IF EXISTS `taxa`;
 CREATE TABLE IF NOT EXISTS `taxa` (
 `id` int(11) NOT NULL,
+  `kingdom` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `phylum` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `_class` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `_order` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `family` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `common` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `image` text COLLATE utf8_unicode_ci
 ) ENGINE=InnoDB AUTO_INCREMENT=3074 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `taxon_determiners`
---
-
-DROP TABLE IF EXISTS `taxon_determiners`;
 CREATE TABLE IF NOT EXISTS `taxon_determiners` (
 `id` int(11) NOT NULL,
   `agent_id` int(11) NOT NULL,
@@ -306,196 +218,102 @@ CREATE TABLE IF NOT EXISTS `taxon_determiners` (
   `original_agent_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=1177822 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `taxon_occurrences`
---
-
-DROP TABLE IF EXISTS `taxon_occurrences`;
 CREATE TABLE IF NOT EXISTS `taxon_occurrences` (
 `id` int(11) NOT NULL,
   `occurrence_id` int(11) NOT NULL,
   `taxon_id` int(11) NOT NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=2371255 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- --------------------------------------------------------
-
---
--- Table structure for table `works`
---
-
-DROP TABLE IF EXISTS `works`;
 CREATE TABLE IF NOT EXISTS `works` (
 `id` int(11) NOT NULL,
   `doi` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `citation` text COLLATE utf8_unicode_ci,
   `processed` tinyint(1) DEFAULT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=7100 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7126 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
---
--- Indexes for dumped tables
---
 
---
--- Indexes for table `agents`
---
 ALTER TABLE `agents`
  ADD PRIMARY KEY (`id`), ADD UNIQUE KEY `full_name` (`family`,`given`);
 
---
--- Indexes for table `agent_barcodes`
---
 ALTER TABLE `agent_barcodes`
- ADD PRIMARY KEY (`id`);
+ ADD PRIMARY KEY (`id`), ADD KEY `idx_agent` (`agent_id`), ADD KEY `idx_agent_original` (`original_agent_id`), ADD KEY `idx_barcode` (`barcode_id`);
 
---
--- Indexes for table `agent_descriptions`
---
+ALTER TABLE `agent_datasets`
+ ADD PRIMARY KEY (`id`), ADD KEY `idx_datasets` (`dataset_id`), ADD KEY `idx_agents` (`agent_id`);
+
 ALTER TABLE `agent_descriptions`
  ADD PRIMARY KEY (`id`), ADD KEY `idx_agent` (`agent_id`), ADD KEY `idx_description` (`description_id`);
 
---
--- Indexes for table `agent_works`
---
 ALTER TABLE `agent_works`
  ADD PRIMARY KEY (`id`), ADD KEY `agent_id` (`agent_id`), ADD KEY `work_id` (`work_id`);
 
---
--- Indexes for table `baby_names`
---
 ALTER TABLE `baby_names`
  ADD PRIMARY KEY (`id`), ADD UNIQUE KEY `index_names_on_name_and_gender` (`name`,`gender`), ADD KEY `gender` (`gender`), ADD KEY `rating_avg` (`rating_avg`), ADD KEY `index_names_on_is_popular` (`is_popular`);
 
---
--- Indexes for table `barcodes`
---
 ALTER TABLE `barcodes`
  ADD PRIMARY KEY (`id`), ADD UNIQUE KEY `processid_idx` (`processid`);
 
---
--- Indexes for table `descriptions`
---
+ALTER TABLE `datasets`
+ ADD PRIMARY KEY (`id`), ADD UNIQUE KEY `doi` (`doi`);
+
 ALTER TABLE `descriptions`
  ADD PRIMARY KEY (`id`), ADD UNIQUE KEY `idx_scientific_name` (`scientificName`);
 
---
--- Indexes for table `occurrences`
---
 ALTER TABLE `occurrences`
  ADD PRIMARY KEY (`id`);
 
---
--- Indexes for table `occurrence_determiners`
---
 ALTER TABLE `occurrence_determiners`
  ADD PRIMARY KEY (`id`), ADD KEY `agent_idx` (`agent_id`), ADD KEY `occurrence_idx` (`occurrence_id`);
 
---
--- Indexes for table `occurrence_recorders`
---
 ALTER TABLE `occurrence_recorders`
  ADD PRIMARY KEY (`id`), ADD KEY `agent_idx` (`agent_id`), ADD KEY `occurrence_idx` (`occurrence_id`);
 
---
--- Indexes for table `schema_migrations`
---
 ALTER TABLE `schema_migrations`
  ADD UNIQUE KEY `unique_schema_migrations` (`version`);
 
---
--- Indexes for table `taxa`
---
 ALTER TABLE `taxa`
- ADD PRIMARY KEY (`id`), ADD UNIQUE KEY `family_idx` (`family`);
+ ADD PRIMARY KEY (`id`), ADD UNIQUE KEY `family_idx` (`family`), ADD KEY `kingdom_idx` (`kingdom`), ADD KEY `phylum_idx` (`phylum`);
 
---
--- Indexes for table `taxon_determiners`
---
 ALTER TABLE `taxon_determiners`
  ADD PRIMARY KEY (`id`), ADD KEY `agent_idx` (`agent_id`), ADD KEY `taxon_idx` (`taxon_id`);
 
---
--- Indexes for table `taxon_occurrences`
---
 ALTER TABLE `taxon_occurrences`
  ADD PRIMARY KEY (`id`), ADD KEY `occurrence_idx` (`occurrence_id`), ADD KEY `taxon_idx` (`taxon_id`);
 
---
--- Indexes for table `works`
---
 ALTER TABLE `works`
  ADD PRIMARY KEY (`id`), ADD KEY `doi` (`doi`);
 
---
--- AUTO_INCREMENT for dumped tables
---
 
---
--- AUTO_INCREMENT for table `agents`
---
 ALTER TABLE `agents`
 MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=59490;
---
--- AUTO_INCREMENT for table `agent_barcodes`
---
 ALTER TABLE `agent_barcodes`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=8702;
---
--- AUTO_INCREMENT for table `agent_descriptions`
---
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=226560;
+ALTER TABLE `agent_datasets`
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=132425;
 ALTER TABLE `agent_descriptions`
 MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=107;
---
--- AUTO_INCREMENT for table `agent_works`
---
 ALTER TABLE `agent_works`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=7337;
---
--- AUTO_INCREMENT for table `baby_names`
---
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=7386;
 ALTER TABLE `baby_names`
 MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=129187;
---
--- AUTO_INCREMENT for table `barcodes`
---
 ALTER TABLE `barcodes`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=8550;
---
--- AUTO_INCREMENT for table `descriptions`
---
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=218920;
+ALTER TABLE `datasets`
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=36495;
 ALTER TABLE `descriptions`
 MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=850;
---
--- AUTO_INCREMENT for table `occurrence_determiners`
---
 ALTER TABLE `occurrence_determiners`
 MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1409931;
---
--- AUTO_INCREMENT for table `occurrence_recorders`
---
 ALTER TABLE `occurrence_recorders`
 MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3187587;
---
--- AUTO_INCREMENT for table `taxa`
---
 ALTER TABLE `taxa`
 MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3074;
---
--- AUTO_INCREMENT for table `taxon_determiners`
---
 ALTER TABLE `taxon_determiners`
 MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1177822;
---
--- AUTO_INCREMENT for table `taxon_occurrences`
---
 ALTER TABLE `taxon_occurrences`
 MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2371255;
---
--- AUTO_INCREMENT for table `works`
---
 ALTER TABLE `works`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=7100;
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=7126;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
