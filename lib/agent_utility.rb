@@ -1,11 +1,13 @@
 # encoding: utf-8
 
+Namae.options[:prefer_comma_as_separator] = true
+
 module Collector
   module AgentUtility
 
-    def self.clean_namae(parsed_namae)
-      family = parsed_namae[0].family rescue nil
-      given = parsed_namae[0].normalize_initials.given rescue nil
+    def self.clean(parsed_namae)
+      family = parsed_namae.family rescue nil
+      given = parsed_namae.normalize_initials.given rescue nil
 
       if family.nil? && !given.nil? && !given.include?(".")
         family = given
@@ -23,7 +25,7 @@ module Collector
       OpenStruct.new(given: given, family: family)
     end
 
-    def self.explode_names(name)
+    def self.parse(name)
       global_strip_out = %r{
         \bet\s+al(\.)?|
         \bu\.\s*a\.|
@@ -111,7 +113,9 @@ module Collector
           .squeeze(' ')
           .split(split_by)
           .map{ |c| c.strip.gsub(/[.,]\z/, '').strip }
-          .reject{ |c| c.empty? || c.length < 3 || c.length > 30 }
+          .reject{ |c| c.empty? || c.length < 3 }
+          .map{ |n| Namae.parse(n) }
+          .flatten! || []
     end
 
     def self.valid_year(year)

@@ -24,8 +24,15 @@ if options[:truncate]
   Occurrence.connection.execute("TRUNCATE TABLE agents")
   Occurrence.connection.execute("TRUNCATE TABLE occurrence_determiners")
   Occurrence.connection.execute("TRUNCATE TABLE occurrence_recorders")
+  Occurrence.connection.execute("TRUNCATE TABLE barcodes")
+  Occurrence.connection.execute("TRUNCATE TABLE agent_barcodes")
   Occurrence.connection.execute("TRUNCATE TABLE descriptions")
   Occurrence.connection.execute("TRUNCATE TABLE agent_descriptions")
+  Occurrence.connection.execute("TRUNCATE TABLE works")
+  Occurrence.connection.execute("TRUNCATE TABLE agent_works")
+  Occurrence.connection.execute("TRUNCATE TABLE datasets")
+  Occurrence.connection.execute("TRUNCATE TABLE agent_datasets")
+  Occurrence.connection.execute("TRUNCATE TABLE taxon_determiners")
 end
 
 if options

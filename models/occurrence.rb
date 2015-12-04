@@ -32,10 +32,9 @@ class Occurrence < ActiveRecord::Base
     Occurrence.where("identifiedBy IS NOT NULL").find_each do |o|
       count += 1
 
-      determiners = Collector::AgentUtility.explode_names(o.identifiedBy)
+      determiners = Collector::AgentUtility.parse(o.identifiedBy)
       determiners.each do |d|
-        name = Namae.parse d
-        cleaned_name = Collector::AgentUtility.clean_namae(name)
+        cleaned_name = Collector::AgentUtility.clean(d)
         save_agent(cleaned_name, o.id, "determiner")
       end
 
@@ -49,10 +48,9 @@ class Occurrence < ActiveRecord::Base
     Occurrence.where("recordedBy IS NOT NULL").find_each do |o|
       count += 1
 
-      recorders = Collector::AgentUtility.explode_names(o.recordedBy)
+      recorders = Collector::AgentUtility.parse(o.recordedBy)
       recorders.each do |r|
-        name = Namae.parse r
-        cleaned_name = Collector::AgentUtility.clean_namae(name)
+        cleaned_name = Collector::AgentUtility.clean(r)
         save_agent(cleaned_name, o.id, "recorder")
       end
 
