@@ -62,7 +62,7 @@ class Agent < ActiveRecord::Base
     agent.orcid_matches = hits.length
     found = hits.length > 0 ? " ... found " + hits.length.to_s : ""
     agent.orcid_identifier = hits[0][:"orcid-profile"][:"orcid-identifier"][:path] if hits.length == 1
-    puts "Searched orcid for " + agent.family + ", " + agent.given + found
+    puts "Searched orcid for " + agent.id.to_s + ": " + agent.family + ", " + agent.given + found
   end
 
   def self.search_profile
@@ -89,26 +89,43 @@ class Agent < ActiveRecord::Base
 
   # Using data from https://github.com/guydavis/babynamemap/blob/master/db.sql.gz
   def self.search_gender
+    count = 0
     Agent.where("length(given) > 1 AND gender IS NULL").find_each do |a|
+      count += 1
       first_name = a.given.split.first.strip
       next if first_name.include? "."
       gender = Agent::GENDER_HASH[first_name]
       unless gender
         searched = BabyName.where("name = %s" % BabyName.connection.quote(first_name))
-                           .pluck(:gender, :rating_avg)
-                           .map{ |n| { gender: n[0], rating: n[1].nil? ? 0 : n[1] } }
-        if searched.size == 1
+                           .pluck(:gender, :is_popular, :rating_avg)
+                           .map{ |n| { gender: n[0], is_popular: n[1], rating_avg: n[2].nil? ? 0 : n[2] } }
+
+        if searched.length == 1
           gender = searched.first[:gender]
-        elsif searched.size > 1
-          gender = searched.sort_by{|k| k[:rating]}.reverse.first[:gender]
-        else
-          gender = "unknown"
         end
-        Agent::GENDER_HASH[first_name] = gender
-        puts first_name + " = " + gender
+        if searched.length > 1
+          num_popular = searched.map{|p| p[:is_popular] ? true : nil}.compact.size
+          if num_popular == 1
+            gender = searched.sort_by{|p| p[:is_popular] ? 0 : 1}.first[:gender]
+          end
+          if num_popular > 1
+            if searched.map{|r| r[:rating_avg]}.uniq.size > 1
+              gender = searched.sort_by{|r| r[:rating_avg]}.reverse.first[:gender]
+            end
+          end
+        end
+
+        Agent::GENDER_HASH[first_name] = gender if gender
+        gender = "male" if a.given.downcase.include?("frère")
+        gender = "male" if a.given.downcase.include?("brother")
+        gender = "female" if a.given.downcase.include?("soeur")
       end
-      a.gender = gender
-      a.save!
+
+      if gender
+        a.gender = gender
+        a.save!
+      end
+      puts "Parsed %s names for genders" % count if count % 1000 == 0
     end
   end
 
@@ -116,6 +133,7 @@ class Agent < ActiveRecord::Base
 
     doi_sub = %r{
       ^http\:\/\/dx\.doi\.org\/|
+      ^http\:\/\/doi\.org\/|
       ^(?i:doi\=?\:?\s+?)
     }x
 

@@ -22,7 +22,7 @@ module Collector
         given = given.mb_chars.capitalize.to_s rescue nil
       end
 
-      OpenStruct.new(given: given, family: family)
+      OpenStruct.new(given: given.strip, family: family.strip)
     end
 
     def self.parse(name)

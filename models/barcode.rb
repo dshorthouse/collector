@@ -5,7 +5,7 @@ class Barcode < ActiveRecord::Base
   end
 
   def self.search_barcodes
-    Agent.where("given <> ''").where(processed_barcodes: nil).find_each do |agent|
+    Agent.where("id = canonical_id").where("given <> ''").where(processed_barcodes: nil).find_each do |agent|
       barcodes = []
       tmp_file = "/tmp/%s.xml" % agent.id
       name = agent.given + " " + agent.family

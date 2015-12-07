@@ -35,9 +35,7 @@ if options[:truncate]
   Occurrence.connection.execute("TRUNCATE TABLE taxon_determiners")
 end
 
-if options
-  puts 'Starting to populate agents'
-  Occurrence.populate_agents
-  Description.populate_agents
-  puts 'Done populating agents'
-end
+puts 'Starting to populate agents'
+Occurrence.populate_agents
+Description.populate_agents
+puts 'Done populating agents'

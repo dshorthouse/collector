@@ -43,7 +43,7 @@ class Taxon < ActiveRecord::Base
   def self.parse_gn_response(taxon,response)
     results = JSON.parse(response, :symbolize_names => true)
     path = results[:data][0][:results][0][:classification_path].split("|") rescue []
-    path_ranks = results[:data][:results][0][:classification_path_ranks] rescue ""
+    path_ranks = results[:data][0][:results][0][:classification_path_ranks] rescue ""
     if path.size == 5 && path_ranks == "kingdom|phylum|class|order|family"
       taxon.kingdom = path[0]
       taxon.phylum = path[1]

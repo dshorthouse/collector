@@ -5,7 +5,7 @@ class Dataset < ActiveRecord::Base
   end
 
   def self.search_datasets
-    Agent.where("given <> ''").where(processed_datasets: nil).find_each do |agent|
+    Agent.where("id = canonical_id").where("given <> ''").where(processed_datasets: nil).find_each do |agent|
       name = agent.given + " " + agent.family
       puts agent.id.to_s + ": " + name
       search = 'contributor:' + URI::encode(name)
