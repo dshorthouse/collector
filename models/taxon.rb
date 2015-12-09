@@ -7,6 +7,7 @@ class Taxon < ActiveRecord::Base
 
   def self.populate_metadata
     Taxon.find_each do |t|
+      puts t.id.to_s + ": " + t.family
       eol_metadata(t)
       gn_hierarchies(t)
     end
@@ -35,8 +36,8 @@ class Taxon < ActiveRecord::Base
       response = RestClient::Request.execute(
         method: :get,
         url: Sinatra::Application.settings.eol_api + 'pages/1.0/' + id.to_s + '.json?common_names=true&images=1&&details=true&videos=0&sounds=0&maps=0&text=0'
-      )
-      parse_page_eol_response(taxon, response)
+      ) rescue nil
+      parse_page_eol_response(taxon, response) if !response.nil?
     end
   end
 
@@ -51,7 +52,7 @@ class Taxon < ActiveRecord::Base
       taxon._order = path[3]
       taxon.save
     end
-    puts "Finished #{taxon.id}, #{taxon.family}"
+    puts "\t...finished GN"
   end
 
   def self.parse_page_eol_response(taxon, response)
@@ -70,7 +71,7 @@ class Taxon < ActiveRecord::Base
     taxon.common = common
     taxon.image = image
     taxon.save
-    puts !common.nil? ? [taxon.family, common].join(": ") : taxon.family
+    puts "\t...finished EOL"
   end
 
   def image_data

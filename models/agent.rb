@@ -25,26 +25,19 @@ class Agent < ActiveRecord::Base
 
   GENDER_HASH = {}
 
-  def self.populate_orcids
-    search_orcid
-  end
-
-  def self.populate_profiles
-    search_profile
-  end
-
   def self.populate_genders
     rebuild_gender_hash
     search_gender
   end
 
-  def self.search_orcid
-    Agent.where("id = canonical_id AND orcid_matches IS NULL").find_each do |agent|
-      agent.orcid_matches = 0
+  def self.populate_orcids
+    Agent.where("id = canonical_id AND length(given) > 0 AND processed_orcid IS NULL").find_each do |agent|
       if !agent.family.empty? && !agent.given.empty?
         max_year = [agent.determinations_year_range[1], agent.recordings_year_range[1]].compact.max
+        given = URI::encode(agent.given.gsub(/\./, '. '))
+        family = URI::encode(agent.family)
         if !max_year.nil? && max_year >= 1975
-          search = 'family-name:' + URI::encode(agent.family) + '+AND+given-names:' + URI::encode(agent.given)
+          search = 'given-names:' + given + '+AND+family-name:' + family + '+OR+other-names:' + given
           response = RestClient::Request.execute(
             method: :get,
             url: Sinatra::Application.settings.orcid_api_url + 'search/orcid-bio?q=' + search,
@@ -53,20 +46,29 @@ class Agent < ActiveRecord::Base
           parse_search_orcid_response(agent, response)
         end
       end
+      agent.processed_orcid = true
       agent.save!
+      puts "ORCID " + [agent.id, agent.fullname, agent.orcid_identifier].join(" ")
     end
   end
 
   def self.parse_search_orcid_response(agent, response)
-    hits = JSON.parse(response, :symbolize_names => true)[:"orcid-search-results"][:"orcid-search-result"] rescue []
-    agent.orcid_matches = hits.length
-    found = hits.length > 0 ? " ... found " + hits.length.to_s : ""
-    agent.orcid_identifier = hits[0][:"orcid-profile"][:"orcid-identifier"][:path] if hits.length == 1
-    puts "Searched orcid for " + agent.id.to_s + ": " + agent.family + ", " + agent.given + found
+    matches = {}
+    results = JSON.parse(response, :symbolize_names => true)[:"orcid-search-results"][:"orcid-search-result"] rescue []
+    results.each do |r|
+      orcid_id = r[:"orcid-profile"][:"orcid-identifier"][:path] rescue nil
+      orcid_given = r[:"orcid-profile"][:"orcid-bio"][:"personal-details"][:"given-names"][:value] rescue nil
+      orcid_family = r[:"orcid-profile"][:"orcid-bio"][:"personal-details"][:"family-name"][:value] rescue nil
+      orcid_credit = r[:"orcid-profile"][:"orcid-bio"][:"personal-details"][:"credit-name"][:value] rescue nil
+      next if orcid_family != agent.family
+      matches[orcid_given] = orcid_id
+      matches[orcid_credit] = orcid_id
+    end
+    agent.orcid_identifier = matches[agent.fullname] || matches[agent.given]
   end
 
-  def self.search_profile
-    Agent.where("orcid_matches = 1").find_each do |agent|
+  def self.populate_profiles
+    Agent.where.not(orcid_identifier: nil).find_each do |agent|
       next if agent.processed_profile
       response = RestClient::Request.execute(
         method: :get,
@@ -74,13 +76,16 @@ class Agent < ActiveRecord::Base
         headers: { accept: 'application/orcid+json' }
       )
       parse_profile_orcid_response(agent, response)
+      puts "Profile " + [agent.id, agent.fullname].join(" ")
+      agent.processed_profile = true
+      agent.save!
     end
   end
 
   def self.rebuild_gender_hash
     puts "Rebuilding list..."
     if Agent::GENDER_HASH.empty?
-      Agent.where("gender IS NOT NULL").pluck(:given, :gender).uniq.each do |a|
+      Agent.where.not(gender: nil).pluck(:given, :gender).uniq.each do |a|
         Agent::GENDER_HASH[a[0].split.first] = a[1]
       end
     end
@@ -90,7 +95,7 @@ class Agent < ActiveRecord::Base
   # Using data from https://github.com/guydavis/babynamemap/blob/master/db.sql.gz
   def self.search_gender
     count = 0
-    Agent.where("length(given) > 1 AND gender IS NULL").find_each do |a|
+    Agent.where("length(given) > 1", gender: nil).find_each do |a|
       count += 1
       first_name = a.given.split.first.strip
       next if first_name.include? "."
@@ -104,13 +109,13 @@ class Agent < ActiveRecord::Base
           gender = searched.first[:gender]
         end
         if searched.length > 1
-          num_popular = searched.map{|p| p[:is_popular] ? true : nil}.compact.size
+          num_popular = searched.map{ |p| p[:is_popular] ? true : nil }.compact.size
           if num_popular == 1
-            gender = searched.sort_by{|p| p[:is_popular] ? 0 : 1}.first[:gender]
+            gender = searched.sort_by{ |p| p[:is_popular] ? 0 : 1 }.first[:gender]
           end
           if num_popular > 1
             if searched.map{|r| r[:rating_avg]}.uniq.size > 1
-              gender = searched.sort_by{|r| r[:rating_avg]}.reverse.first[:gender]
+              gender = searched.sort_by{ |r| r[:rating_avg] }.reverse.first[:gender]
             end
           end
         end
@@ -131,15 +136,8 @@ class Agent < ActiveRecord::Base
 
   def self.parse_profile_orcid_response(agent, response)
 
-    doi_sub = %r{
-      ^http\:\/\/dx\.doi\.org\/|
-      ^http\:\/\/doi\.org\/|
-      ^(?i:doi\=?\:?\s+?)
-    }x
-
     Agent.transaction do
-      Agent.connection.execute("DELETE FROM agent_works WHERE agent_id = %s" % agent.id)
-
+      AgentWork.delete_all(agent_id: agent.id)
       profile = JSON.parse(response, :symbolize_names => true)[:"orcid-profile"]
       agent.email = profile[:"orcid-bio"][:"contact-details"][:email][0][:value] rescue nil
       agent.position = profile[:"orcid-activities"][:affiliations][:affiliation][0][:"role-title"] rescue nil
@@ -150,19 +148,19 @@ class Agent < ActiveRecord::Base
         identifiers = pub[:"work-external-identifiers"][:"work-external-identifier"] rescue []
         identifiers.each do |identifier|
             if identifier[:"work-external-identifier-type"] == "DOI"
-              doi = identifier[:"work-external-identifier-id"][:value].gsub(doi_sub,'')
-              work = Work.find_or_create_by(doi: doi)
+              doi = Collector::AgentUtility.doi_clean(identifier[:"work-external-identifier-id"][:value])
+              work = Work.where(doi: doi).first_or_create
               AgentWork.create(agent_id: agent.id, work_id: work.id)
               break
             end
         end
       end
-
-      puts "Added profile for " + agent.id.to_s + ": " + agent.family + ", " + agent.given
-
-      agent.processed_profile = true
-      agent.save!
     end
+
+  end
+
+  def fullname
+    [given, family].join(" ").strip
   end
 
   def determinations_year_range

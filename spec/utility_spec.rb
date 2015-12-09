@@ -6,6 +6,34 @@ describe "Utility functions to handle names of people" do
     @utility = Collector::AgentUtility
   end
 
+  it "should capitalize mistaken lowercase first initials" do
+    input = "r.C. Smith"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(["R. C.", "Smith"])
+  end
+
+  it "should remove numerical values and lowercase letter" do
+    input = "23440a Ian D. Macdonald"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(["Ian D.", "Macdonald"])
+  end
+
+  it "should remove numerical values and capital letter" do
+    input = "23440G Ian D. Macdonald"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(["Ian D.", "Macdonald"])
+  end
+
+  it "should remove numerical values and lowercase letter in brackets" do
+    input = "23440(a) Ian D. Macdonald"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(["Ian D.", "Macdonald"])
+  end
+
   it "should remove 'et al'" do
     input = "Jack Smith et al"
     parsed = @utility.parse(input)
@@ -63,7 +91,7 @@ describe "Utility functions to handle names of people" do
   end
 
   it "should explode by 'stet!'" do
-    input = "Jack Smith stet! 1989"
+    input = "Jack Smith stet!"
     parsed = @utility.parse(input)
     expect(parsed.size).to eq(1)
     expect(parsed[0].values_at(:given, :family)).to eq(['Jack', 'Smith'])
@@ -141,6 +169,14 @@ describe "Utility functions to handle names of people" do
     expect(parsed[1].values_at(:given, :family)).to eq(['Yves', 'Archambault'])
   end
 
+  it "should explode names with 'or'" do
+    input = "Jack Smithor or Orlando Archambault"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(2)
+    expect(parsed[0].values_at(:given, :family)).to eq(['Jack', 'Smithor'])
+    expect(parsed[1].values_at(:given, :family)).to eq(['Orlando', 'Archambault'])
+  end
+
   it "should explode names with 'AND'" do
     input = "Jack Smith AND Yves Archambault"
     parsed = @utility.parse(input)
@@ -200,6 +236,16 @@ describe "Utility functions to handle names of people" do
     expect(parsed[2].values_at(:given, :family)).to eq(['N', 'Marshall'])
   end
 
+  it "should explode lists of names with semicolons and commas in reverse order" do
+    input = "Gad., L.; Dawson, J.; Wyatt, N.; Gerring, J."
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(4)
+    expect(parsed[0].values_at(:given, :family)).to eq(['L', 'Gad.'])
+    expect(parsed[1].values_at(:given, :family)).to eq(['J', 'Dawson'])
+    expect(parsed[2].values_at(:given, :family)).to eq(['N', 'Wyatt'])
+    expect(parsed[3].values_at(:given, :family)).to eq(['J', 'Gerring'])
+  end
+
   it "should explode lists of names with initials (forward), commas and '&'" do
     input = "N. Lujan, D. Werneke, D. Taphorn, D. German & D. Osorio"
     parsed = @utility.parse(input)
@@ -242,6 +288,13 @@ describe "Utility functions to handle names of people" do
     expect(parsed[0].values_at(:given, :family)).to eq(['Jack', 'Smith'])
     expect(parsed[1].values_at(:given, :family)).to eq(['Yves', 'Archambault'])
     expect(parsed[2].values_at(:given, :family)).to eq(['Don', 'Johnson'])
+  end
+
+  it "should explode names with 'by'" do
+    input = "by P. Zika"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(['P.', 'Zika'])
   end
 
   it "should explode names with 'annotated'" do
@@ -304,6 +357,14 @@ describe "Utility functions to handle names of people" do
     expect(parsed.size).to eq(2)
     expect(parsed[0].values_at(:given, :family)).to eq(['Jack', 'Johnson'])
     expect(parsed[1].values_at(:given, :family)).to eq(['Yves', 'Archambault'])
+  end
+
+  it "should explode names with 'checked:'" do
+    input = "C.E. Garton 1980 checked:W.G. Argus 1980"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(2)
+    expect(parsed[0].values_at(:given, :family)).to eq(['C. E.', 'Garton'])
+    expect(parsed[1].values_at(:given, :family)).to eq(['W. G.', 'Argus'])
   end
 
   it "should explode names with 'checked by'" do
@@ -431,6 +492,29 @@ describe "Utility functions to handle names of people" do
     expect(parsed.size).to eq(2)
     expect(parsed[0].values_at(:given, :family)).to eq(['Rex', 'Byron'])
     expect(parsed[1].values_at(:given, :family)).to eq(['Yves', 'Archambault'])
+  end
+
+  it "should explode names with abbreviation for verified by" do
+    input = "W.W. Diehl; Verif.: C.L. Shear"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(2)
+    expect(parsed[0].values_at(:given, :family)).to eq(['W. W.', 'Diehl'])
+    expect(parsed[1].values_at(:given, :family)).to eq(['C. L.', 'Shear'])
+  end
+
+  it "should explode names with verified indicator in French" do
+    input = "Vérifié Michelle Garneau"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(['Michelle', 'Garneau'])
+  end
+
+  it "should explode names with complex verif. statements with year" do
+    input = "Gji; Verif. S. Churchill; 1980"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(2)
+    expect(parsed[0].values_at(:given, :family)).to eq(['Gji', nil])
+    expect(parsed[1].values_at(:given, :family)).to eq(['S.', 'Churchill'])
   end
 
   it "should explode concatenated names like 'Yves R.Archambault'" do
@@ -590,6 +674,36 @@ describe "Utility functions to handle names of people" do
     expect(parsed.size).to eq(1)
     expect(parsed[0].values_at(:given, :family)).to eq(['Léas', 'Sicard'])
     expect(@utility.clean(parsed[0]).to_h).to eq({ family: "Sicard", given: "Léas"})
+  end
+
+  it "should clean a doi with http://dx.doi.org" do
+    input = "http://dx.doi.org/10.12345/12345"
+    cleaned = @utility.doi_clean(input)
+    expect(cleaned).to eq("10.12345/12345")
+  end
+
+  it "should clean a doi with http://doi.org" do
+    input = "http://doi.org/10.12345/12345"
+    cleaned = @utility.doi_clean(input)
+    expect(cleaned).to eq("10.12345/12345")
+  end
+
+  it "should clean a doi with doi:" do
+    input = "doi:10.12345/12345"
+    cleaned = @utility.doi_clean(input)
+    expect(cleaned).to eq("10.12345/12345")
+  end
+
+  it "should clean a doi with DOI:" do
+    input = "DOI:10.12345/12345"
+    cleaned = @utility.doi_clean(input)
+    expect(cleaned).to eq("10.12345/12345")
+  end
+
+  it "should clean a doi with DOI= " do
+    input = "DOI= 10.12345/12345"
+    cleaned = @utility.doi_clean(input)
+    expect(cleaned).to eq("10.12345/12345")
   end
 
 end

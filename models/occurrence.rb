@@ -19,53 +19,37 @@ class Occurrence < ActiveRecord::Base
   end
 
   def self.populate_agents
-    parse_determiners
-    parse_recorders
+    count = 0
+    Occurrence.find_each do |o|
+      count += 1
+
+      next if o.identifiedBy.nil? && o.recordedBy.nil?
+
+      if o.identifiedBy
+        determiners = Collector::AgentUtility.parse(o.identifiedBy)
+        determiners.each do |d|
+          save_agent(Collector::AgentUtility.clean(d), o.id, "determiner")
+        end
+      end
+
+      if o.recordedBy
+        recorders = Collector::AgentUtility.parse(o.recordedBy)
+        recorders.each do |r|
+          save_agent(Collector::AgentUtility.clean(r), o.id, "recorder")
+        end
+      end
+
+      puts "%s occurrences for agents" % count if count % 1000 == 0
+    end
   end
 
   def self.populate_taxa
-    parse_taxa
-  end
-
-  def self.parse_determiners
     count = 0
-    Occurrence.where("identifiedBy IS NOT NULL").find_each do |o|
-      count += 1
-
-      determiners = Collector::AgentUtility.parse(o.identifiedBy)
-      determiners.each do |d|
-        cleaned_name = Collector::AgentUtility.clean(d)
-        save_agent(cleaned_name, o.id, "determiner")
-      end
-
-      puts "Parsed %s occurrences for determiners" % count if count % 1000 == 0
-
-    end
-  end
-
-  def self.parse_recorders
-    count = 0
-    Occurrence.where("recordedBy IS NOT NULL").find_each do |o|
-      count += 1
-
-      recorders = Collector::AgentUtility.parse(o.recordedBy)
-      recorders.each do |r|
-        cleaned_name = Collector::AgentUtility.clean(r)
-        save_agent(cleaned_name, o.id, "recorder")
-      end
-
-      puts "Parsed %s occurrences for recorders" % count if count % 1000 == 0
-
-    end
-  end
-
-  def self.parse_taxa
-    count = 0
-    Occurrence.where("identifiedBy IS NOT NULL AND family <> ''").find_each do |o|
+    Occurrence.where.not(identifiedBy: [nil, ''], family: [nil,'']).find_each do |o|
       count += 1
 
       Occurrence.transaction do
-        taxon = Taxon.find_or_create_by(family: o.family)
+        taxon = Taxon.where(family: o.family).first_or_create
         TaxonOccurrence.create(taxon_id: taxon.id, occurrence_id: o.id)
 
         o.occurrence_determiners.each do |d|
@@ -73,21 +57,19 @@ class Occurrence < ActiveRecord::Base
         end
       end
 
-      puts "Parsed %s occurrences for taxa" % count if count % 1000 == 0
+      puts "%s occurrences for taxa" % count if count % 1000 == 0
     end
   end
 
   def self.save_agent(name, id, type)
-    return if name.family.nil? || name.family.length < 3
+    return if name[:family].nil? || name[:family].length < 3
 
-    family = name.family.to_s
-    given = name.given.to_s
+    family = name[:family].to_s
+    given = name[:given].to_s
 
     Occurrence.transaction do
-      agent = Agent.find_or_create_by(family: family, given: given)
-      if agent.canonical_id.nil?
-        agent.update(canonical_id: agent.id)
-      end
+      agent = Agent.where(family: family, given: given).first_or_create
+      agent.update(canonical_id: agent.id)
       if type == "determiner"
         OccurrenceDeterminer.create(occurrence_id: id, agent_id: agent.id)
       end

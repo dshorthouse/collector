@@ -1,14 +1,8 @@
 class Dataset < ActiveRecord::Base
 
   def self.populate_datasets
-    search_datasets
-  end
-
-  def self.search_datasets
-    Agent.where("id = canonical_id").where("given <> ''").where(processed_datasets: nil).find_each do |agent|
-      name = agent.given + " " + agent.family
-      puts agent.id.to_s + ": " + name
-      search = 'contributor:' + URI::encode(name)
+    Agent.where("id = canonical_id AND processed_datasets IS NULL").where.not(given: [nil,'']).find_each do |agent|
+      search = 'contributor:' + URI::encode(agent.fullname)
       response = send_datacite_request(search)
       if response[:numFound] > 0
         datasets = datacite_records(response)
@@ -25,7 +19,7 @@ class Dataset < ActiveRecord::Base
       end
       agent.processed_datasets = true
       agent.save!
-      puts "\t\t...done"
+      puts [agent.id,agent.fullname].join(": ")
     end
   end
 

@@ -26,7 +26,6 @@ OptionParser.new do |opts|
 
 end.parse!
 
-puts 'Starting to disambiguate agents'
 graphs = Collector::AgentDisambiguator.new
 
 if options[:reset]

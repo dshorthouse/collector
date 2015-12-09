@@ -1,8 +1,23 @@
 #!/usr/bin/env ruby
 # encoding: utf-8
 require_relative '../environment.rb'
+require 'optparse'
 
-if ARGV[0] == '--truncate'
+options = {}
+OptionParser.new do |opts|
+  opts.banner = "Usage: populate_taxa.rb [options]"
+
+  opts.on("-t", "--truncate", "Truncate data") do |a|
+    options[:truncate] = true
+  end
+
+  opts.on("-h", "--help", "Prints this help") do
+    puts opts
+    exit
+  end
+end.parse!
+
+if options[:truncate]
   puts "Truncating data"
   Occurrence.connection.execute("TRUNCATE TABLE taxa")
   Occurrence.connection.execute("TRUNCATE TABLE taxon_occurrences")

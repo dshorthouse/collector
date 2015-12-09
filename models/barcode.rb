@@ -1,18 +1,12 @@
 class Barcode < ActiveRecord::Base
 
   def self.populate_barcodes
-    search_barcodes
-  end
-
-  def self.search_barcodes
-    Agent.where("id = canonical_id").where("given <> ''").where(processed_barcodes: nil).find_each do |agent|
+    Agent.where("id = canonical_id AND processed_barcodes IS NULL").where.not(given: [nil,'']).find_each do |agent|
       barcodes = []
       tmp_file = "/tmp/%s.xml" % agent.id
-      name = agent.given + " " + agent.family
-      puts agent.id.to_s + ": " + name
 
       params = {
-        :researchers => name,
+        :researchers => agent.fullname,
         :format => 'xml'
       }
 
@@ -55,7 +49,7 @@ class Barcode < ActiveRecord::Base
         end
         agent.processed_barcodes = true
         agent.save!
-        puts "\t\t...done"
+        puts [agent.id, agent.fullname].join(" ")
       end
 
     end

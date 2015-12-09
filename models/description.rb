@@ -5,7 +5,7 @@ class Description < ActiveRecord::Base
   def self.populate_agents
     count = 0
     parser = ScientificNameParser.new
-    Occurrence.where("typeStatus LIKE '%type'").pluck(:scientificName).uniq.each do |namestring|
+    Occurrence.where("typeStatus LIKE '%type%'").pluck(:scientificName).uniq.each do |namestring|
       count += 1
       authors = []
       year = nil
@@ -20,18 +20,18 @@ class Description < ActiveRecord::Base
           authors_year[:authors].uniq.each do |d|
             name = Collector::AgentUtility.parse(d)
             cleaned_name = Collector::AgentUtility.clean(name[0])
-            if !cleaned_name.family.nil?
-              agent = Agent.find_or_create_by(family: cleaned_name.family.to_s, given: cleaned_name.given.to_s)
+            if !cleaned_name[:family].nil?
+              agent = Agent.find_or_create_by(family: cleaned_name[:family].to_s, given: cleaned_name[:given].to_s)
               if agent.canonical_id.nil?
                 agent.update(canonical_id: agent.id)
               end
-              AgentDescription.find_or_create_by(description_id: description.id, agent_id: agent.id)
+              AgentDescription.create(description_id: description.id, agent_id: agent.id)
             end
           end
         end
       end
 
-      puts "Parsed %s occurrences for describers" % count if count % 10 == 0
+      puts "%s occurrences for describers" % count if count % 10 == 0
 
     end
   end
