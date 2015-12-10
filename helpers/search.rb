@@ -43,7 +43,7 @@ module Sinatra
               }
             }
           else
-            body = build_name_query(searched_terms)
+            body = build_name_query(searched_term)
           end
         end
 
