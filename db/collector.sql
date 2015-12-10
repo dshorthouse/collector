@@ -13,43 +13,43 @@ CREATE TABLE IF NOT EXISTS `agents` (
   `family` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `given` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `gender` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `orcid_matches` int(11) DEFAULT NULL,
   `orcid_identifier` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `email` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `position` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `affiliation` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `processed_orcid` tinyint(1) DEFAULT NULL,
   `processed_profile` tinyint(1) DEFAULT NULL,
   `processed_barcodes` tinyint(1) DEFAULT NULL,
   `processed_datasets` tinyint(1) DEFAULT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=59490 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=60266 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `agent_barcodes` (
 `id` int(11) NOT NULL,
   `agent_id` int(11) NOT NULL,
   `barcode_id` int(11) NOT NULL,
   `original_agent_id` int(11) DEFAULT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=226560 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=212801 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `agent_datasets` (
 `id` int(11) NOT NULL,
   `agent_id` int(11) NOT NULL,
   `dataset_id` int(11) NOT NULL,
   `original_agent_id` int(11) DEFAULT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=132425 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=144933 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `agent_descriptions` (
 `id` int(11) NOT NULL,
   `agent_id` int(11) NOT NULL,
   `description_id` int(11) NOT NULL,
   `original_agent_id` int(11) DEFAULT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=107 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1817 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `agent_works` (
 `id` int(11) NOT NULL,
   `agent_id` int(11) NOT NULL,
   `work_id` int(11) NOT NULL,
   `original_agent_id` int(11) DEFAULT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=7386 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3242 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `baby_names` (
 `id` int(11) NOT NULL,
@@ -59,26 +59,26 @@ CREATE TABLE IF NOT EXISTS `baby_names` (
   `rating_total` decimal(10,0) DEFAULT NULL,
   `rating_avg` decimal(10,2) DEFAULT NULL,
   `is_popular` tinyint(1) DEFAULT '0'
-) ENGINE=MyISAM AUTO_INCREMENT=129187 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=129200 DEFAULT CHARSET=latin1;
 
 CREATE TABLE IF NOT EXISTS `barcodes` (
 `id` int(11) NOT NULL,
   `processid` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `bin_uri` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `catalognum` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=218920 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=207873 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `datasets` (
 `id` int(11) NOT NULL,
   `doi` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `title` text COLLATE utf8_unicode_ci NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=36495 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=41034 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `descriptions` (
 `id` int(11) NOT NULL,
   `scientificName` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `year` int(11) DEFAULT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=850 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2386 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `occurrences` (
   `id` int(11) NOT NULL,
@@ -187,14 +187,14 @@ CREATE TABLE IF NOT EXISTS `occurrence_determiners` (
   `occurrence_id` int(11) NOT NULL,
   `agent_id` int(11) NOT NULL,
   `original_agent_id` int(11) DEFAULT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=1409931 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1421535 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `occurrence_recorders` (
 `id` int(11) NOT NULL,
   `occurrence_id` int(11) NOT NULL,
   `agent_id` int(11) NOT NULL,
   `original_agent_id` int(11) DEFAULT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=3187587 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3275748 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `schema_migrations` (
   `version` varchar(255) COLLATE utf8_unicode_ci NOT NULL
@@ -209,27 +209,27 @@ CREATE TABLE IF NOT EXISTS `taxa` (
   `family` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `common` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `image` text COLLATE utf8_unicode_ci
-) ENGINE=InnoDB AUTO_INCREMENT=3074 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1966 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `taxon_determiners` (
 `id` int(11) NOT NULL,
   `agent_id` int(11) NOT NULL,
   `taxon_id` int(11) NOT NULL,
   `original_agent_id` int(11) DEFAULT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=1177822 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1189006 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `taxon_occurrences` (
 `id` int(11) NOT NULL,
   `occurrence_id` int(11) NOT NULL,
   `taxon_id` int(11) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=2371255 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1135601 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `works` (
 `id` int(11) NOT NULL,
   `doi` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `citation` text COLLATE utf8_unicode_ci,
   `processed` tinyint(1) DEFAULT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=7126 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2982 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
 ALTER TABLE `agents`
@@ -260,7 +260,7 @@ ALTER TABLE `descriptions`
  ADD PRIMARY KEY (`id`), ADD UNIQUE KEY `idx_scientific_name` (`scientificName`);
 
 ALTER TABLE `occurrences`
- ADD PRIMARY KEY (`id`);
+ ADD PRIMARY KEY (`id`), ADD FULLTEXT KEY `idx_recordedby` (`recordedBy`);
 
 ALTER TABLE `occurrence_determiners`
  ADD PRIMARY KEY (`id`), ADD KEY `agent_idx` (`agent_id`), ADD KEY `occurrence_idx` (`occurrence_id`);
@@ -285,35 +285,35 @@ ALTER TABLE `works`
 
 
 ALTER TABLE `agents`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=59490;
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=60266;
 ALTER TABLE `agent_barcodes`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=226560;
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=212801;
 ALTER TABLE `agent_datasets`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=132425;
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=144933;
 ALTER TABLE `agent_descriptions`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=107;
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1817;
 ALTER TABLE `agent_works`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=7386;
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3242;
 ALTER TABLE `baby_names`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=129187;
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=129200;
 ALTER TABLE `barcodes`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=218920;
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=207873;
 ALTER TABLE `datasets`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=36495;
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=41034;
 ALTER TABLE `descriptions`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=850;
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2386;
 ALTER TABLE `occurrence_determiners`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1409931;
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1421535;
 ALTER TABLE `occurrence_recorders`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3187587;
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3275748;
 ALTER TABLE `taxa`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3074;
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1966;
 ALTER TABLE `taxon_determiners`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1177822;
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1189006;
 ALTER TABLE `taxon_occurrences`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2371255;
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1135601;
 ALTER TABLE `works`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=7126;
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2982;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
