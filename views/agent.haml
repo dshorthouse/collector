@@ -15,7 +15,7 @@
   %script{src: '/javascript/agent.js', type: 'text/javascript' }
   :javascript
     google.load("visualization", "1", { packages:["corechart", "bar"] });
-    $(function() { Agent.init(#{@result[:id]}); });
+    $(function() { Agent.init(#{@result[:id]}, #{@result[:recordings_with].size}); });
 
 -content_for :title do
   #{@result[:given]} #{@result[:family]}
@@ -63,7 +63,8 @@
         %li
           - name = [c[:given].presence, c[:family].presence]. join(" ")
           %a{href: "/agent/#{c[:id]}" }=  name
-    #social-graph
+    - if @result[:recordings_with].size > 1
+      #social-graph
 
 - if @result[:determined_families] && @result[:determined_families].size > 0
   %h2 Top Families Identified (# Specimens)

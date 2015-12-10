@@ -12,4 +12,5 @@ The progression is as follows:
     ./bin/populate_barcodes [--truncate]
     ./bin/populate_datasets [--truncate]
     ./bin/disambiguate_agents --reassign (if deemed necessary)
+    ./bin/agent_network -e
     ./bin/populate_search [--flush][--rebuild-all][--rebuild-agents][--rebuild-occurrences][--rebuild-taxa][--refresh]

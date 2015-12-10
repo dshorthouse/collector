@@ -11,12 +11,15 @@ var Agent = (function($, window) {
     map: {},
     layers: [],
 
-    init: function(id) {
+    init: function(id, graph_size) {
       this.id = id;
+      this.graph_size = graph_size;
       this.getActivity();
       this.createCharts();
       this.createMap();
-      this.createGraph();
+      if (graph_size > 1) {
+        this.createGraph();
+      }
       this.enableEdit();
     },
     getActivity: function(zoom) {
@@ -390,8 +393,8 @@ var Agent = (function($, window) {
   };
 
   return {
-    init: function(id) {
-      _private.init(id);
+    init: function(id, graph_size) {
+      _private.init(id, graph_size);
     }
   };
 

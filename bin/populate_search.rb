@@ -64,7 +64,7 @@ if options[:rebuild_all]
   index.import_taxa
   puts "Populating agents..."
   index.import_agents
-  puts "Populating occurrence..."
+  puts "Populating occurrences..."
   index.import_occurrences
   puts "Refreshing the index..."
   index.refresh

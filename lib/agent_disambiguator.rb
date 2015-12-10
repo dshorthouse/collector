@@ -165,8 +165,8 @@ module Collector
     end
 
     def reassign_data
-      Agent.where.not(id: :canonical_id).find_each do |a|
-        puts "Reassigning data for #{a.given} #{a.family}"
+      Agent.where("id != canonical_id").find_each do |a|
+        puts "Reassigning data for #{a.fullname}"
         OccurrenceDeterminer.where(agent_id: a.id).update_all(agent_id: a.canonical_id, original_agent_id: a.id)
         OccurrenceRecorder.where(agent_id: a.id).update_all(agent_id: a.canonical_id, original_agent_id: a.id)
         TaxonDeterminer.where(agent_id: a.id).update_all(agent_id: a.canonical_id, original_agent_id: a.id)

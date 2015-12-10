@@ -9,7 +9,7 @@ options = {}
 OptionParser.new do |opts|
   opts.banner = "Usage: update_agents.rb [options]"
 
-  opts.on("--agent [JSON]", String, "Update single agent search with a JSON string of options") do |h|
+  opts.on("--agent [JSON]", String, "Update single agent search with a JSON string of options, '{\"id\": 1, \"orcid_identifier:\" \"000-000-000-000\"}'") do |h|
     options[:all_agents] = false
     options[:agent_attributes] = JSON.parse(h)
   end

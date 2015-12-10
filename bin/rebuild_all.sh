@@ -11,3 +11,4 @@
 ./bin/populate_barcodes.rb --truncate
 ./bin/populate_datasets.rb --truncate
 ./bin/populate_search.rb --rebuild-all
+./bin/agent_network.rb --all-agents

@@ -43,27 +43,7 @@ module Sinatra
               }
             }
           else
-            parsed = Namae.parse searched_term
-            name = ::Collector::AgentUtility.clean_namae(parsed)
-            family = !name.family.nil? ? name.family : ""
-            given = !name.given.nil? ? name.given : ""
-
-            body = {
-              query: {
-                bool: {
-                  must: [
-                    match: { family: family }
-                  ],
-                  should: [
-                    match: { family: searched_term }
-                  ],
-                  should: [
-                    match: { given: given }
-                  ]
-                }
-              }
-            }
-
+            body = build_name_query(searched_terms)
           end
         end
 
@@ -102,18 +82,44 @@ module Sinatra
         end
       end
 
-      def agent_profile(id)
+      def build_name_query(search)
+        parsed = Namae.parse search
+        name = ::Collector::AgentUtility.clean(parsed[0])
+        family = !name[:family].nil? ? name[:family] : ""
+        given = !name[:given].nil? ? name[:given] : ""
+
+        {
+          query: {
+            bool: {
+              must: [
+                match: { family: family }
+              ],
+              should: [
+                match: { family: search }
+              ],
+              should: [
+                match: { given: given }
+              ]
+            }
+          }
+        }
+      end
+
+      def agent_profile(search)
         @result = {}
-        return if !id.present?
+        return if !search.present?
 
         client = Elasticsearch::Client.new
 
-        query = { match: { id: id.to_i } }
-        if id.include? "-"
-          query = { match: { orcid: id } }
+        if search.to_s == search.to_i.to_s
+          body = { query: { match: { id: search.to_i } } }
+        elsif /(\d{4})-(\d{4})-(\d{4})-(\d{3}[0-9X])/.match(search)
+          body = { query: { match: { orcid: search } } }
+        else
+          body = build_name_query(CGI::unescape(search))
         end
 
-        response = client.search index: settings.elastic_index, type: 'agent', body: { query: query }
+        response = client.search index: settings.elastic_index, type: 'agent', body: body
         result = response["hits"].deep_symbolize_keys
         if result[:total] > 0
           @result = result[:hits][0][:_source]

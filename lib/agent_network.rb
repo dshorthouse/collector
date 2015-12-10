@@ -26,7 +26,7 @@ module Collector
         else
           write_d3_file
         end
-        puts "Created graph for #{[@agent.given, @agent.family].join(' ')} (#{@agent.id})"
+        puts "Graph for #{[@agent.id, @agent.fullname].join(' ')}"
       end
     end
 
@@ -65,11 +65,11 @@ module Collector
     end
 
     def write_dot_file
-      @graph.write_to_dot_file("public/images/graphs/#{@agent.id}")
+      @graph.write_to_dot_file("public/images/graphs/agents/#{@agent.id}")
     end
 
     def write_d3_file
-      @graph.write_to_d3_file("public/images/graphs/#{@agent.id}")
+      @graph.write_to_d3_file("public/images/graphs/agents/#{@agent.id}")
     end
 
   end
