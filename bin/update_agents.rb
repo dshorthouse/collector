@@ -34,7 +34,7 @@ if options[:all_agents]
 else
   attributes = options[:agent_attributes]
   a = Agent.find(attributes["id"])
-  puts "Updating %{given} %{family} ..." % { given: a.given, family: a.family}
+  puts "Updating %{name} ..." % { name: a.fullname }
   a.update_attributes(attributes)
   puts "Refreshing ORCID data..."
   a.refresh_orcid_data

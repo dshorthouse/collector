@@ -10,7 +10,16 @@ describe "Utility functions to handle names of people" do
     input = "r.C. Smith"
     parsed = @utility.parse(input)
     expect(parsed.size).to eq(1)
-    expect(parsed[0].values_at(:given, :family)).to eq(["R. C.", "Smith"])
+    expect(parsed[0].values_at(:particle, :given, :family)).to eq(["r.C.", nil, "Smith"])
+    expect(@utility.clean(parsed[0]).to_h).to eq({given:"R.C.", family:"Smith"})
+  end
+
+  it "should clean family names with extraneous period" do
+    input = "C. Tanner."
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(['C.', 'Tanner.'])
+    expect(@utility.clean(parsed[0]).to_h).to eq({given:'C.', family: 'Tanner'})
   end
 
   it "should remove numerical values and lowercase letter" do
@@ -87,7 +96,7 @@ describe "Utility functions to handle names of people" do
     input = "W.P. Coreneuk(?)"
     parsed = @utility.parse(input)
     expect(parsed.size).to eq(1)
-    expect(parsed[0].values_at(:given, :family)).to eq(['W. P.', 'Coreneuk'])
+    expect(parsed[0].values_at(:given, :family)).to eq(['W.P.', 'Coreneuk'])
   end
 
   it "should explode by 'stet!'" do
@@ -224,26 +233,26 @@ describe "Utility functions to handle names of people" do
     expect(parsed.size).to eq(3)
     expect(parsed[0].values_at(:given, :family)).to eq(['V.', 'Crecco'])
     expect(parsed[1].values_at(:given, :family)).to eq(['J.', 'Savage'])
-    expect(parsed[2].values_at(:given, :family)).to eq(['T. A.', 'Wheeler'])
+    expect(parsed[2].values_at(:given, :family)).to eq(['T.A.', 'Wheeler'])
   end
 
   it "should explode lists of names with initials (reversed), commas, and '&'" do
     input = "Harkness, W.J.K., Dickinson, J.C., & Marshall, N."
     parsed = @utility.parse(input)
     expect(parsed.size).to eq(3)
-    expect(parsed[0].values_at(:given, :family)).to eq(['W. J. K.', 'Harkness'])
-    expect(parsed[1].values_at(:given, :family)).to eq(['J. C.', 'Dickinson'])
-    expect(parsed[2].values_at(:given, :family)).to eq(['N', 'Marshall'])
+    expect(parsed[0].values_at(:given, :family)).to eq(['W.J.K.', 'Harkness'])
+    expect(parsed[1].values_at(:given, :family)).to eq(['J.C.', 'Dickinson'])
+    expect(parsed[2].values_at(:given, :family)).to eq(['N.', 'Marshall'])
   end
 
   it "should explode lists of names with semicolons and commas in reverse order" do
     input = "Gad., L.; Dawson, J.; Wyatt, N.; Gerring, J."
     parsed = @utility.parse(input)
     expect(parsed.size).to eq(4)
-    expect(parsed[0].values_at(:given, :family)).to eq(['L', 'Gad.'])
-    expect(parsed[1].values_at(:given, :family)).to eq(['J', 'Dawson'])
-    expect(parsed[2].values_at(:given, :family)).to eq(['N', 'Wyatt'])
-    expect(parsed[3].values_at(:given, :family)).to eq(['J', 'Gerring'])
+    expect(parsed[0].values_at(:given, :family)).to eq(['L.', 'Gad.'])
+    expect(parsed[1].values_at(:given, :family)).to eq(['J.', 'Dawson'])
+    expect(parsed[2].values_at(:given, :family)).to eq(['N.', 'Wyatt'])
+    expect(parsed[3].values_at(:given, :family)).to eq(['J.', 'Gerring'])
   end
 
   it "should explode lists of names with initials (forward), commas and '&'" do
@@ -363,8 +372,8 @@ describe "Utility functions to handle names of people" do
     input = "C.E. Garton 1980 checked:W.G. Argus 1980"
     parsed = @utility.parse(input)
     expect(parsed.size).to eq(2)
-    expect(parsed[0].values_at(:given, :family)).to eq(['C. E.', 'Garton'])
-    expect(parsed[1].values_at(:given, :family)).to eq(['W. G.', 'Argus'])
+    expect(parsed[0].values_at(:given, :family)).to eq(['C.E.', 'Garton'])
+    expect(parsed[1].values_at(:given, :family)).to eq(['W.G.', 'Argus'])
   end
 
   it "should explode names with 'checked by'" do
@@ -498,8 +507,8 @@ describe "Utility functions to handle names of people" do
     input = "W.W. Diehl; Verif.: C.L. Shear"
     parsed = @utility.parse(input)
     expect(parsed.size).to eq(2)
-    expect(parsed[0].values_at(:given, :family)).to eq(['W. W.', 'Diehl'])
-    expect(parsed[1].values_at(:given, :family)).to eq(['C. L.', 'Shear'])
+    expect(parsed[0].values_at(:given, :family)).to eq(['W.W.', 'Diehl'])
+    expect(parsed[1].values_at(:given, :family)).to eq(['C.L.', 'Shear'])
   end
 
   it "should explode names with verified indicator in French" do
@@ -517,23 +526,8 @@ describe "Utility functions to handle names of people" do
     expect(parsed[1].values_at(:given, :family)).to eq(['S.', 'Churchill'])
   end
 
-  it "should explode concatenated names like 'Yves R.Archambault'" do
-    input = "Rex Byron and Yves R.Archambault"
-    parsed = @utility.parse(input)
-    expect(parsed.size).to eq(2)
-    expect(parsed[0].values_at(:given, :family)).to eq(['Rex', 'Byron'])
-    expect(parsed[1].values_at(:given, :family)).to eq(['Yves R.', 'Archambault'])
-  end
-
-  it "should explode concatenated names like 'J.L.Gentry Jr'" do
-    input = "J.L.Gentry Jr"
-    parsed = @utility.parse(input)
-    expect(parsed.size).to eq(1)
-    expect(parsed[0].values_at(:given, :family, :suffix)).to eq(['J. L.', 'Gentry', 'Jr'])
-  end
-
-  it "should explode concantenated names and deal with 'Ver By'" do
-    input = "S.Ross Ver By P. Perrin"
+  it "should deal with 'Ver By'" do
+    input = "S. Ross Ver By P. Perrin"
     parsed = @utility.parse(input)
     expect(parsed.size).to eq(2)
     expect(parsed[0].values_at(:given, :family)).to eq(['S.', 'Ross'])
@@ -552,8 +546,8 @@ describe "Utility functions to handle names of people" do
     input = "4073 A.A. Beetle, with D.E. Beetle and Alva Hansen"
     parsed = @utility.parse(input)
     expect(parsed.size).to eq(3)
-    expect(parsed[0].values_at(:given, :family)).to eq(['A. A.', 'Beetle'])
-    expect(parsed[1].values_at(:given, :family)).to eq(['D. E.', 'Beetle'])
+    expect(parsed[0].values_at(:given, :family)).to eq(['A.A.', 'Beetle'])
+    expect(parsed[1].values_at(:given, :family)).to eq(['D.E.', 'Beetle'])
     expect(parsed[2].values_at(:given, :family)).to eq(['Alva', 'Hansen'])
   end
 
@@ -561,8 +555,8 @@ describe "Utility functions to handle names of people" do
     input = "C. Tanner.; M.W. Hawkes"
     parsed = @utility.parse(input)
     expect(parsed.size).to eq(2)
-    expect(parsed[0].values_at(:given, :family)).to eq(['C.', 'Tanner'])
-    expect(parsed[1].values_at(:given, :family)).to eq(['M. W.', 'Hawkes'])
+    expect(parsed[0].values_at(:given, :family)).to eq(['C.', 'Tanner.'])
+    expect(parsed[1].values_at(:given, :family)).to eq(['M.W.', 'Hawkes'])
   end
 
   it "should explode names with Jan. 14, 2013 included in string" do
@@ -583,11 +577,11 @@ describe "Utility functions to handle names of people" do
     input = "C.J. Bird 20/Aug./1980"
     parsed = @utility.parse(input)
     expect(parsed.size).to eq(1)
-    expect(parsed[0].values_at(:given, :family)).to eq(['C. J.', 'Bird'])
+    expect(parsed[0].values_at(:given, :family)).to eq(['C.J.', 'Bird'])
   end
 
-  it "should explode names with dates separated by semicolons in the string" do
-    input = "K. January; January; 1979"
+  it "should explode names with dates separated by commas in the string" do
+    input = "K. January; January, 1979"
     parsed = @utility.parse(input)
     expect(parsed.size).to eq(1)
     expect(parsed[0].values_at(:given, :family)).to eq(['K.', 'January'])
@@ -632,16 +626,17 @@ describe "Utility functions to handle names of people" do
     input = "Winterbottom, R.;Katz, L.;& CI team"
     parsed = @utility.parse(input)
     expect(parsed.size).to eq(3)
-    expect(parsed[0].values_at(:given, :family)).to eq(['R', 'Winterbottom'])
-    expect(parsed[1].values_at(:given, :family)).to eq(['L', 'Katz'])
+    expect(parsed[0].values_at(:given, :family)).to eq(['R.', 'Winterbottom'])
+    expect(parsed[1].values_at(:given, :family)).to eq(['L.', 'Katz'])
     expect(parsed[2].values_at(:given, :family)).to eq(['CI', 'team'])
   end
 
   it "should reject an empty name" do
     input = "Norman Johnson and P"
     parsed = @utility.parse(input)
-    expect(parsed.size).to eq(1)
+    expect(parsed.size).to eq(2)
     expect(parsed[0].values_at(:given, :family)).to eq(['Norman', 'Johnson'])
+    expect(parsed[1].values_at(:given, :family)).to eq(["P", nil])
   end
 
   it "should parse name with given initials without period(s)" do

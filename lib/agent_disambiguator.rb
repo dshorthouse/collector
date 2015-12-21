@@ -92,7 +92,7 @@ module Collector
       @graph.isolates.each { |v| @graph.remove_vertex v }
     end
 
-    # TODO: not flexible enough to accommodate more nuances in score
+    # TODO: not flexible enough to accommodate more nuances in score, maybe use neural network
     def name_similarity(agent1, agent2)
       given1 = agent1[:given]
       given2 = agent2[:given]

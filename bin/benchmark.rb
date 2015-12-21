@@ -6,24 +6,20 @@ require 'benchmark'
 iterations = 1_000
 
 utility = Collector::AgentUtility
-names = ["A.A. Beetle", "D.E. Beetle", "Alva Hansen"]
+name = "A.A. Beetle"
 name_string = "A.A. Beetle and D.E. Beetle & Alva Hansen"
 parsed = Namae.parse("Smith, Jack")
 
 Benchmark.bm do |bm|
-  bm.report("Namae") do
+  bm.report("Namae1") do
     iterations.times do
-      names.each do |n|
-        Namae.parse n
-      end
+      Namae.parse name
     end
   end
 
   bm.report("Parse1") do
     iterations.times do
-      names.each do |n|
-        utility.parse n
-      end
+      utility.parse name
     end
   end
 
