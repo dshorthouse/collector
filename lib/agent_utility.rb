@@ -9,14 +9,18 @@ module Collector
       \bu\.\s*a\.|
       \b[,;]?\s*(?i:and|&)?\s*(?i:others)\s*\b|
       \b[,;]?\s*(?i:etc)\.?|
-      \b(?i:on)\b|
-      \b(?i:unknown)\b|
-      \b(?i:ann?onymous)\b|
-      \b(?i:undetermined)\b|
-      \b(?i:stet)[,!]?\s*\d*$|
-      \d+/(?i:Jan|Feb|Mar|Apr|
+      \b[,;]?\s*(?i:on)\b|
+      \b[,;]?\s*(?i:unkn?own)\b|
+      \b[,;]?\s*(?i:n/a)\b|
+      \b[,;]?\s*(?i:ann?onymous)\b|
+      \b[,;]?\s*(?i:undetermined|indeterminable|dummy)\b|
+      \b[,;]?\s*(?i:importer|per)\b|
+      \b[,;]?\s*(?i:frère|père|soeur)\b|
+      (?i:no\s+data)|
+      \b[,;]?\s*(?i:stet)[,!]?\s*\d*\z|
+      [,;]?\s*\d+[-/\s+](?i:\d+|Jan|Feb|Mar|Apr|
         May|Jun|Jul|Aug|Sept?|
-        Oct|Nov|Dec)\.?\s*/\d+|
+        Oct|Nov|Dec)\.?\s*[-/\s+]?\d+|
       \b[,;]?\s*(?i:Jan|Jan(uary|vier))[.,;]?\s*\d+|
       \b[,;]?\s*(?i:Feb|February|f(é|e)vrier)[.,;]?\s*\d+|
       \b[,;]?\s*(?i:Mar|Mar(ch|s))[.,;]?\s*\d+|
@@ -41,14 +45,17 @@ module Collector
       \d+\s+(?i:Oct|Octob(er|re))\.?\b|
       \d+\s+(?i:Nov|Novemb(er|re))\.?\b|
       \d+\s+(?i:Dec|D(e|é)cemb(er|re))\.?\b|
+      FNA|DAO|HUH|
       \b[,;]\s+\d+|
-      [":\d+]|
-      [,;]$|
-      ^\w{0,2}$
+      [":]|
+      [,;]?\d+|
+      [,;]\z|
+      ^\w{0,2}\z|
+      ^[A-Z]{2,}\z+
     }x
 
     SPLIT_BY = %r{
-      [–|&\/;]|
+      [–|&+/;]|
       \s+-\s+|
       \b(?i:with|and|et)\s+|
       \b(?i:annotated(\s+by)?)\s*\b|
@@ -65,7 +72,8 @@ module Collector
       \b(?i:then(\s+by)?)\s+|
       \b(?i:veri?f?\.?\:?(\s+by)?|verified?(\s+by)?)\s*\b|
       \b(?i:vérifié)\s*\b|
-      \b(?i:by)\s+|
+      \b(?i:via|from)\s*\b|
+      \b(?i:(donated)?\s*by)\s+|
       \b(?i:or)\s+
     }x
 
@@ -76,10 +84,12 @@ module Collector
       ']' => ' ',
       '?' => '',
       '!' => '',
-      '=' => ''
+      '=' => '',
+      '#' => '',
+      '/' => ' / '
     }
 
-    TITLE = /\s*\b(sir|lord|count(ess)?|(gen|adm|col|maj|capt|cmdr|lt|sgt|cpl|pvt|prof|dr|md|ph\.?d|rev|fr|mrs?|mi?ss?)\.?)(\s+|$)/i
+    TITLE = /\s*\b(sir|lord|count(ess)?|(gen|adm|col|maj|capt|cmdr|lt|sgt|cpl|pvt|prof|dr|md|ph\.?d|rev)\.?|frère|père)(\s+|$)/i
 
     Namae.options[:prefer_comma_as_separator] = true
     Namae.options[:separator] = SPLIT_BY

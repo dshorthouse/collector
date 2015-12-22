@@ -155,6 +155,20 @@ describe "Utility functions to handle names of people" do
     expect(parsed[0].values_at(:given, :family)).to eq(['W.P.', 'Coreneuk'])
   end
 
+  it "should explode by 'via" do
+    input = "via Serena Lowartz"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(['Serena', 'Lowartz'])
+  end
+
+  it "should explode by +" do
+    input = "D.B. Jepsen + T. L. McGuire"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(2)
+    expect(parsed[0].values_at(:given, :family)).to eq(['D.B.', 'Jepsen'])
+  end
+
   it "should explode by 'stet!'" do
     input = "Jack Smith stet!"
     parsed = @utility.parse(input)
@@ -182,6 +196,13 @@ describe "Utility functions to handle names of people" do
     expect(parsed).to eq([])
   end
 
+  it "should remove 'importer'" do
+    input = "Lucanus, O. (importer)"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(['O.', 'Lucanus'])
+  end
+
   it "should not parse what does not resemble a name" do
     input = "EB"
     parsed = @utility.parse(input)
@@ -193,6 +214,19 @@ describe "Utility functions to handle names of people" do
     parsed = @utility.parse(input)
     expect(parsed.size).to eq(1)
     expect(parsed[0].values_at(:given, :family)).to eq(['J. S.', 'Erskine'])
+  end
+
+  it "should remove [no data]" do
+    input = "[no data]"
+    parsed = @utility.parse(input)
+    expect(parsed).to eq([])
+  end
+  
+  it "should parse name with many given initials" do
+    input = "FAH Sperling"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(['FAH', 'Sperling'])
   end
 
   it "should preserve caps in family names" do
@@ -208,6 +242,14 @@ describe "Utility functions to handle names of people" do
     parsed = @utility.parse(input)
     expect(parsed.size).to eq(1)
     expect(parsed[0].values_at(:given, :family)).to eq(['Jack John', 'Smith'])
+  end
+
+  it "should explode names with '/'" do
+    input = "O.Bennedict/G.J. Spencer"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(2)
+    expect(parsed[0].values_at(:given, :family)).to eq(['O.', 'Bennedict'])
+    expect(parsed[1].values_at(:given, :family)).to eq(['G.J.', 'Spencer'])
   end
 
   it "should explode names with ' - '" do
@@ -582,12 +624,27 @@ describe "Utility functions to handle names of people" do
     expect(parsed[1].values_at(:given, :family)).to eq(['S.', 'Churchill'])
   end
 
+  it "should remove FNA" do
+    input = "Adam F. Szczawinski ; J.K. Morton (FNA) 1993"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(2)
+    expect(parsed[0].values_at(:given, :family)).to eq(['Adam F.', 'Szczawinski'])
+    expect(parsed[1].values_at(:given, :family)).to eq(['J.K.', 'Morton'])
+  end
+
   it "should deal with 'Ver By'" do
     input = "S. Ross Ver By P. Perrin"
     parsed = @utility.parse(input)
     expect(parsed.size).to eq(2)
     expect(parsed[0].values_at(:given, :family)).to eq(['S.', 'Ross'])
     expect(parsed[1].values_at(:given, :family)).to eq(['P.', 'Perrin'])
+  end
+
+  it "should recognize a religious suffix like Marie-Victorin, frère" do
+    input = "Marie-Victorin, frère"
+    parsed = @utility.parse(input)
+    expect(parsed[0].values_at(:given, :family)).to eq(['Marie-Victorin', nil])
+    expect(@utility.clean(parsed[0]).to_h).to eq({ family: "Marie-Victorin", given: nil})
   end
 
   it "should explode a complicated example" do
@@ -613,6 +670,24 @@ describe "Utility functions to handle names of people" do
     expect(parsed.size).to eq(2)
     expect(parsed[0].values_at(:given, :family)).to eq(['C.', 'Tanner.'])
     expect(parsed[1].values_at(:given, :family)).to eq(['M.W.', 'Hawkes'])
+  end
+
+  it "should strip out dates like 21-12-1999 in the string" do
+    input = "CJ Bird,21-12-1971"
+    parsed = @utility.parse(input)
+    expect(parsed[0].values_at(:given, :family)).to eq(['CJ', 'Bird'])
+  end
+
+  it "should strip out dates like 21 Dec. 1999 in the string" do
+    input = "CJ Bird,21 Dec. 1999"
+    parsed = @utility.parse(input)
+    expect(parsed[0].values_at(:given, :family)).to eq(['CJ', 'Bird'])
+  end
+
+  it "should strip out year in string" do
+    input = "Mortensen,Agnes Mols,2010"
+    parsed = @utility.parse(input)
+    expect(parsed[0].values_at(:given, :family)).to eq(['Agnes Mols', 'Mortensen'])
   end
 
   it "should explode names with Jan. 14, 2013 included in string" do
