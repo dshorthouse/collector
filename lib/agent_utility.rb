@@ -5,10 +5,10 @@ module Collector
 
     STRIP_OUT = %r{
       \b\d+\(?(?i:[[:alpha:]])\)?\b|
-      \b(?i:et\s+al\.?)|
+      \b[,;]?\s*(?i:et\s+al)\.?|
       \bu\.\s*a\.|
-      \b,?\s*(?i:and|&)?\s*(?i:others)\s*\b|
-      \b,?\s*(?i:etc(\.)?)|
+      \b[,;]?\s*(?i:and|&)?\s*(?i:others)\s*\b|
+      \b[,;]?\s*(?i:etc)\.?|
       \b(?i:on)\b|
       \b(?i:unknown)\b|
       \b(?i:ann?onymous)\b|
@@ -17,18 +17,18 @@ module Collector
       \d+/(?i:Jan|Feb|Mar|Apr|
         May|Jun|Jul|Aug|Sept?|
         Oct|Nov|Dec)\.?\s*/\d+|
-      \b;?\s*(?i:Jan|Jan(uary|vier))[.,;]?\s*\d+|
-      \b;?\s*(?i:Feb|February|f(é|e)vrier)[.,;]?\s*\d+|
-      \b;?\s*(?i:Mar|Mar(ch|s))[.,;]?\s*\d+|
-      \b;?\s*(?i:Apr|Apri|April|avril)[.,;]?\s*\d+|
-      \b;?\s*(?i:Ma(y|i))[.,;]?\s*\d+|
-      \b;?\s*(?i:Jun|June|juin)[.,;]?\s*\d+|
-      \b;?\s*(?i:Jul|July|juillet)[.,;]?\s*\d+|
-      \b;?\s*(?i:Aug|August|ao(û|u)t)[.,;]?\s*\d+|
-      \b;?\s*(?i:Sep|Sept|Septemb(er|re))[.,;]?\s*\d+|
-      \b;?\s*(?i:Oct|Octob(er|re))[.,;]?\s*\d+|
-      \b;?\s*(?i:Nov|Novemb(er|re))[.,;]?\s*\d+|
-      \b;?\s*(?i:Dec|D(é|e)cemb(er|re))[.,;]?\s*\d+|
+      \b[,;]?\s*(?i:Jan|Jan(uary|vier))[.,;]?\s*\d+|
+      \b[,;]?\s*(?i:Feb|February|f(é|e)vrier)[.,;]?\s*\d+|
+      \b[,;]?\s*(?i:Mar|Mar(ch|s))[.,;]?\s*\d+|
+      \b[,;]?\s*(?i:Apr|Apri|April|avril)[.,;]?\s*\d+|
+      \b[,;]?\s*(?i:Ma(y|i))[.,;]?\s*\d+|
+      \b[,;]?\s*(?i:Jun|June|juin)[.,;]?\s*\d+|
+      \b[,;]?\s*(?i:Jul|July|juillet)[.,;]?\s*\d+|
+      \b[,;]?\s*(?i:Aug|August|ao(û|u)t)[.,;]?\s*\d+|
+      \b[,;]?\s*(?i:Sep|Sept|Septemb(er|re))[.,;]?\s*\d+|
+      \b[,;]?\s*(?i:Oct|Octob(er|re))[.,;]?\s*\d+|
+      \b[,;]?\s*(?i:Nov|Novemb(er|re))[.,;]?\s*\d+|
+      \b[,;]?\s*(?i:Dec|D(é|e)cemb(er|re))[.,;]?\s*\d+|
       \d+\s+(?i:Jan|Jan(uary|vier))\.?\b|
       \d+\s+(?i:Feb|February|f(é|e)vrier)\.?\b|
       \d+\s+(?i:Mar|March|mars)\.?\b|
@@ -79,11 +79,21 @@ module Collector
       '=' => ''
     }
 
+    TITLE = /\s*\b(sir|lord|count(ess)?|(gen|adm|col|maj|capt|cmdr|lt|sgt|cpl|pvt|prof|dr|md|ph\.?d|rev|fr|mrs?|mi?ss?)\.?)(\s+|$)/i
+
     Namae.options[:prefer_comma_as_separator] = true
     Namae.options[:separator] = SPLIT_BY
+    Namae.options[:title] = TITLE
+
+    def self.parse(name)
+      Namae.parse(name.gsub(STRIP_OUT, ' ')
+                      .gsub(/[#{CHAR_SUBS.keys.join('\\')}]/, CHAR_SUBS)
+                      .gsub(/([A-Z]{1}\.)([[:alpha:]]{2,})/, '\1 \2')
+                      .gsub(/,\z/, '')
+                      .squeeze(' '))
+    end
 
     def self.clean(parsed_namae)
-
       family = parsed_namae.family.gsub(/\.\z/, '').strip rescue nil
       given = parsed_namae.normalize_initials.given.strip rescue nil
       particle = parsed_namae.normalize_initials.particle.strip rescue nil
@@ -107,15 +117,6 @@ module Collector
       end
 
       { given: given, family: family }
-    end
-
-    def self.parse(name)
-      cleaned = name.gsub(STRIP_OUT, ' ')
-                    .gsub(/[#{CHAR_SUBS.keys.join('\\')}]/, CHAR_SUBS)
-                    .gsub(/,\z/, '')
-                    .squeeze(' ')
-
-      Namae.parse(cleaned)
     end
 
     def self.valid_year(year)

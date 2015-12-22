@@ -50,6 +50,13 @@ describe "Utility functions to handle names of people" do
     expect(parsed[0].values_at(:given, :family)).to eq(['Jack', 'Smith'])
   end
 
+  it "should remove '; et al'" do
+    input = "Jack Smith; et al"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(['Jack', 'Smith'])
+  end
+
   it "should remove 'et al.'" do
     input = "Jack Smith et al."
     parsed = @utility.parse(input)
@@ -69,6 +76,55 @@ describe "Utility functions to handle names of people" do
     parsed = @utility.parse(input)
     expect(parsed.size).to eq(1)
     expect(parsed[0].values_at(:given, :family)).to eq(['Jack', 'Smith'])
+  end
+
+  it "should separate a concatenated name" do
+    input = "J.R.Smith"
+    parsed = @utility.parse(input)
+    expect(parsed[0].values_at(:given, :family)).to eq(['J.R.', 'Smith'])
+  end
+
+  it "should separate multiple concatenated names" do
+    input = "J.R.Smith and P.Sutherland"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(2)
+    expect(parsed[0].values_at(:given, :family)).to eq(['J.R.', 'Smith'])
+    expect(parsed[1].values_at(:given, :family)).to eq(['P.', 'Sutherland'])
+  end
+
+  it "should properly deal with Rev." do
+    input = "Rev. Jack Smith"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(['Jack', 'Smith'])
+  end
+
+  it "should properly deal with Fr." do
+    input = "Fr. Jack Smith"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(['Jack', 'Smith'])
+  end
+
+  it "should properly deal with Miss" do
+    input = "Miss Penelope Cruz"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(['Penelope', 'Cruz'])
+  end
+
+  it "should properly deal with Mrs." do
+    input = "Mrs. Penelope Cruz"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(['Penelope', 'Cruz'])
+  end
+
+  it "should properly deal with Ms" do
+    input = "Ms Penelope Cruz"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(['Penelope', 'Cruz'])
   end
 
   it "should remove 'etc'" do
