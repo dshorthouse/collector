@@ -26,15 +26,13 @@ class Occurrence < ActiveRecord::Base
       next if o.identifiedBy.nil? && o.recordedBy.nil?
 
       if o.identifiedBy
-        determiners = Collector::AgentUtility.parse(o.identifiedBy)
-        determiners.each do |d|
+        Collector::AgentUtility.parse(o.identifiedBy).each do |d|
           save_agent(Collector::AgentUtility.clean(d), o.id, "determiner")
         end
       end
 
       if o.recordedBy
-        recorders = Collector::AgentUtility.parse(o.recordedBy)
-        recorders.each do |r|
+        Collector::AgentUtility.parse(o.recordedBy).each do |r|
           save_agent(Collector::AgentUtility.clean(r), o.id, "recorder")
         end
       end

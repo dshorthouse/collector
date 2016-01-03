@@ -34,7 +34,7 @@ class Agent < ActiveRecord::Base
     Agent.where("id = canonical_id AND length(given) > 0 AND processed_orcid IS NULL").find_each do |agent|
       if !agent.family.empty? && !agent.given.empty?
         max_year = [agent.determinations_year_range[1], agent.recordings_year_range[1]].compact.max
-        given = URI::encode(agent.given.gsub(/\./, '. '))
+        given = URI::encode(agent.given.gsub(/\./, '. ').gsub(/&/,''))
         family = URI::encode(agent.family)
         if !max_year.nil? && max_year >= 1975
           search = 'given-names:' + given + '+AND+family-name:' + family + '+OR+other-names:' + given
