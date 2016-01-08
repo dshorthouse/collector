@@ -31,6 +31,7 @@ class COLLECTOR < Sinatra::Base
   helpers WillPaginate::Sinatra::Helpers
   helpers Sinatra::ContentFor
   helpers Sinatra::Collector::Helpers
+  helpers Sinatra::Collector::JsonLdContexts
   helpers Sinatra::Collector::Search
 
   register Sinatra::Collector::Routing::Main

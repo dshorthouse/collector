@@ -7,6 +7,7 @@ ARGV << '-h' if ARGV.empty?
 
 options = {}
 options[:type] = "d3"
+options[:depth] = 1
 
 OptionParser.new do |opts|
   opts.banner = "Usage:agent_network.rb [options]"
@@ -37,6 +38,10 @@ OptionParser.new do |opts|
     end
   end
 
+  opts.on("-d", "--depth N", Integer, "The depth of the agent network") do |d|
+    options[:depth] = d
+  end
+
   opts.on("-h", "--help", "Prints this help") do
     puts opts
     exit
@@ -62,13 +67,13 @@ elsif options[:phylum]
 elsif options[:all_agents]
   puts 'Starting to create all agent network graphs as ' + options[:type]
   Agent.where("id = canonical_id").find_each do |agent|
-    graph = Collector::AgentNetwork.new(agent.id)
+    graph = Collector::AgentNetwork.new(agent.id, options[:depth])
     graph.build(options[:type])
   end
   puts 'Done creating agent network graphs'
 elsif options[:agent_id]
   puts 'Creating agent network graph as ' + options[:type]
-  graph = Collector::AgentNetwork.new(options[:agent_id])
+  graph = Collector::AgentNetwork.new(options[:agent_id], options[:depth])
   graph.build(options[:type])
   puts 'Done creating agent network graph'
 end

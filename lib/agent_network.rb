@@ -4,20 +4,23 @@ require 'rgl/adjacency'
 require 'rgl/connected_components'
 require 'rgl/dot'
 
+RGL::DOT::NODE_OPTS.push("gender")
+
 module Collector
   class AgentNetwork
 
-    def initialize(id)
+    def initialize(id, depth = 1)
       @graph = WeightedGraph.new
       @agent = Agent.find(id)
-      @agents = []
+      @agents = Set.new
+      @depth = depth + 1
     end
 
     def build(type = "dot")
       if @agent.id != @agent.canonical_id
         @agent = Agent.find(@agent.canonical_id)
       end
-      collect_agents(@agent)
+      collect_agents([@agent], @depth)
       add_edges
       add_attributes
       if @graph.size > 2
@@ -30,15 +33,16 @@ module Collector
       end
     end
 
-    def collect_agents(agent)
-      @agents << agent
-      agent.recordings_with.each do |a|
-        @agents << Agent.find(a[:id])
+    def collect_agents(agents, depth)
+      return if depth.zero?
+      agents.each do |agent|
+        @agents.add(agent)
+        collect_agents(Agent.find(agent.recordings_with.map{|n| n[:id]}), depth-1)
       end
     end
 
     def add_edges
-      @agents.combination(2).each do |pair|
+      @agents.to_a.combination(2).each do |pair|
         add_edge(pair.first, pair.second)
       end
     end
@@ -48,7 +52,9 @@ module Collector
         options = {}
         vertex = [a.given, a.family].join(" ")
         if @graph.has_vertex?(vertex)
-          options["id"] = a.id
+          if a.id == @agent.id
+            options["fillcolor"] = "#962825"
+          end
           if !a.gender.nil?
             options["gender"] = a.gender
           end

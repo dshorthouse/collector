@@ -184,7 +184,7 @@ module Collector
               identifiedBy: {
                 type: 'nested',
                 properties: {
-                  id: {type: 'integer', index: 'not_analyzed' },
+                  id: { type: 'integer', index: 'not_analyzed' },
                   family: { type: 'string', index: 'not_analyzed' },
                   given: { type: 'string', index: 'not_analyzed' },
                   count: { type: 'integer', index: 'not_analyzed' }

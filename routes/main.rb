@@ -21,26 +21,23 @@ module Sinatra
             format_agents.to_json
           end
 
-          app.get '/agent/:id.json' do
+          app.get '/agent/:id.?:format?' do
             agent_profile(params[:id])
-            if @result[:id] != @result[:canonical_id]
-              redirect to('/agent/' + @result[:canonical_id].to_s + '.json')
-            end
-            if !@result[:orcid].nil? && params[:id] != @result[:orcid]
-              redirect to('/agent/' + @result[:orcid] + '.json' )
-            end
-            @result.to_json
-          end
+            extension = params[:format].nil? ? nil : "." + params[:format]
 
-          app.get '/agent/:id' do
-            agent_profile(params[:id])
             if @result[:id] != @result[:canonical_id]
-              redirect to('/agent/' + @result[:canonical_id].to_s )
+              redirect to("/agent/#{@result[:canonical_id]}#{extension}")
             end
             if !@result[:orcid].nil? && params[:id] != @result[:orcid]
-              redirect to('/agent/' + @result[:orcid] )
+              redirect to("/agent/#{@result[:orcid]}#{extension}")
             end
-            haml :agent
+
+            if extension.nil?
+              haml :agent
+            elsif extension == ".json"
+              @result["@context"] = "#{request.base_url}/contexts/collector.jsonld"
+              @result.to_json
+            end
           end
 
           app.put '/agent/:id' do
@@ -55,6 +52,11 @@ module Sinatra
           app.get '/agent/:id/activity.json' do
             agent_aggregation(params[:id].to_i, params[:zoom].to_i)
             @result.to_json
+          end
+
+          app.get '/contexts/collector.jsonld' do
+            collector_context
+            @context.to_json
           end
 
           app.get '/main.css' do
@@ -81,15 +83,14 @@ module Sinatra
             format_taxa.to_json
           end
 
-          app.get '/taxon/:id.json' do
+          app.get '/taxon/:id.?:format?' do
             taxon_profile(params[:id])
-            @result.to_json
-          end
-
-          app.get '/taxon/:id' do
-            set_session
-            taxon_profile(params[:id])
-            haml :taxon
+            if params[:format].nil?
+              set_session
+              haml :taxon
+            elsif params[:format] == "json"
+              @result.to_json
+            end
           end
 
           app.not_found do

@@ -8,7 +8,7 @@
   %script{src: 'http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js', type: 'text/javascript' }
   %script{src: 'http://maps.stamen.com/js/tile.stamen.js?v1.2.4', type: 'text/javascript' }
 
-  %script{src: 'https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js', type: 'text/javascript' }
+  %script{src: '/javascript/vis.min.js', type: 'text/javascript' }
 
   %script{src: '/javascript/leaflet-dvf.min.js', type: 'text/javascript' }
   %script{src: '/javascript/geohash.js', type: 'text/javascript' }
@@ -20,19 +20,22 @@
 -content_for :title do
   #{@result[:given]} #{@result[:family]}
 
-%h1{id: "agent-title"}
-  %span{contenteditable: authorized? ? "true" : "false", data: "given" }= @result[:given]
-  %span{contenteditable: authorized? ? "true" : "false", data: "family" }= @result[:family]
+%div{itemscope: true, itemtype: "http://schema.org/Person" }
 
-.contact-details #{@result[:position]}
-.contact-details #{@result[:affiliation]}
-.contact-details
-  - if @result[:email]
-    %a{href: "mailto:#{@result[:email]}" }= @result[:email]
-.contact-details
-  - if @result[:orcid]
-    ORCID
-    %a{href: "https://orcid.org/#{@result[:orcid]}" }= @result[:orcid]
+  %h1{id: "agent-title"}
+    %span{contenteditable: authorized? ? "true" : "false", data: "given", itemprop: "givenName" }= @result[:given]
+    %span{contenteditable: authorized? ? "true" : "false", data: "family", itemprop: "familyName" }= @result[:family]
+
+  .contact-details{itemprop: "jobTitle"} #{@result[:position]}
+  .contact-details{itemprop: "affiliation"} #{@result[:affiliation]}
+  .contact-details
+    - if @result[:email]
+      %a{href: "mailto:#{@result[:email]}", itemprop: "email" }= @result[:email]
+  .contact-details
+    - if @result[:orcid]
+      ORCID
+      %a{href: "https://orcid.org/#{@result[:orcid]}", itemprop: "sameAs" }
+        https://orcid.org/#{@result[:orcid]}
 
 #recordings-wrapper.clear
   #recordings-map
@@ -67,19 +70,21 @@
       #social-graph
 
 - if @result[:determined_families] && @result[:determined_families].size > 0
-  %h2 Top Families Identified (# Specimens)
-  %ol.ranked
-    - @result[:determined_families].sort_by { |a| a[:count] }.reverse.first(10).each do |t|
-      %li
-        %a{href: "/taxon/#{t[:family]}" }=  t[:family]
-        (#{number_with_delimiter(t[:count])})
+  %div{ itemscope: true, itemtype: "http://schema.org/ItemList" }
+    %h2 Top Families Identified (# Specimens)
+    %ol.ranked
+      - @result[:determined_families].sort_by { |a| a[:count] }.reverse.first(10).each do |t|
+        %li
+          %a{href: "/taxon/#{t[:family]}" }=  t[:family]
+          (#{number_with_delimiter(t[:count])})
 
-  %h2 Families Identified
-  %p.sums Total: #{number_with_delimiter(@result[:determined_families].size)}
-  %ul.determinations
-    - @result[:determined_families].sort_by { |d| d[:family] }.each do |t|
-      %li
-        %a{href: "/taxon/#{t[:family]}" }=  t[:family]
+    %h2{ itemprop: "name" } Families Identified
+    %p.sums Total: #{number_with_delimiter(@result[:determined_families].size)}
+    %ul.determinations
+      - @result[:determined_families].sort_by { |d| d[:family] }.each do |t|
+        %li
+          %a{href: "/taxon/#{t[:family]}" }
+            %span{ itemprop: "itemListElement" }= t[:family]
 
 #determinations-wrapper
   #identifications.chart
@@ -87,35 +92,35 @@
     %p.sums Total: #{number_with_delimiter(@result[:determinations_count])}
     #determinations
 
-#description-wrapper
+#description-wrapper{ itemscope: true, itemtype: "http://schema.org/ItemList" }
   - if @result[:named_species] && @result[:named_species].size > 0
-    %h2 Species Described
+    %h2{itemprop: "name"} Species Described
     %p.sums Total: #{@result[:named_species].size}
     %ul.descriptions
       - @result[:named_species].each do |s|
-        %li #{s[:scientificName]}
+        %li{ itemprop: "itemListElement" } #{s[:scientificName]}
 
-#publications-wrapper
+#publications-wrapper{ itemscope: true, itemtype: "http://schema.org/ItemList" }
   - if @result[:works] && @result[:works].size > 0
-    %h2 Publications With DOIs
+    %h2{ itemprop: "name" } Publications With DOIs
     %p.sums Total: #{@result[:works].size}
     - @result[:works].each do |w|
       %div.citation
-        %a{href: "http://doi.org/#{w[:doi]}" }= w[:citation]
+        %a{href: "http://doi.org/#{w[:doi]}", itemprop: "itemListElement" }= w[:citation]
 
-#datasets-wrapper
+#datasets-wrapper{ itemscope: true, itemtype: "http://schema.org/ItemList" }
   - if @result[:datasets] && @result[:datasets].size > 0
-    %h2 Datasets With DOIs
+    %h2{ itemprop: "name" } Datasets With DOIs
     %p.sums Total: #{@result[:datasets].size}
     - @result[:datasets].each do |d|
       %div.citation
-        %a{href: "http://doi.org/#{d[:doi]}" }= d[:title]
+        %a{href: "http://doi.org/#{d[:doi]}", itemprop: "itemListElement" }= d[:title]
 
-#barcodes-wrapper
+#barcodes-wrapper{ itemscope: true, itemtype: "http://schema.org/ItemList" }
   - if @result[:barcodes] && @result[:barcodes].size > 0
-    %h2 Barcode of Life Specimen Citations
+    %h2{ itemprop: "name" } Barcode of Life Specimen Citations
     %p.sums Total: #{@result[:barcodes].size}
     %ul.barcodes
       - @result[:barcodes].sort_by{|b| b[:processid] }.each do |b|
         %li
-          %a{href: "http://www.boldsystems.org/index.php/Public_RecordView?processid=#{b[:processid]}"}= b[:processid]
+          %a{href: "http://www.boldsystems.org/index.php/Public_RecordView?processid=#{b[:processid]}", itemprop: "itemListElement" }= b[:processid]
