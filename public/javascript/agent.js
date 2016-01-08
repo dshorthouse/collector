@@ -188,7 +188,17 @@ var Agent = (function($, window) {
       var self = this,
           container = $('#social-graph')[0],
           options = {
-            nodes: { shape: 'dot', size: 12 },
+            nodes: {
+              shape: 'dot',
+              scaling: {
+                min: 10,
+                max: 30
+              },
+              size: 12
+            },
+            edges: {
+              width: 0.15
+            },
             interaction: {
               hideEdgesOnDrag: true
             },
