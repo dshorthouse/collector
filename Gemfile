@@ -22,8 +22,6 @@ gem 'require_all'
 gem 'rgl'
 gem 'rack-google-analytics'
 gem 'nokogiri'
-gem 'classifier'
-gem 'madeleine'
 
 group :production do
 end

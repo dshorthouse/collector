@@ -647,6 +647,42 @@ describe "Utility functions to handle names of people" do
     expect(@utility.clean(parsed[0]).to_h).to eq({ family: "Marie-Victorin", given: nil})
   end
 
+  it "should remove (See Note Inside)" do
+    input = "J. Macoun (See Note Inside)"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(['J.', 'Macoun'])
+  end
+
+  it "should remove nom. rev." do
+    input = "Bird,C.J. 9/Mar/1981: nom. rev."
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(['C.J.', 'Bird'])
+  end
+
+  it "should remove stet ! at the end of the name" do
+    input = "Roy, Claude   Stet !"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(['Claude', 'Roy'])
+  end
+
+  it "should remove (MT) from a name" do
+    input = "A.E. Porsild; stet! Luc Brouillet (MT) 2003"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(2)
+    expect(parsed[0].values_at(:given, :family)).to eq(['A.E.', 'Porsild'])
+    expect(parsed[1].values_at(:given, :family)).to eq(['Luc', 'Brouillet'])
+  end
+
+  it "should not remove stet from the end of a name" do
+    input = "Christian Kronenstet !"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(["Christian", "Kronenstet"])
+  end
+
   it "should explode a complicated example" do
     input = "Vernon C. Brink; Thomas C. Brayshaw stet! 1979"
     parsed = @utility.parse(input)

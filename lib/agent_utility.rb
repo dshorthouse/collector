@@ -45,13 +45,20 @@ module Collector
       \d+\s+(?i:Oct|Octob(er|re))\.?\b|
       \d+\s+(?i:Nov|Novemb(er|re))\.?\b|
       \d+\s+(?i:Dec|D(e|é)cemb(er|re))\.?\b|
-      FNA|DAO|HUH|
+      (?i:see\s+notes?\s+inside)|
+      (?i:see\s+letter\s+enclosed)|
+      (?i:revised|photograph|fruits\s+only)|
+      (?i:iFloraQuebeca|Nature\s+Conservancy)|
+      (?i:nom\.?\s+rev\.?)|
+      FNA|DAO|HUH|\(MT\)|(?i:\(KEW\))|
+      (The)?\s*University of Guelph|
       \b[,;]\s+\d+|
-      [":]|
+      [":!]|
       [,;]?\d+|
       [,;]\z|
       ^\w{0,2}\z|
-      ^[A-Z]{2,}\z+
+      ^[A-Z]{2,}\z|
+      \s+(?i:stet)\s*!?\s*\z
     }x
 
     SPLIT_BY = %r{
@@ -68,7 +75,7 @@ module Collector
       \b(?i:in\s+part(\s+by)?)\s*\b|
       \b(?i:redet\.?(\s+by?)?)\s*\b|
       \b(?i:reidentified(\s+by)?)\s*\b|
-      \b(?i:stet)!?\s\b*|
+      \b(?i:stet)\s*\b|
       \b(?i:then(\s+by)?)\s+|
       \b(?i:veri?f?\.?\:?(\s+by)?|verified?(\s+by)?)\s*\b|
       \b(?i:vérifié)\s*\b|
@@ -100,7 +107,7 @@ module Collector
                       .gsub(/[#{CHAR_SUBS.keys.join('\\')}]/, CHAR_SUBS)
                       .gsub(/([A-Z]{1}\.)([[:alpha:]]{2,})/, '\1 \2')
                       .gsub(/,\z/, '')
-                      .squeeze(' '))
+                      .squeeze(' ').strip)
     end
 
     def self.clean(parsed_namae)

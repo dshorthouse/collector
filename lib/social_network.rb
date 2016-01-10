@@ -4,49 +4,47 @@ require 'rgl/adjacency'
 require 'rgl/connected_components'
 require 'rgl/dot'
 
+RGL::DOT::NODE_OPTS.push("gender")
+
 module Collector
   class SocialNetwork
 
     def initialize
-      @graph = WeightedGraph.new
+      @graph = {
+        nodes: Set.new,
+        edges: Set.new
+      }
     end
 
-    def build(type = "dot")
-      Agent.where('id = canonical_id').find_in_batches(batch_size: 10) do |batch|
+    def build
+      Agent.where('id = canonical_id').where('id < 200').find_in_batches(batch_size: 10) do |batch|
         batch.each do |agent|
-          vertex = [agent.given, agent.family].join(" ")
-          options = {}
-          options["id"] = agent.id
-          options["gender"] = agent.gender if !agent.gender.nil?
           agent.recordings_with.each do |r|
-            add_edge(agent, Agent.find(r[:id]))
+            add_elements(agent, Agent.find(r[:id]))
           end
-          @graph.add_vertex_attributes(vertex, options)
         end
-        puts "Batch completed"
+        puts "#{batch.last.id} completed"
       end
 
-      if type == "dot"
-        write_dot_file
-      else
-        write_d3_file
-      end
+      write_to_d3_file
       puts "Created graph"
     end
 
-    def add_edge(agent1, agent2)
-      vertex1 = [agent1.given, agent1.family].join(" ")
-      vertex2 = [agent2.given, agent2.family].join(" ")
+    def add_elements(agent1, agent2)
       common = agent1.recordings.pluck(:id) & agent2.recordings.pluck(:id)
-      @graph.add_edge(vertex1, vertex2, common.size) if common.size > 1
+      if common.size > 1
+        @graph[:nodes].merge([ { id: agent1.id, label: agent1.fullname }, { id: agent2.id, label: agent2.fullname } ])
+        edge = [agent1.id, agent2.id].sort
+        @graph[:edges].add({ from: edge[0], to: edge[1] })
+      end
     end
 
-    def write_dot_file
-      @graph.write_to_dot_file("public/images/graphs/graph")
-    end
-
-    def write_d3_file
-      @graph.write_to_d3_file("public/images/graphs/graph")
+    def write_to_d3_file
+      src = "public/images/graphs/socialgraph.json"
+      File.open(src, 'w') do |f|
+        f << @graph.to_json
+      end
+      src
     end
 
   end

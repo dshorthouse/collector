@@ -52,7 +52,7 @@ end.parse!
 if options[:social_network]
   puts 'Starting to create graph for whole network as ' + options[:type]
   graph = Collector::SocialNetwork.new
-  graph.build(options[:type])
+  graph.build
   puts 'Done creating whole network'
 elsif options[:kingdom]
   puts 'Starting to create graph for Kingdoms as ' + options[:type]

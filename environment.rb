@@ -31,8 +31,6 @@ require 'rack-google-analytics'
 require 'nokogiri'
 require 'uri'
 require 'net/http'
-require 'classifier'
-require 'madeleine'
 
 require_all 'lib'
 require_all 'helpers'
