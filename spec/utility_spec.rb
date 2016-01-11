@@ -6,6 +6,15 @@ describe "Utility functions to handle names of people" do
     @utility = Collector::AgentUtility
   end
 
+  it "should reject a name that has 'Canadian Museum of Nature'" do
+    input = "Jeff Saarela; Canadian Museum of Nature"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(2)
+    expect(parsed[0].values_at(:given, :family)).to eq(["Jeff", "Saarela"])
+    expect(@utility.clean(parsed[1]).to_h).to eq({given: nil, family:nil})
+  end
+
+
   it "should capitalize mistaken lowercase first initials" do
     input = "r.C. Smith"
     parsed = @utility.parse(input)
@@ -676,6 +685,27 @@ describe "Utility functions to handle names of people" do
     expect(parsed[1].values_at(:given, :family)).to eq(['Luc', 'Brouillet'])
   end
 
+  it "should remove '(See Note Inside)'" do
+    input = "Roy, Claude (See Note Inside)"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(['Claude', 'Roy'])
+  end
+
+  it "should remove '(see note)'" do
+    input = "Roy, Claude (see note)"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(['Claude', 'Roy'])
+  end
+
+  it "should remove Bro." do
+    input = "Brouard, Gustav G. Arsène, Bro."
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(["Gustav G. Arsène", "Brouard"])
+  end
+
   it "should not remove stet from the end of a name" do
     input = "Christian Kronenstet !"
     parsed = @utility.parse(input)
@@ -726,11 +756,36 @@ describe "Utility functions to handle names of people" do
     expect(parsed[0].values_at(:given, :family)).to eq(['Agnes Mols', 'Mortensen'])
   end
 
+  it "should strip out '(Photograph)" do
+    input = "Robert J. Bandoni (Photograph)"
+    parsed = @utility.parse(input)
+    expect(parsed[0].values_at(:given, :family)).to eq(['Robert J.', 'Bandoni'])
+  end
+
+  it "should strip out '(to subsp.)" do
+    input = "Jeffery M. Saarela 2005 (to subsp.) "
+    parsed = @utility.parse(input)
+    expect(parsed[0].values_at(:given, :family)).to eq(['Jeffery M.', 'Saarela'])
+  end
+
+  it "should strip out '6 autres de FloraQuebeca" do
+    input = "Sabourin, André; 6 autres de FloraQuebeca"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(['André', 'Sabourin'])
+  end
+
   it "should explode names with Jan. 14, 2013 included in string" do
     input = "Jan Jones Jan. 14, 2013"
     parsed = @utility.parse(input)
     expect(parsed.size).to eq(1)
     expect(parsed[0].values_at(:given, :family)).to eq(['Jan', 'Jones'])
+  end
+
+  it "should explode names with 'per'" do
+    input = "G.J. Spencer per Sheila Lyons"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(2)
   end
 
   it "should explode names with freeform dates in the string" do
@@ -789,6 +844,15 @@ describe "Utility functions to handle names of people" do
     expect(parsed[0].values_at(:given, :family)).to eq(['Paul', 'Kroeger'])
   end
 
+  it "should explode names with spaces missing surrounding ampersand" do
+    input = "Henrik Andersen&jon Feilberg"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(2)
+    expect(parsed[0].values_at(:given, :family)).to eq(['Henrik', 'Andersen'])
+    expect(parsed[1].values_at(:given, :family)).to eq([nil, 'Feilberg'])
+    expect(@utility.clean(parsed[1]).to_h).to eq({ family: "Feilberg", given: "Jon"})
+  end
+
   it "should explode a messy list" do
     input = "Winterbottom, R.;Katz, L.;& CI team"
     parsed = @utility.parse(input)
@@ -796,6 +860,7 @@ describe "Utility functions to handle names of people" do
     expect(parsed[0].values_at(:given, :family)).to eq(['R.', 'Winterbottom'])
     expect(parsed[1].values_at(:given, :family)).to eq(['L.', 'Katz'])
     expect(parsed[2].values_at(:given, :family)).to eq(['CI', 'team'])
+    expect(@utility.clean(parsed[2]).to_h).to eq({ family: nil, given: nil})
   end
 
   it "should reject an empty name" do

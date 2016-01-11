@@ -14,8 +14,8 @@ module Collector
       \b[,;]?\s*(?i:n/a)\b|
       \b[,;]?\s*(?i:ann?onymous)\b|
       \b[,;]?\s*(?i:undetermined|indeterminable|dummy)\b|
-      \b[,;]?\s*(?i:importer|per)\b|
-      \b[,;]?\s*(?i:frère|père|soeur)\b|
+      \b[,;]?\s*(?i:importer)\b|
+      \b[,;]?\s*(?i:frère|frere|père|pere|soeur|bro)\.?(\b|\z)|
       (?i:no\s+data)|
       \b[,;]?\s*(?i:stet)[,!]?\s*\d*\z|
       [,;]?\s*\d+[-/\s+](?i:\d+|Jan|Feb|Mar|Apr|
@@ -45,10 +45,13 @@ module Collector
       \d+\s+(?i:Oct|Octob(er|re))\.?\b|
       \d+\s+(?i:Nov|Novemb(er|re))\.?\b|
       \d+\s+(?i:Dec|D(e|é)cemb(er|re))\.?\b|
-      (?i:see\s+notes?\s+inside)|
+      (?i:autres?\s+de)|
+      (?i:see\s+notes?\s*(inside)?)|
       (?i:see\s+letter\s+enclosed)|
       (?i:revised|photograph|fruits\s+only)|
-      (?i:iFloraQuebeca|Nature\s+Conservancy)|
+      (?i:FloraQuebeca|Nature\s+Conservancy)|
+      (?i:student)|
+      \b(?i:to\s+(sub)?spp?)\.?|
       (?i:nom\.?\s+rev\.?)|
       FNA|DAO|HUH|\(MT\)|(?i:\(KEW\))|
       (The)?\s*University of Guelph|
@@ -64,7 +67,7 @@ module Collector
     SPLIT_BY = %r{
       [–|&+/;]|
       \s+-\s+|
-      \b(?i:with|and|et)\s+|
+      \b(?i:and|et|with|per)\s+|
       \b(?i:annotated(\s+by)?)\s*\b|
       \b(?i:conf\.?(\s+by)?|confirmed(\s+by)?)\s*\b|
       \b(?i:checked?(\s+by)?)\s*\b|
@@ -73,15 +76,14 @@ module Collector
       \b(?i:ex\.?(\s+by)?|examined(\s+by)?)\s*\b|
       \b(?i:in?dentified(\s+by)?)\s*\b|
       \b(?i:in\s+part(\s+by)?)\s*\b|
+      \b(?i:or)\s+|
       \b(?i:redet\.?(\s+by?)?)\s*\b|
       \b(?i:reidentified(\s+by)?)\s*\b|
       \b(?i:stet)\s*\b|
       \b(?i:then(\s+by)?)\s+|
-      \b(?i:veri?f?\.?\:?(\s+by)?|verified?(\s+by)?)\s*\b|
-      \b(?i:vérifié)\s*\b|
+      \b(?i:veri?f?\.?\:?(\s+by)?|v(e|é)rifi(e|é)d?(\s+by)?)\s*\b|
       \b(?i:via|from)\s*\b|
-      \b(?i:(donated)?\s*by)\s+|
-      \b(?i:or)\s+
+      \b(?i:(donated)?\s*by)\s+
     }x
 
     CHAR_SUBS = {
@@ -93,10 +95,23 @@ module Collector
       '!' => '',
       '=' => '',
       '#' => '',
-      '/' => ' / '
+      '/' => ' / ',
+      '&' => ' & '
     }
 
-    TITLE = /\s*\b(sir|lord|count(ess)?|(gen|adm|col|maj|capt|cmdr|lt|sgt|cpl|pvt|prof|dr|md|ph\.?d|rev)\.?|frère|père)(\s+|$)/i
+    BLACKLIST = %r{
+      (?i:abundant)|
+      (?i:biolog|botan|zoolog|ecolog|mycolog|(in)?vertebrate|forest|fisheries|genetic)|
+      (?i:bris?tish|canadi?an?)|
+      (?i:herbarium|herbier)|
+      (?i:internation|gou?vern|ministry|unit|district|provincial|national|military|regional|environ|natural|naturelles)|
+      (?i:mus(eum|ée)|universit(y|é)|institute?|acad(e|é)m|school|écol(e|iers?)|department|research|graduate|students)|
+      (?i:soci(e|é)t(y|é)|farm|cent(er|re)|community|commercial|history|conservation)|
+      (?i:survey|assessment|control|station|consultant|monitor|stn\.|checklist|team|index)|
+      (?i:workshop|group|garden|jardin)
+    }x
+
+    TITLE = /\s*\b(sir|lord|count(ess)?|(gen|adm|col|maj|capt|cmdr|lt|sgt|cpl|pvt|prof|dr|md|ph\.?d|rev|docteur)\.?|frère|frere|père|pere)(\s+|$)/i
 
     Namae.options[:prefer_comma_as_separator] = true
     Namae.options[:separator] = SPLIT_BY
@@ -111,6 +126,8 @@ module Collector
     end
 
     def self.clean(parsed_namae)
+      return { given: nil, family: nil } if parsed_namae.display_order =~ BLACKLIST
+
       family = parsed_namae.family.gsub(/\.\z/, '').strip rescue nil
       given = parsed_namae.normalize_initials.given.strip rescue nil
       particle = parsed_namae.normalize_initials.particle.strip rescue nil
