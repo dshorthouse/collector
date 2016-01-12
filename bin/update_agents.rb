@@ -2,6 +2,7 @@
 # encoding: utf-8
 require_relative '../environment.rb'
 require 'optparse'
+require 'progressbar'
 
 ARGV << '-h' if ARGV.empty?
 
@@ -25,12 +26,16 @@ OptionParser.new do |opts|
 end.parse!
 
 if options[:all_agents]
-  Agent.where("id = canonical_id").find_each do |a|
-    puts a.id
+  count = 0
+  agents = Agent.where("id = canonical_id")
+  pbar = ProgressBar.new("Agents", agents.count)
+  agents.find_each do |a|
+    count += 1
+    pbar.set(count)
     index = Collector::ElasticIndexer.new
     index.update_agent(a)
   end
-  puts "Done"
+  pbar.finish
 else
   attributes = options[:agent_attributes]
   a = Agent.find(attributes["id"])

@@ -14,6 +14,11 @@ describe "Utility functions to handle names of people" do
     expect(@utility.clean(parsed[1]).to_h).to eq({given: nil, family:nil})
   end
 
+  it "should reject a name that has 'Department' in it" do
+    input = "Oregon Department of Agriculture"
+    parsed = @utility.parse(input)
+    expect(@utility.clean(parsed[0]).to_h).to eq({given: nil, family:nil})
+  end
 
   it "should capitalize mistaken lowercase first initials" do
     input = "r.C. Smith"
@@ -36,6 +41,14 @@ describe "Utility functions to handle names of people" do
     parsed = @utility.parse(input)
     expect(parsed.size).to eq(1)
     expect(parsed[0].values_at(:given, :family)).to eq(["Ian D.", "Macdonald"])
+  end
+
+  it "should remove 'male' or 'female' text from name" do
+    input = "13267 (male) W.J. Cody; 13268 (female) W.E. Kemp"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(2)
+    expect(parsed[0].values_at(:given, :family)).to eq(["W.J.", "Cody"])
+    expect(parsed[1].values_at(:given, :family)).to eq(["W.E.", "Kemp"])
   end
 
   it "should remove numerical values and capital letter" do
@@ -641,6 +654,27 @@ describe "Utility functions to handle names of people" do
     expect(parsed[1].values_at(:given, :family)).to eq(['J.K.', 'Morton'])
   end
 
+  it "should remove Roman numerals from dates" do
+    input = "S. Ross 12/i/1999"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(['S.', 'Ross'])
+  end
+
+  it "should remove Roman numerals from determinations" do
+    input = "S. Ross III.1990"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(['S.', 'Ross'])
+  end
+
+  it "should not remove Roman numeral-like text from names" do
+    input = "Xinxiao Wang"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(['Xinxiao', 'Wang'])
+  end
+
   it "should deal with 'Ver By'" do
     input = "S. Ross Ver By P. Perrin"
     parsed = @utility.parse(input)
@@ -762,17 +796,16 @@ describe "Utility functions to handle names of people" do
     expect(parsed[0].values_at(:given, :family)).to eq(['Robert J.', 'Bandoni'])
   end
 
+  it "should strip out 'Sight Identification" do
+    input = "S.A. Redhead- Sight Identification"
+    parsed = @utility.parse(input)
+    expect(parsed[0].values_at(:given, :family)).to eq(['S.A.', 'Redhead'])
+  end
+
   it "should strip out '(to subsp.)" do
     input = "Jeffery M. Saarela 2005 (to subsp.) "
     parsed = @utility.parse(input)
     expect(parsed[0].values_at(:given, :family)).to eq(['Jeffery M.', 'Saarela'])
-  end
-
-  it "should strip out '6 autres de FloraQuebeca" do
-    input = "Sabourin, André; 6 autres de FloraQuebeca"
-    parsed = @utility.parse(input)
-    expect(parsed.size).to eq(1)
-    expect(parsed[0].values_at(:given, :family)).to eq(['André', 'Sabourin'])
   end
 
   it "should explode names with Jan. 14, 2013 included in string" do

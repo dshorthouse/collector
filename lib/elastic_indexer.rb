@@ -199,8 +199,11 @@ module Collector
     end
 
     def import_agents
+      imports = Agent.where("id = canonical_id")
+      pbar = ProgressBar.new("Agents", imports.count)
       counter = 0
-      Agent.where("id = canonical_id").find_in_batches(batch_size: 25) do |group|
+
+      imports.find_in_batches(batch_size: 25) do |group|
         agents = []
         group.each do |a|
           agents << {
@@ -232,13 +235,17 @@ module Collector
         end
         @client.bulk index: @settings.elastic_index, type: 'agent', body: agents
         counter += agents.size
-        puts "Added #{counter} agents"
+        pbar.set(counter)
       end
+
+      pbar.finish
     end
 
     def import_occurrences
+      pbar = ProgressBar.new("Occurrences", Occurrence.count)
       counter = 0
       parser = ScientificNameParser.new
+
       Occurrence.find_in_batches(batch_size: 1_000) do |group|
         occurrences = []
         group.each do |o|
@@ -261,12 +268,16 @@ module Collector
         end
         @client.bulk index: @settings.elastic_index, type: 'occurrence', body: occurrences
         counter += occurrences.size
-        puts "Added #{counter} occurrences"
+        pbar.set(counter)
       end
+
+      pbar.finish
     end
 
     def import_taxa
+      pbar = ProgressBar.new("Taxa", Occurrence.count)
       counter = 0
+
       Taxon.find_in_batches(batch_size: 50) do |group|
         taxa = []
         group.each do |t|
@@ -286,8 +297,10 @@ module Collector
         end
         @client.bulk index: @settings.elastic_index, type: 'taxon', body: taxa
         counter += taxa.size
-        puts "Added #{counter} taxa"
+        pbar.set(counter)
       end
+
+      pbar.finish
     end
 
     def update_agent(a)

@@ -31,7 +31,14 @@ class Agent < ActiveRecord::Base
   end
 
   def self.populate_orcids
-    Agent.where("id = canonical_id AND length(given) > 0 AND processed_orcid IS NULL").find_each do |agent|
+    count = 0
+    agents = Agent.where("id = canonical_id AND length(given) > 0 AND processed_orcid IS NULL")
+    pbar = ProgressBar.new("ORCID", agents.count)
+
+    agents.find_each do |agent|
+      count += 1
+      pbar.set(count)
+
       if !agent.family.empty? && !agent.given.empty?
         max_year = [agent.determinations_year_range[1], agent.recordings_year_range[1]].compact.max
         given = URI::encode(agent.given.gsub(/\./, '. ').gsub(/&/,''))
@@ -46,10 +53,12 @@ class Agent < ActiveRecord::Base
           parse_search_orcid_response(agent, response)
         end
       end
+
       agent.processed_orcid = true
       agent.save!
-      puts "ORCID " + [agent.id, agent.fullname, agent.orcid_identifier].join(" ")
     end
+
+    pbar.finish
   end
 
   def self.parse_search_orcid_response(agent, response)
@@ -68,7 +77,14 @@ class Agent < ActiveRecord::Base
   end
 
   def self.populate_profiles
-    Agent.where.not(orcid_identifier: nil).find_each do |agent|
+    count = 0
+    agents = Agent.where.not(orcid_identifier: nil)
+    pbar = ProgressBar.new("Profiles", agents.count)
+
+    agents.find_each do |agent|
+      count += 1
+      pbar.set(count)
+
       next if agent.processed_profile
       response = RestClient::Request.execute(
         method: :get,
@@ -76,27 +92,31 @@ class Agent < ActiveRecord::Base
         headers: { accept: 'application/orcid+json' }
       )
       parse_profile_orcid_response(agent, response)
-      puts "Profile " + [agent.id, agent.fullname].join(" ")
       agent.processed_profile = true
       agent.save!
     end
+
+    pbar.finish
   end
 
   def self.rebuild_gender_hash
-    puts "Rebuilding list..."
     if Agent::GENDER_HASH.empty?
       Agent.where.not(gender: nil).pluck(:given, :gender).uniq.each do |a|
         Agent::GENDER_HASH[a[0].split.first] = a[1]
       end
     end
-    puts "List rebuilt."
   end
 
   # Using data from https://github.com/guydavis/babynamemap/blob/master/db.sql.gz
   def self.search_gender
     count = 0
-    Agent.where("length(given) > 1", gender: nil).find_each do |a|
+    agents = Agent.where("length(given) > 1", gender: nil)
+    pbar = ProgressBar.new("Genders", agents.count)
+
+    agents.find_each do |a|
       count += 1
+      pbar.set(count)
+
       first_name = a.given.split.first.strip
       next if first_name.include? "."
       gender = Agent::GENDER_HASH[first_name]
@@ -130,8 +150,10 @@ class Agent < ActiveRecord::Base
         a.gender = gender
         a.save!
       end
-      puts "Parsed %s names for genders" % count if count % 1000 == 0
+
     end
+
+    pbar.finish
   end
 
   def self.parse_profile_orcid_response(agent, response)

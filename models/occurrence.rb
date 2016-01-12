@@ -19,9 +19,12 @@ class Occurrence < ActiveRecord::Base
   end
 
   def self.populate_agents
+    pbar = ProgressBar.new("Agents", Occurrence.count)
     count = 0
+
     Occurrence.find_each do |o|
       count += 1
+      pbar.set(count)
 
       next if o.identifiedBy.nil? && o.recordedBy.nil?
 
@@ -37,14 +40,19 @@ class Occurrence < ActiveRecord::Base
         end
       end
 
-      puts "%s occurrences for agents" % count if count % 1000 == 0
     end
+
+    pbar.finish
   end
 
   def self.populate_taxa
+    taxa = Occurrence.where.not(identifiedBy: [nil, ''], family: [nil,''])
+    pbar = ProgressBar.new("Taxa", taxa.count)
     count = 0
-    Occurrence.where.not(identifiedBy: [nil, ''], family: [nil,'']).find_each do |o|
+
+    taxa.find_each do |o|
       count += 1
+      pbar.set(count)
 
       Occurrence.transaction do
         taxon = Taxon.where(family: o.family).first_or_create
@@ -54,9 +62,9 @@ class Occurrence < ActiveRecord::Base
           save_taxon_determiner(taxon.id, d.agent_id)
         end
       end
-
-      puts "%s occurrences for taxa" % count if count % 1000 == 0
     end
+
+    pbar.finish
   end
 
   def self.save_agent(name, id, type)

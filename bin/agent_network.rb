@@ -66,11 +66,16 @@ elsif options[:phylum]
   puts 'Done creating Phylum networks'
 elsif options[:all_agents]
   puts 'Starting to create all agent network graphs as ' + options[:type]
-  Agent.where("id = canonical_id").find_each do |agent|
+  count = 0
+  agents = Agent.where("id = canonical_id")
+  pbar = ProgressBar.new("Networks", agents.count)
+  agents.find_each do |agent|
+    count += 1
+    pbar.set(count)
     graph = Collector::AgentNetwork.new(agent.id, options[:depth])
     graph.build(options[:type])
   end
-  puts 'Done creating agent network graphs'
+  pbar.finish
 elsif options[:agent_id]
   puts 'Creating agent network graph as ' + options[:type]
   graph = Collector::AgentNetwork.new(options[:agent_id], options[:depth])

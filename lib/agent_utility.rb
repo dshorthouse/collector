@@ -15,7 +15,7 @@ module Collector
       \b[,;]?\s*(?i:ann?onymous)\b|
       \b[,;]?\s*(?i:undetermined|indeterminable|dummy)\b|
       \b[,;]?\s*(?i:importer)\b|
-      \b[,;]?\s*(?i:frère|frere|père|pere|soeur|bro)\.?(\b|\z)|
+      \b[,;]?\s*(?i:frère|frere|père|pere|soeur|sister|bro)\.?(\b|\z)|
       (?i:no\s+data)|
       \b[,;]?\s*(?i:stet)[,!]?\s*\d*\z|
       [,;]?\s*\d+[-/\s+](?i:\d+|Jan|Feb|Mar|Apr|
@@ -45,19 +45,23 @@ module Collector
       \d+\s+(?i:Oct|Octob(er|re))\.?\b|
       \d+\s+(?i:Nov|Novemb(er|re))\.?\b|
       \d+\s+(?i:Dec|D(e|é)cemb(er|re))\.?\b|
-      (?i:autres?\s+de)|
+      (?i:autres?\s+de|probably)|
       (?i:see\s+notes?\s*(inside)?)|
       (?i:see\s+letter\s+enclosed)|
+      (?i:pers\.?\s+comm\.?)|
+      (?i:crossed\s+out)|
       (?i:revised|photograph|fruits\s+only)|
-      (?i:FloraQuebeca|Nature\s+Conservancy)|
-      (?i:student)|
+      -?\s*(?i:sight\s+(id|identifi?cation))\.?\s*\b|
+      (?i:doubtful)|
+      \b\s*\(?(?i:(fe)?male)\)?\s*\b|
       \b(?i:to\s+(sub)?spp?)\.?|
       (?i:nom\.?\s+rev\.?)|
       FNA|DAO|HUH|\(MT\)|(?i:\(KEW\))|
-      (The)?\s*University of Guelph|
-      \b[,;]\s+\d+|
+      (?i:uqam)|
+      \b[,;]\s+\d+\z|
       [":!]|
-      [,;]?\d+|
+      [,]?\d+|
+      \s+\d+?(\/|\.)?(?i:i|ii|iii|iv|v|vi|vii|viii|ix|x)(\/|\.)\d+|
       [,;]\z|
       ^\w{0,2}\z|
       ^[A-Z]{2,}\z|
@@ -101,17 +105,25 @@ module Collector
 
     BLACKLIST = %r{
       (?i:abundant)|
-      (?i:biolog|botan|zoolog|ecolog|mycolog|(in)?vertebrate|forest|fisheries|genetic)|
-      (?i:bris?tish|canadi?an?)|
-      (?i:herbarium|herbier)|
-      (?i:internation|gou?vern|ministry|unit|district|provincial|national|military|regional|environ|natural|naturelles)|
-      (?i:mus(eum|ée)|universit(y|é)|institute?|acad(e|é)m|school|écol(e|iers?)|department|research|graduate|students)|
-      (?i:soci(e|é)t(y|é)|farm|cent(er|re)|community|commercial|history|conservation)|
-      (?i:survey|assessment|control|station|consultant|monitor|stn\.|checklist|team|index)|
-      (?i:workshop|group|garden|jardin)
+      (?i:adult|juvenile)|
+      (?i:believe)|
+      (?i:biolog|botan|zoo|ecolog|mycol|(in)?vertebrate|fisheries|genetic|animal|mushroom|wildlife|plumage|flower|agriculture)|
+      (?i:bris?tish|canadi?an?|chinese|arctic|japan|russian|north\s+america)|
+      (?i:herbarium|herbier|collection|collected|publication|specimen|describe|anamorph|isolated|recorded|inspection)|
+      \b\s*(?i:help)\s*\b|
+      (?i:description|drawing|identification|remark|original|illustration|checklist|intermedia|measurement|indisting|series)|
+      (?i:internation|gou?vern|ministry|unit|district|provincial|national|military|region|environ|natur(e|al)|naturelles|division|program|direction)|
+      (?i:o?\.?m\.?n\.?r\.?)|
+      (?i:mus(eum|ée)|universit(y|é)|college|institute?|acad(e|é)m|school|écol(e|iers?)|polytech|dep(t|art?ment)|research|clinic|hospital|cientifica|sanctuary|safari)|
+      (?i:graduate|student|supervisor|rcmp|coordinator|minority|police|taxonomist|consultant|team|équipe|memb(er|re)|crew|group|staff|personnel|family|captain|friends|assistant)|
+      (?i:ontario|qu(e|é)bec|assurance)|
+      (?i:soci(e|é)t(y|é)|cent(er|re)|community|history|conservation|conference|assoc|class|commission|consortium|council|club|alliance|protective|circle)|
+      (?i:commercial|company|control|product)|
+      (?i:survey|assessment|station|monitor|stn\.|index|project|bureau|engine|expedi(c|t)ion|festival|generation|inventory|marine)|
+      (?i:workshop|garden|farm|jardin|public)
     }x
 
-    TITLE = /\s*\b(sir|lord|count(ess)?|(gen|adm|col|maj|capt|cmdr|lt|sgt|cpl|pvt|prof|dr|md|ph\.?d|rev|docteur)\.?|frère|frere|père|pere)(\s+|$)/i
+    TITLE = /\s*\b(sir|lord|count(ess)?|(gen|adm|col|maj|capt|cmdr|lt|sgt|cpl|pvt|prof|dr|md|ph\.?d|rev|docteur|mme|abbé|ptre)\.?|frère|frere|père|pere)(\s+|$)/i
 
     Namae.options[:prefer_comma_as_separator] = true
     Namae.options[:separator] = SPLIT_BY

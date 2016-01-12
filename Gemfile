@@ -22,6 +22,7 @@ gem 'require_all'
 gem 'rgl'
 gem 'rack-google-analytics'
 gem 'nokogiri'
+gem 'progressbar'
 
 group :production do
 end

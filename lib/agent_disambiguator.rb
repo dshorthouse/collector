@@ -22,10 +22,15 @@ module Collector
 
     def disambiguate
       duplicates = Agent.where("family NOT LIKE '%.%'").group(:family).count.map{ |k,v| k if v > 1 }.compact
+      pbar = ProgressBar.new("Agents", duplicates.count)
+      counter = 0
+
       duplicates.each do |d|
         @graph = WeightedGraph.new
         @family = d
         agents = []
+        counter += 1
+
         Agent.where(family: d).find_each do |a|
            if !a.given.empty?
             agents << {
@@ -36,12 +41,18 @@ module Collector
             }
           end
         end
+
         add_edges(agents)
         write_graphic_file('raw') if @write_graphics
         prune_graph
         write_graphic_file('pruned') if @write_graphics
         combine_subgraphs
+
+        counter += 1
+        pbar.set(counter)
       end
+
+      pbar.finish
     end
 
     def add_edges(agents)

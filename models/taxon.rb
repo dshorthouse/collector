@@ -6,11 +6,17 @@ class Taxon < ActiveRecord::Base
   has_many :taxon_occurrences
 
   def self.populate_metadata
+    count = 0
+    pbar = ProgressBar.new("Metadata", Taxon.count)
+
     Taxon.find_each do |t|
-      puts t.id.to_s + ": " + t.family
+      count += 1
+      pbar.set(count)
       eol_metadata(t)
       gn_hierarchies(t)
     end
+
+    pbar.finish
   end
 
   def self.eol_metadata(t)

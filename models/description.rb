@@ -3,12 +3,16 @@ class Description < ActiveRecord::Base
   has_many :agent_descriptions
 
   def self.populate_agents
+    types = Occurrence.where("typeStatus LIKE '%type%'")
+    pbar = ProgressBar.new("Descriptions", types.count)
     count = 0
     parser = ScientificNameParser.new
-    Occurrence.where("typeStatus LIKE '%type%'").pluck(:scientificName).uniq.each do |namestring|
-      count += 1
+
+    types.pluck(:scientificName).uniq.each do |namestring|
       authors = []
       year = nil
+      count += 1
+      pbar.set(count)
 
       parsed_scientific_name = parser.parse(namestring.gsub(/\A"|"\Z/, ''))[:scientificName] rescue nil
       normalized_scientific_name = parsed_scientific_name[:normalized] rescue nil
@@ -33,9 +37,9 @@ class Description < ActiveRecord::Base
         end
       end
 
-      puts "%s occurrences for describers" % count if count % 10 == 0
-
     end
+
+    pbar.finish
   end
 
   def self.description_authors(parsed_scientific_name)
