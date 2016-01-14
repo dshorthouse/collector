@@ -47,7 +47,7 @@ class Agent < ActiveRecord::Base
           search = 'given-names:' + given + '+AND+family-name:' + family + '+OR+other-names:' + given
           response = RestClient::Request.execute(
             method: :get,
-            url: Sinatra::Application.settings.orcid_api_url + 'search/orcid-bio?q=' + search,
+            url: Sinatra::Application.settings.orcid_api_url + 'search/orcid-bio?q=' + search + '&rows=1',
             headers: { accept: 'application/orcid+json' }
           )
           parse_search_orcid_response(agent, response)

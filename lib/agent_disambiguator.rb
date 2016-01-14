@@ -29,7 +29,6 @@ module Collector
         @graph = WeightedGraph.new
         @family = d
         agents = []
-        counter += 1
 
         Agent.where(family: d).find_each do |a|
            if !a.given.empty?
@@ -95,7 +94,6 @@ module Collector
         #make the longest given name the 'canonical' version
         canonical = ids.pop
         Agent.where(id: ids).update_all(canonical_id: canonical)
-        puts sorted_vertices.map {|v| v[:given] }.join(" | ") + " => " + [sorted_vertices.last[:given],@family].join(" ")
       end
     end
 
@@ -176,8 +174,12 @@ module Collector
     end
 
     def reassign_data
-      Agent.where("id != canonical_id").find_each do |a|
-        puts "Reassigning data for #{a.fullname}"
+      agents = Agent.where("id != canonical_id")
+      pbar = ProgressBar.new("Reassign", agents.count)
+      counter = 0
+      agents.find_each do |a|
+        counter += 1
+        pbar.set(counter)
         OccurrenceDeterminer.where(agent_id: a.id).update_all(agent_id: a.canonical_id, original_agent_id: a.id)
         OccurrenceRecorder.where(agent_id: a.id).update_all(agent_id: a.canonical_id, original_agent_id: a.id)
         TaxonDeterminer.where(agent_id: a.id).update_all(agent_id: a.canonical_id, original_agent_id: a.id)
@@ -186,6 +188,7 @@ module Collector
         AgentBarcode.where(agent_id: a.id).update_all(agent_id: a.canonical_id, original_agent_id: a.id)
         AgentDataset.where(agent_id: a.id).update_all(agent_id: a.canonical_id, original_agent_id: a.id)
       end
+      pbar.finish
     end
 
   end

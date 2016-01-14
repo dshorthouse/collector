@@ -29,7 +29,6 @@ module Collector
         else
           write_d3_file
         end
-        puts "Graph for #{[@agent.id, @agent.fullname].join(' ')}"
       end
     end
 
@@ -50,7 +49,6 @@ module Collector
     def add_attributes
       @agents.each do |a|
         options = {}
-        vertex = [a.given, a.family].join(" ")
         if @graph.has_vertex?(vertex)
           if a.id == @agent.id
             options["fillcolor"] = "#962825"
@@ -58,16 +56,14 @@ module Collector
           if !a.gender.nil?
             options["gender"] = a.gender
           end
-          @graph.add_vertex_attributes(vertex, options)
+          @graph.add_vertex_attributes(a.fullname, options)
         end
       end
     end
 
     def add_edge(agent1, agent2)
-      vertex1 = [agent1.given, agent1.family].join(" ")
-      vertex2 = [agent2.given, agent2.family].join(" ")
       common = agent1.recordings.pluck(:id) & agent2.recordings.pluck(:id)
-      @graph.add_edge(vertex1, vertex2, common.size) if common.size > 1
+      @graph.add_edge(agent1.fullname, agent2.fullname, common.size) if common.size > 1
     end
 
     def write_dot_file

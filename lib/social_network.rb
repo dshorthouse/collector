@@ -4,8 +4,6 @@ require 'rgl/adjacency'
 require 'rgl/connected_components'
 require 'rgl/dot'
 
-RGL::DOT::NODE_OPTS.push("gender")
-
 module Collector
   class SocialNetwork
 
@@ -17,13 +15,12 @@ module Collector
     end
 
     def build
-      Agent.where('id = canonical_id').where('id < 200').find_in_batches(batch_size: 10) do |batch|
+      Agent.where('id = canonical_id').find_in_batches(batch_size: 10) do |batch|
         batch.each do |agent|
           agent.recordings_with.each do |r|
             add_elements(agent, Agent.find(r[:id]))
           end
         end
-        puts "#{batch.last.id} completed"
       end
 
       write_to_d3_file

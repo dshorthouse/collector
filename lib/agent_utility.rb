@@ -106,16 +106,16 @@ module Collector
     BLACKLIST = %r{
       (?i:abundant)|
       (?i:adult|juvenile)|
-      (?i:believe)|
+      (?i:believe|unclear|illegible)|
       (?i:biolog|botan|zoo|ecolog|mycol|(in)?vertebrate|fisheries|genetic|animal|mushroom|wildlife|plumage|flower|agriculture)|
       (?i:bris?tish|canadi?an?|chinese|arctic|japan|russian|north\s+america)|
-      (?i:herbarium|herbier|collection|collected|publication|specimen|describe|anamorph|isolated|recorded|inspection)|
+      (?i:herbarium|herbier|collection|collected|publication|specimen|species|describe|an(a|o)morph|isolated|recorded|inspection|define|status)|
       \b\s*(?i:help)\s*\b|
       (?i:description|drawing|identification|remark|original|illustration|checklist|intermedia|measurement|indisting|series)|
-      (?i:internation|gou?vern|ministry|unit|district|provincial|national|military|region|environ|natur(e|al)|naturelles|division|program|direction)|
+      (?i:internation|gou?vern|ministry|unit|district|provincial|na(c|t)ional|military|region|environ|natur(e|al)|naturelles|division|program|direction)|
       (?i:o?\.?m\.?n\.?r\.?)|
       (?i:mus(eum|ée)|universit(y|é)|college|institute?|acad(e|é)m|school|écol(e|iers?)|polytech|dep(t|art?ment)|research|clinic|hospital|cientifica|sanctuary|safari)|
-      (?i:graduate|student|supervisor|rcmp|coordinator|minority|police|taxonomist|consultant|team|équipe|memb(er|re)|crew|group|staff|personnel|family|captain|friends|assistant)|
+      (?i:graduate|student|supervisor|rcmp|coordinator|minority|police|taxonomist|consultant|team|équipe|memb(er|re)|crew|group|staff|personnel|family|captain|friends|assistant|worker)|
       (?i:ontario|qu(e|é)bec|assurance)|
       (?i:soci(e|é)t(y|é)|cent(er|re)|community|history|conservation|conference|assoc|class|commission|consortium|council|club|alliance|protective|circle)|
       (?i:commercial|company|control|product)|

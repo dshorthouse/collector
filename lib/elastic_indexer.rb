@@ -206,6 +206,9 @@ module Collector
       imports.find_in_batches(batch_size: 25) do |group|
         agents = []
         group.each do |a|
+          counter += 1
+          pbar.set(counter)
+
           agents << {
                       index: {
                         _id: a.id,
@@ -234,8 +237,6 @@ module Collector
                     }
         end
         @client.bulk index: @settings.elastic_index, type: 'agent', body: agents
-        counter += agents.size
-        pbar.set(counter)
       end
 
       pbar.finish
@@ -249,6 +250,9 @@ module Collector
       Occurrence.find_in_batches(batch_size: 1_000) do |group|
         occurrences = []
         group.each do |o|
+          counter += 1
+          pbar.set(counter)
+
           agents = o.agents
           date_identified = Collector::AgentUtility.valid_year(o.dateIdentified)
           event_date = Collector::AgentUtility.valid_year(o.eventDate)
@@ -267,20 +271,21 @@ module Collector
           }
         end
         @client.bulk index: @settings.elastic_index, type: 'occurrence', body: occurrences
-        counter += occurrences.size
-        pbar.set(counter)
       end
 
       pbar.finish
     end
 
     def import_taxa
-      pbar = ProgressBar.new("Taxa", Occurrence.count)
+      pbar = ProgressBar.new("Taxa", Taxon.count)
       counter = 0
 
       Taxon.find_in_batches(batch_size: 50) do |group|
         taxa = []
         group.each do |t|
+          counter += 1
+          pbar.set(counter)
+
           taxa << {
                     index: {
                       _id: t.id,
@@ -296,8 +301,6 @@ module Collector
                   }
         end
         @client.bulk index: @settings.elastic_index, type: 'taxon', body: taxa
-        counter += taxa.size
-        pbar.set(counter)
       end
 
       pbar.finish

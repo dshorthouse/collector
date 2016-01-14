@@ -5,7 +5,7 @@ class Work < ActiveRecord::Base
   def self.populate_citations
     count = 0
     works = Work.where(processed: nil)
-    pbar = ProgressBar.new("Works", agents.count)
+    pbar = ProgressBar.new("Works", works.count)
 
     works.find_each do |w|
       count += 1
