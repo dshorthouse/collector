@@ -39,10 +39,10 @@
 
 - if @result[:personal][:aka] && @result[:personal][:aka].size > 0
   #aka-wrapper
-    %h2 Other Recognized Names
+    %h4 Other Recognized Names
     %ul.aka
       - @result[:personal][:aka].each do |a|
-        - name = [a[:personal][:given].presence, a[:personal][:family].presence]. join(" ")
+        - name = [a[:given].presence, a[:family].presence].join(" ")
         %li #{name}
 
 %h2 Collections
