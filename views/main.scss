@@ -21,6 +21,7 @@ h2{
   line-height: 2em;
   text-shadow:0 -1px 2px #fff;
   margin:0.5em 0;
+  text-decoration:underline;
 }
 h3{
   color:#333;
@@ -269,6 +270,7 @@ ul.aka li {
   line-height:2.25em;
 }
 
+#recordings-institutions li, #determinations-institutions li { line-height:1.5em; }
 ul.determinations li:hover, ul.collectors li:hover, ul.agent-examples li:hover, ul.taxon-examples li:hover, ul.location-examples li:hover, ul.barcodes li:hover { border-radius:3px; border:1px solid #246D80; }
 ul.collectors li:hover a, ul.determinations li:hover a, ul.agent-examples li:hover a, ul.taxon-examples li:hover a, ul.location-examples li:hover a, ul.barcodes li:hover a { color:#FFF; }
 

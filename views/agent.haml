@@ -15,112 +15,130 @@
   %script{src: '/javascript/agent.js', type: 'text/javascript' }
   :javascript
     google.load("visualization", "1", { packages:["corechart", "bar"] });
-    $(function() { Agent.init(#{@result[:id]}, #{@result[:recordings_with].size}); });
+    $(function() { Agent.init(#{@result[:id]}, #{@result[:recordings][:with].size rescue nil}); });
 
 -content_for :title do
-  #{@result[:given]} #{@result[:family]}
+  #{@result[:personal][:given]} #{@result[:personal][:family]}
 
 %div{itemscope: true, itemtype: "http://schema.org/Person" }
 
   %h1{id: "agent-title"}
-    %span{contenteditable: authorized? ? "true" : "false", data: "given", itemprop: "givenName" }= @result[:given]
-    %span{contenteditable: authorized? ? "true" : "false", data: "family", itemprop: "familyName" }= @result[:family]
+    %span{contenteditable: authorized? ? "true" : "false", data: "given", itemprop: "givenName" }= @result[:personal][:given]
+    %span{contenteditable: authorized? ? "true" : "false", data: "family", itemprop: "familyName" }= @result[:personal][:family]
 
-  .contact-details{itemprop: "jobTitle"} #{@result[:position]}
-  .contact-details{itemprop: "affiliation"} #{@result[:affiliation]}
+  .contact-details{itemprop: "jobTitle"} #{@result[:personal][:position]}
+  .contact-details{itemprop: "affiliation"} #{@result[:personal][:affiliation]}
   .contact-details
-    - if @result[:email]
-      %a{href: "mailto:#{@result[:email]}", itemprop: "email" }= @result[:email]
+    - if @result[:personal][:email]
+      %a{href: "mailto:#{@result[:personal][:email]}", itemprop: "email" }= @result[:personal][:email]
   .contact-details
     - if @result[:orcid]
       ORCID
       %a{href: "https://orcid.org/#{@result[:orcid]}", itemprop: "sameAs" }
         https://orcid.org/#{@result[:orcid]}
 
+- if @result[:personal][:aka] && @result[:personal][:aka].size > 0
+  #aka-wrapper
+    %h2 Other Recognized Names
+    %ul.aka
+      - @result[:personal][:aka].each do |a|
+        - name = [a[:personal][:given].presence, a[:personal][:family].presence]. join(" ")
+        %li #{name}
+
+%h2 Collections
+
 #recordings-wrapper.clear
+
   #recordings-map
-    %h2 Collecting Localities
     #map-wrapper
       #map
       #legend
 
   #recordings-chart
-    %h2 Collecting Activity
-    %p.sums Total: #{number_with_delimiter(@result[:recordings_count])}
+    %h3 Collecting Activity
+    %p.sums Total: #{number_with_delimiter(@result[:recordings][:count])}
     #recordings
 
-- if @result[:aka] && @result[:aka].size > 0
-  #aka-wrapper
-    %h2 Other Recognized Names
-    %ul.aka
-      - @result[:aka].each do |a|
-        - name = [a[:given].presence, a[:family].presence]. join(" ")
-        %li #{name}
+#recordings-institutions
+  %h3 Collected Specimens Deposited In
+  %ul
+    - @result[:recordings][:institutions].each do |i|
+      %li #{i}
 
 #colleagues-wrapper
-  - if @result[:recordings_with].size > 0
-    %h2 Fellow Collectors
-    %p.sums Total: #{@result[:recordings_with].size}
+  - if @result[:recordings][:with].size > 0
+    %h3 Fellow Collectors
+    %p.sums Total: #{number_with_delimiter(@result[:recordings][:with].size)}
     %ul.collectors
-      - @result[:recordings_with].sort_by { |a| a[:family] }.each do |c|
+      - @result[:recordings][:with].sort_by { |a| a[:family] }.each do |c|
         %li
-          - name = [c[:given].presence, c[:family].presence]. join(" ")
+          - name = [c[:given].presence, c[:family].presence].join(" ")
           %a{href: "/agent/#{c[:id]}" }=  name
-    - if @result[:recordings_with].size > 1
+    - if @result[:recordings][:with].size > 1
       #social-graph
 
-- if @result[:determined_families] && @result[:determined_families].size > 0
+%h2 Identifications
+
+- if @result[:determinations][:families] && @result[:determinations][:families].size > 0
   %div{ itemscope: true, itemtype: "http://schema.org/ItemList" }
-    %h2 Top Families Identified (# Specimens)
+    %h3 Top Families Identified (# Specimens)
     %ol.ranked
-      - @result[:determined_families].sort_by { |a| a[:count] }.reverse.first(10).each do |t|
+      - @result[:determinations][:families].sort_by { |a| a[:count] }.reverse.first(10).each do |t|
         %li
           %a{href: "/taxon/#{t[:family]}" }=  t[:family]
           (#{number_with_delimiter(t[:count])})
 
-    %h2{ itemprop: "name" } Families Identified
-    %p.sums Total: #{number_with_delimiter(@result[:determined_families].size)}
+    %h3{ itemprop: "name" } Families Identified
+    %p.sums Total: #{number_with_delimiter(@result[:determinations][:families].size)}
     %ul.determinations
-      - @result[:determined_families].sort_by { |d| d[:family] }.each do |t|
+      - @result[:determinations][:families].sort_by { |d| d[:family] }.each do |t|
         %li
           %a{href: "/taxon/#{t[:family]}" }
             %span{ itemprop: "itemListElement" }= t[:family]
 
 #determinations-wrapper
   #identifications.chart
-    %h2 Identification Activity
-    %p.sums Total: #{number_with_delimiter(@result[:determinations_count])}
+    %h3 Identification Activity
+    %p.sums Total: #{number_with_delimiter(@result[:determinations][:count])}
     #determinations
 
+#determinations-institutions
+  %h3 Identified Specimens Deposited In
+  %ul
+    - @result[:determinations][:institutions].each do |i|
+      %li #{i}
+
+%h2 Works & Taxonomy
+
 #description-wrapper{ itemscope: true, itemtype: "http://schema.org/ItemList" }
-  - if @result[:named_species] && @result[:named_species].size > 0
-    %h2{itemprop: "name"} Species Described
-    %p.sums Total: #{@result[:named_species].size}
+  - if @result[:works][:named_species] && @result[:works][:named_species].size > 0
+    %h3{itemprop: "name"} Species Described
+    %p.sums Total: #{number_with_delimiter(@result[:works][:named_species].size)}
     %ul.descriptions
-      - @result[:named_species].each do |s|
+      - @result[:works][:named_species].each do |s|
         %li{ itemprop: "itemListElement" } #{s[:scientificName]}
 
 #publications-wrapper{ itemscope: true, itemtype: "http://schema.org/ItemList" }
-  - if @result[:works] && @result[:works].size > 0
-    %h2{ itemprop: "name" } Publications With DOIs
-    %p.sums Total: #{@result[:works].size}
-    - @result[:works].each do |w|
+  - if @result[:works][:publications] && @result[:works][:publications].size > 0
+    %h3{ itemprop: "name" } Publications With DOIs
+    %p.sums Total: #{number_with_delimiter(@result[:works][:publications].size)}
+    - @result[:works][:publications].each do |w|
       %div.citation
         %a{href: "http://doi.org/#{w[:doi]}", itemprop: "itemListElement" }= w[:citation]
 
 #datasets-wrapper{ itemscope: true, itemtype: "http://schema.org/ItemList" }
-  - if @result[:datasets] && @result[:datasets].size > 0
-    %h2{ itemprop: "name" } Datasets With DOIs
-    %p.sums Total: #{@result[:datasets].size}
-    - @result[:datasets].each do |d|
+  - if @result[:works][:datasets] && @result[:works][:datasets].size > 0
+    %h3{ itemprop: "name" } Datasets With DOIs
+    %p.sums Total: #{number_with_delimiter(@result[:works][:datasets].size)}
+    - @result[:works][:datasets].each do |d|
       %div.citation
         %a{href: "http://doi.org/#{d[:doi]}", itemprop: "itemListElement" }= d[:title]
 
 #barcodes-wrapper{ itemscope: true, itemtype: "http://schema.org/ItemList" }
-  - if @result[:barcodes] && @result[:barcodes].size > 0
-    %h2{ itemprop: "name" } Barcode of Life Specimen Citations
-    %p.sums Total: #{@result[:barcodes].size}
+  - if @result[:works][:barcodes] && @result[:works][:barcodes].size > 0
+    %h3{ itemprop: "name" } Barcode of Life Specimen Citations
+    %p.sums Total: #{number_with_delimiter(@result[:works][:barcodes].size)}
     %ul.barcodes
-      - @result[:barcodes].sort_by{|b| b[:processid] }.each do |b|
+      - @result[:works][:barcodes].sort_by{|b| b[:processid] }.each do |b|
         %li
           %a{href: "http://www.boldsystems.org/index.php/Public_RecordView?processid=#{b[:processid]}", itemprop: "itemListElement" }= b[:processid]

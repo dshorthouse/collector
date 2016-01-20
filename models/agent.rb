@@ -185,6 +185,14 @@ class Agent < ActiveRecord::Base
     [given, family].join(" ").strip
   end
 
+  def determinations_institutions
+    determinations.map{|o| o.institutionCode }.uniq
+  end
+
+  def recordings_institutions
+    recordings.map{|o| o.institutionCode }.uniq
+  end
+
   def determinations_year_range
     years = determinations.pluck(:dateIdentified)
                           .map{ |d| Collector::AgentUtility.valid_year(d) }

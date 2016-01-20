@@ -49,7 +49,7 @@ module Collector
     def add_attributes
       @agents.each do |a|
         options = {}
-        if @graph.has_vertex?(vertex)
+        if @graph.has_vertex?(a.fullname)
           if a.id == @agent.id
             options["fillcolor"] = "#962825"
           end

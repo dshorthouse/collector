@@ -1,0 +1,44 @@
+-content_for :stylesheets do
+  %link{href: 'http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css', rel: 'stylesheet', type: 'text/css' }
+  %link{href: '/stylesheet/leaflet.dvf.css', rel: 'stylesheet', type: 'text/css' }
+  %link{href: '/stylesheet/vis.min.css', rel: 'stylesheet', type: 'text/css' }
+
+-content_for :scripts do
+  %script{src: 'https://www.google.com/jsapi', type: 'text/javascript' }
+  %script{src: 'http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js', type: 'text/javascript' }
+  %script{src: 'http://maps.stamen.com/js/tile.stamen.js?v1.2.4', type: 'text/javascript' }
+
+  %script{src: '/javascript/vis.min.js', type: 'text/javascript' }
+
+  %script{src: '/javascript/leaflet-dvf.min.js', type: 'text/javascript' }
+  %script{src: '/javascript/Leaflet.MultiOptionsPolyline.min.js', type: 'text/javascript' }
+  %script{src: '/javascript/waypoint.js', type: 'text/javascript' }
+  :javascript
+    $(function() { Waypoint.init(#{@result[:id]}); });
+
+-content_for :title do
+  #{@result[:given]} #{@result[:family]}
+
+%div{itemscope: true, itemtype: "http://schema.org/Person" }
+
+  %h1{id: "agent-title"}
+    %span{data: "given", itemprop: "givenName" }= @result[:given]
+    %span{data: "family", itemprop: "familyName" }= @result[:family]
+
+  .contact-details{itemprop: "jobTitle"} #{@result[:position]}
+  .contact-details{itemprop: "affiliation"} #{@result[:affiliation]}
+  .contact-details
+    - if @result[:email]
+      %a{href: "mailto:#{@result[:email]}", itemprop: "email" }= @result[:email]
+  .contact-details
+    - if @result[:orcid]
+      ORCID
+      %a{href: "https://orcid.org/#{@result[:orcid]}", itemprop: "sameAs" }
+        https://orcid.org/#{@result[:orcid]}
+
+#recordings-wrapper.clear
+  #recordings-map
+    %h2 Collecting Waypoint
+    #map-wrapper
+      #map
+      #legend

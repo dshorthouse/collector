@@ -45,12 +45,12 @@
         %div.result
           %div.agent
             - if r[:_type] == 'taxon'
-              %a{href: "/taxon/#{r[:fields][:family][0]}"}= r[:fields][:family][0]
+              %a{href: "/taxon/#{r[:fields][:"personal.family"][0]}"}= r[:fields][:"personal.family"][0]
             - elsif r[:_type] == 'agent'
               - id = r[:fields][:id][0]
               - if r[:fields].has_key? :orcid
                 - id = r[:fields][:orcid][0].presence
-              %a{href: "/agent/#{id}"}= [r[:fields][:family][0].presence,r[:fields][:given][0].presence].compact.join(", ")
+              %a{href: "/agent/#{id}"}= [r[:fields][:"personal.family"][0].presence,r[:fields][:"personal.given"][0].presence].compact.join(", ")
 
       = paginate @results
 

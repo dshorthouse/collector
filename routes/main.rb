@@ -97,6 +97,11 @@ module Sinatra
             end
           end
 
+          app.get '/waypoint/:id' do
+            agent_profile(params[:id])
+            haml :waypoint
+          end
+
           app.not_found do
             status 404
             haml :oops

@@ -14,7 +14,7 @@
       %a{href: @result[:image_data][:license] }= @result[:image_data][:license]
 
 #colleagues-wrapper
-  %h2 Top Determiners (# Specimens)
+  %h3 Top Determiners (# Specimens)
   - if @result[:identifiedBy].size > 0
     %ol.ranked
       - @result[:identifiedBy].sort_by { |a| a[:count] }.reverse.first(10).each do |c|
@@ -22,7 +22,7 @@
           - name = [c[:given].presence, c[:family].presence]. join(" ")
           %a{href: "/agent/#{c[:id]}" }= name
           (#{number_with_delimiter(c[:count])})
-  %h2 Identified By
+  %h3 Identified By
   - if @result[:identifiedBy].size > 0
     %ul.collectors
       - @result[:identifiedBy].sort_by { |a| a[:family] }.each do |c|

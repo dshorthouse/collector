@@ -99,61 +99,79 @@ module Collector
             properties: {
               id: { type: 'integer', index: 'not_analyzed' },
               canonical_id: { type: 'integer', index: 'not_analyzed' },
-              family: { type: 'string', search_analyzer: :family_search, index_analyzer: :family_index, omit_norms: true },
-              given: { type: 'string', search_analyzer: :given_search, index_analyzer: :given_index, omit_norms: true },
-              gender: { type: 'string', index: 'not_analyzed' },
-              aka: {
-                type: 'nested',
-                properties: {
-                  family: { type: 'string', index: 'not_analyzed' },
-                  given: { type: 'string', index: 'not_analyzed' }
-                }
-              },
               orcid: { type: 'string', index: 'not_analyzed' },
-              email: { type: 'string', index: 'not_analyzed' },
-              position: { type: 'string', index: 'not_analyzed' },
-              affiliation: { type: 'string', index: 'not_analyzed' },
-              coordinates: { type: 'geo_point', lat_lon: true, fielddata: { format: 'compressed', precision: "5km" }, index: 'not_analyzed' },
-              determinations_count: { type: 'integer', index: 'not_analyzed' },
-              determined_families: {
+              personal: {
                 properties: {
-                  id: { type: 'integer', index: 'not_analyzed' },
-                  family: { type: 'string', index: 'not_analyzed' },
-                  count: { type: 'integer', index: 'not_analyzed' }
+                  family: { type: 'string', search_analyzer: :family_search, index_analyzer: :family_index, omit_norms: true },
+                  given: { type: 'string', search_analyzer: :given_search, index_analyzer: :given_index, omit_norms: true },
+                  gender: { type: 'string', index: 'not_analyzed' },
+                  aka: {
+                    type: 'nested',
+                    properties: {
+                      family: { type: 'string', index: 'not_analyzed' },
+                      given: { type: 'string', index: 'not_analyzed' }
+                    }
+                  },
+                  email: { type: 'string', index: 'not_analyzed' },
+                  position: { type: 'string', index: 'not_analyzed' },
+                  affiliation: { type: 'string', index: 'not_analyzed' }
                 }
               },
-              recordings_count: { type: 'integer', index: 'not_analyzed' },
-              recordings_with: {
-                type: 'nested',
+              recordings: {
                 properties: {
-                  id: { type: 'integer', index: 'not_analyzed' },
-                  family: { type: 'string', index: 'not_analyzed' },
-                  given: { type: 'string', index: 'not_analyzed' }
+                  count: { type: 'integer', index: 'not_analyzed' },
+                  with: {
+                    type: 'nested',
+                    properties: {
+                      id: { type: 'integer', index: 'not_analyzed' },
+                      family: { type: 'string', index: 'not_analyzed' },
+                      given: { type: 'string', index: 'not_analyzed' }
+                    }
+                  },
+                  coordinates: { type: 'geo_point', lat_lon: true, fielddata: { format: 'compressed', precision: "5km" }, index: 'not_analyzed' },
+                  institutions: { type: 'string', index: 'not_analyzed' }
+                }
+              },
+              determinations: {
+                properties: {
+                  count: { type: 'integer', index: 'not_analyzed' },
+                  institutions: { type: 'string', index: 'not_analyzed' },
+                  families: {
+                    properties: {
+                      id: { type: 'integer', index: 'not_analyzed' },
+                      family: { type: 'string', index: 'not_analyzed' },
+                      count: { type: 'integer', index: 'not_analyzed' }
+                    }
+                  }
                 }
               },
               works: {
                 properties: {
-                  doi: { type: 'string', index: 'not_analyzed' },
-                  citation: { type: 'string', index: 'not_analyzed' }
-                }
-              },
-              barcodes: {
-                properties: {
-                  processid: { type: 'string', index: 'not_analyzed' },
-                  bin_uri: { type: 'string', index: 'not_analyzed' },
-                  catalognum: { type: 'string', index: 'not_analyzed' }
-                }
-              },
-              named_species: {
-                properties: {
-                  scientificName: { type: 'string', index: 'not_analyzed' },
-                  year: { type: 'date', format: 'year' }
-                }
-              },
-              datasets: {
-                properties: {
-                  doi: { type: 'string', index: 'not_analyzed' },
-                  title: { type: 'string', index: 'not_analyzed' }
+                  publications: {
+                    properties: {
+                      doi: { type: 'string', index: 'not_analyzed' },
+                      citation: { type: 'string', index: 'not_analyzed' }
+                    }
+                  },
+                  barcodes: {
+                    properties: {
+                      processid: { type: 'string', index: 'not_analyzed' },
+                      bin_uri: { type: 'string', index: 'not_analyzed' },
+                      catalognum: { type: 'string', index: 'not_analyzed' }
+                    }
+                  },
+                  named_species: {
+                    properties: {
+                      scientificName: { type: 'string', index: 'not_analyzed' },
+                      year: { type: 'date', format: 'year' }
+                    }
+                  },
+                  datasets: {
+                    properties: {
+                      doi: { type: 'string', index: 'not_analyzed' },
+                      title: { type: 'string', index: 'not_analyzed' }
+                    }
+                  }
                 }
               }
             }
@@ -215,23 +233,33 @@ module Collector
                         data: {
                           id: a.id,
                           canonical_id: a.canonical_id,
-                          family: a.family,
-                          given: a.given,
-                          gender: a.gender,
-                          aka: a.aka,
                           orcid: a.orcid_identifier,
-                          email: a.email,
-                          position: a.position,
-                          affiliation: a.affiliation,
-                          coordinates: a.recordings_coordinates,
-                          recordings_count: a.recordings.size,
-                          recordings_with: a.recordings_with,
-                          determinations_count: a.determinations.size,
-                          determined_families: a.determined_families,
-                          works: a.works.pluck(:doi,:citation).uniq.map{ |c| { doi: c[0], citation: c[1] } },
-                          barcodes: a.barcodes.pluck(:processid,:bin_uri).uniq.map{ |b| { processid: b[0], bin_uri: b[1] } },
-                          named_species: a.descriptions,
-                          datasets: a.datasets.pluck(:doi,:title).uniq.map{ |d| { doi: d[0], title: d[1] } }
+                          personal: {
+                            family: a.family,
+                            given: a.given,
+                            gender: a.gender,
+                            aka: a.aka,
+                            email: a.email,
+                            position: a.position,
+                            affiliation: a.affiliation,
+                          },
+                          recordings: {
+                            count: a.recordings.size,
+                            with: a.recordings_with,
+                            coordinates: a.recordings_coordinates,
+                            institutions: a.recordings_institutions
+                          },
+                          determinations: {
+                            count: a.determinations.size,
+                            institutions: a.determinations_institutions,
+                            families: a.determined_families,
+                          },
+                          works: {
+                            publications: a.works.pluck(:doi,:citation).uniq.map{ |c| { doi: c[0], citation: c[1] } },
+                            barcodes: a.barcodes.pluck(:processid,:bin_uri).uniq.map{ |b| { processid: b[0], bin_uri: b[1] } },
+                            named_species: a.descriptions,
+                            datasets: a.datasets.pluck(:doi,:title).uniq.map{ |d| { doi: d[0], title: d[1] } }
+                          }
                         }
                       }
                     }
@@ -311,23 +339,33 @@ module Collector
         doc: {
           id: a.id,
           canonical_id: a.canonical_id,
-          family: a.family,
-          given: a.given,
-          gender: a.gender,
-          aka: a.aka,
           orcid: a.orcid_identifier,
-          email: a.email,
-          position: a.position,
-          affiliation: a.affiliation,
-          coordinates: a.recordings_coordinates,
-          recordings_count: a.recordings.size,
-          recordings_with: a.recordings_with,
-          determinations_count: a.determinations.size,
-          determined_families: a.determined_families,
-          works: a.works.pluck(:doi,:citation).uniq.map{ |c| { doi: c[0], citation: c[1] } },
-          barcodes: a.barcodes.pluck(:processid,:bin_uri).uniq.map{ |b| { processid: b[0], bin_uri: b[1] } },
-          named_species: a.descriptions,
-          datasets: a.datasets.pluck(:doi,:title).uniq.map{ |d| { doi: d[0], title: d[1] } }
+          personal: {
+            family: a.family,
+            given: a.given,
+            gender: a.gender,
+            aka: a.aka,
+            email: a.email,
+            position: a.position,
+            affiliation: a.affiliation,
+          },
+          recordings: {
+            count: a.recordings.size,
+            with: a.recordings_with,
+            institutions: a.recordings_institutions,
+            coordinates: a.recordings_coordinates
+          },
+          determinations: {
+            count: a.determinations.size,
+            institutions: a.determinations_institutions,
+            families: a.determined_families
+          },
+          works: {
+            publications: a.works.pluck(:doi,:citation).uniq.map{ |c| { doi: c[0], citation: c[1] } },
+            barcodes: a.barcodes.pluck(:processid,:bin_uri).uniq.map{ |b| { processid: b[0], bin_uri: b[1] } },
+            named_species: a.descriptions,
+            datasets: a.datasets.pluck(:doi,:title).uniq.map{ |d| { doi: d[0], title: d[1] } }
+          }
         }
       }
 

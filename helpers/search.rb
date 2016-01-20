@@ -21,7 +21,7 @@ module Sinatra
         polygon = YAML::load(params[:p] || "[[0,0]]").map{ |n| n.reverse } rescue []
 
         body = { query: { match_all: {} } }
-        fields = "id,family,given,orcid"
+        fields = "id,family,personal.family,personal.given,orcid"
         sort = ""
 
         client = Elasticsearch::Client.new
@@ -49,15 +49,30 @@ module Sinatra
 
         if geo.present?
           if !searched_term.present?
-            sort = "family"
+            if type == "taxon"
+              sort = "family"
+            elsif type == "agent"
+              sort = "personal.family"
+            end
           end
+
+          if type == "taxon"
+            geo_circle = { geo_distance: { coordinates: center, distance: radius } }
+            geo_bounding_box = { geo_bounding_box: { coordinates: { top_left: [bounds[1],bounds[2]], bottom_right: [bounds[3],bounds[0]] } } }
+            geo_polygon = { geo_polygon: { coordinates: { points: polygon } } }
+          elsif type == "agent"
+            geo_circle = { geo_distance: { "recordings.coordinates" => center, distance: radius } }
+            geo_bounding_box = { geo_bounding_box: { "recordings.coordinates" => { top_left: [bounds[1],bounds[2]], bottom_right: [bounds[3],bounds[0]] } } }
+            geo_polygon = { geo_polygon: { "recordings.coordinates" => { points: polygon } } }
+          end
+
           case geo
             when 'circle'
-              filters << { geo_distance: { coordinates: center, distance: radius } }
+              filters << geo_circle
             when 'rectangle'
-              filters << { geo_bounding_box: { coordinates: { top_left: [bounds[1],bounds[2]], bottom_right: [bounds[3],bounds[0]] } } }
+              filters << geo_bounding_box
             when 'polygon'
-              filters << { geo_polygon: { coordinates: { points: polygon } } }
+              filters << geo_polygon
           end
         end
 
@@ -65,7 +80,7 @@ module Sinatra
           if !searched_term.present?
             sort = "family"
           end
-          filters << { term: { "determined_families.family" => taxon } }
+          filters << { term: { "determinations.families.family" => taxon } }
         end
 
         if filters.size > 0
@@ -76,7 +91,7 @@ module Sinatra
 
         response = client.search index: settings.elastic_index, type: type, fields: fields, from: from, size: search_size, sort: sort, body: body
         results = response["hits"].deep_symbolize_keys
-
+        
         @results = WillPaginate::Collection.create(page, search_size, results[:total]) do |pager|
           pager.replace results[:hits]
         end
@@ -87,18 +102,17 @@ module Sinatra
         name = ::Collector::AgentUtility.clean(parsed[0])
         family = !name[:family].nil? ? name[:family] : ""
         given = !name[:given].nil? ? name[:given] : ""
-
         {
           query: {
             bool: {
               must: [
-                match: { family: family }
+                match: { "personal.family" => family }
               ],
               should: [
-                match: { family: search }
+                match: { "personal.family" => search }
               ],
               should: [
-                match: { given: given }
+                match: { "personal.given" => given }
               ]
             }
           }
@@ -212,7 +226,9 @@ module Sinatra
       def format_agents
         @results.map{ |n|
           orcid = n[:fields][:orcid][0].presence if n[:fields].has_key? :orcid
-          { id: n[:fields][:id][0], name: [n[:fields][:family][0].presence, n[:fields][:given][0].presence].compact.join(", "), orcid: orcid }
+          { id: n[:fields][:id][0],
+            name: [n[:fields][:"personal.family"][0].presence, n[:fields][:"personal.given"][0].presence].compact.join(", "),
+            orcid: orcid }
         }
       end
 

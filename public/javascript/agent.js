@@ -1,4 +1,5 @@
 /*global window, document, jQuery, google, L */
+
 var Agent = (function($, window) {
 
   "use strict";
@@ -155,8 +156,6 @@ var Agent = (function($, window) {
         }
       });
       if(this.layers.length > 0) {
-        //L.control.layers(null, this.layers).addTo(this.map);
-        //TODO: layer.getLegend is too arbitrary - just takes last one from the each loop above
         $('#legend').append(layer.getLegend({
           numSegments: (max/10 > 5) ? 20 : 5,
           width: 80

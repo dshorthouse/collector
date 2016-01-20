@@ -179,6 +179,20 @@ module Collector
       end
     end
 
+    def self.valid_date(date)
+      return if date.presence.nil?
+
+      parsed = Date.strptime(date, "%Y-%m-%d") rescue nil
+
+      if parsed.year.nil? || parsed.year <= 1756 || parsed.year >= Time.now.year
+        parsed = Chronic.parse(date) rescue nil
+      end
+
+      if !parsed.year.nil? && parsed.year >= 1756 && parsed.year <= Time.now.year
+        parsed
+      end
+    end
+
     def self.doi_clean(doi)
       sub = %r{
         ^http\:\/\/dx\.doi\.org\/|
