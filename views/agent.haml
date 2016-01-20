@@ -59,11 +59,12 @@
     %p.sums Total: #{number_with_delimiter(@result[:recordings][:count])}
     #recordings
 
-#recordings-institutions
-  %h3 Collected Specimens Deposited In
-  %ul
-    - @result[:recordings][:institutions].each do |i|
-      %li #{i}
+- if @result[:recordings][:institutions].size > 0
+  #recordings-institutions
+    %h3 Collected Specimens Deposited In
+    %ul
+      - @result[:recordings][:institutions].each do |i|
+        %li #{i}
 
 #colleagues-wrapper
   - if @result[:recordings][:with].size > 0
@@ -102,11 +103,12 @@
     %p.sums Total: #{number_with_delimiter(@result[:determinations][:count])}
     #determinations
 
-#determinations-institutions
-  %h3 Identified Specimens Deposited In
-  %ul
-    - @result[:determinations][:institutions].each do |i|
-      %li #{i}
+- if @result[:determinations][:institutions].size > 0
+  #determinations-institutions
+    %h3 Identified Specimens Deposited In
+    %ul
+      - @result[:determinations][:institutions].each do |i|
+        %li #{i}
 
 %h2 Works & Taxonomy
 
