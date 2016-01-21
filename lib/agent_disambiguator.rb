@@ -112,9 +112,9 @@ module Collector
       initials1_arr = initials1.split(".")
       initials2_arr = initials2.split(".")
       shared_friends = agent1[:collected_with] & agent2[:collected_with]
-      shared_friends_boost = (shared_friends.size > 0) ? 0.1 : 0
+      shared_friends_boost = (shared_friends.size > 0) ? 0.4 : 0
       shared_ids = agent1[:determined_families] & agent2[:determined_families]
-      shared_ids_boost = (shared_ids.size > 0) ? 0.05 : 0
+      shared_ids_boost = (shared_ids.size > 0) ? 0.1 : 0
 
       #Exact match - not going to happen with these data, but here anyway
       if given1 == given2
@@ -135,7 +135,7 @@ module Collector
       if (given1.include?(" ") || given2.include?(" ")) &&
          (initials1_arr.size == 1 || initials2_arr.size == 1) &&
          given1_arr[0] == given2_arr[0]
-        return 0.90
+        return adjust_score(0.90 + shared_friends_boost + shared_ids_boost)
       end
 
       #Both given names are composites
@@ -147,30 +147,30 @@ module Collector
         end
         #All initials match (eg. Timothy A. and T.A.)
         if initials1 == initials2
-          return (0.80 + shared_friends_boost + shared_ids_boost).round(2)
+          return adjust_score(0.80 + shared_friends_boost + shared_ids_boost)
         end
         #First and second initials match
         if initials1_arr[0] == initials2_arr[0] && initials1_arr[1] == initials2_arr[1]
-          return (0.70 + shared_friends_boost + shared_ids_boost).round(2)
+          return adjust_score(0.70 + shared_friends_boost + shared_ids_boost)
         end
       end
 
       #First initial in common (eg. Timothy and T.)
       if initials1_arr[0] == initials2_arr[0]
-        return (0.50 + shared_friends_boost + shared_ids_boost).round(2)
+        return adjust_score(0.50 + shared_friends_boost + shared_ids_boost)
       end
 
-      #One of pair empty but there are shared friends
-      if (given1.empty? || given2.empty?) && shared_friends.size > 0
-        return 0.4
-      end
-
-      #One of pair empty but there are shared ids
-      if (given1.empty? || given2.empty?) && shared_ids.size > 0
-        return 0.2
+      #One of pair missing given name
+      if (given1.empty? || given2.empty?)
+        return adjust_score(0.40 + shared_friends_boost + shared_ids_boost)
       end
 
       return 0
+    end
+
+    def adjust_score(score)
+      adjusted = (score > 1) ? 1 : score
+      adjusted.round(2)
     end
 
     def reassign_data

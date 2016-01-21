@@ -15,7 +15,7 @@ OptionParser.new do |opts|
     options[:write] = true
   end
 
-  opts.on("-r", "--reassign", "Reassign data") do
+  opts.on("-x", "--reassign", "Reassign data") do
     options[:reassign] = true
   end
 

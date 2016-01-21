@@ -232,7 +232,7 @@ var Agent = (function($, window) {
           network = new vis.Network(container, data, options);
         },
         error: function(xhr, ajaxOptions, thrownError) {
-          alert(xhr.responseText);
+          //alert(xhr.responseText);
         }
       });
     },
