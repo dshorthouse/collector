@@ -151,7 +151,7 @@ var Collector = (function($, window) {
             radius = this.getParameterByName("r")*1000
             this.layer = L.circle(coord, radius, { color: "#246d80" });
             this.map.addLayer(this.layer);
-            this.map.setView(coord, 3)
+            this.map.fitBounds(this.layer.getBounds());
           break;
 
           case 'rectangle':
@@ -159,14 +159,14 @@ var Collector = (function($, window) {
             bounds = [[bbox[0],bbox[1]],[bbox[2],bbox[3]]];
             this.layer = L.rectangle(bounds, { color: "#246d80" });
             this.map.addLayer(this.layer);
-            this.map.setView(this.layer.getBounds().getCenter(), 3);
+            this.map.fitBounds(this.layer.getBounds());
           break;
 
           case 'polygon':
             vertices = JSON.parse(this.getParameterByName("p"));
             this.layer = L.polygon(vertices, { color: "#246d80" });
             this.map.addLayer(this.layer);
-            this.map.setView(this.layer.getBounds().getCenter(), 3);
+            this.map.fitBounds(this.layer.getBounds());
           break;
         }
       },
