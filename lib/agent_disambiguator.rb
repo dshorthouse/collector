@@ -175,18 +175,16 @@ module Collector
 
     def reassign_data
       agents = Agent.where("id != canonical_id")
+      models = ["OccurrenceDeterminer", "OccurrenceRecorder", "TaxonDeterminer", "AgentWork", "AgentDescription", "AgentBarcode", "AgentDataset"]
       pbar = ProgressBar.new("Reassign", agents.count)
       counter = 0
       agents.find_each do |a|
         counter += 1
         pbar.set(counter)
-        OccurrenceDeterminer.where(agent_id: a.id).update_all(agent_id: a.canonical_id, original_agent_id: a.id)
-        OccurrenceRecorder.where(agent_id: a.id).update_all(agent_id: a.canonical_id, original_agent_id: a.id)
-        TaxonDeterminer.where(agent_id: a.id).update_all(agent_id: a.canonical_id, original_agent_id: a.id)
-        AgentWork.where(agent_id: a.id).update_all(agent_id: a.canonical_id, original_agent_id: a.id)
-        AgentDescription.where(agent_id: a.id).update_all(agent_id: a.canonical_id, original_agent_id: a.id)
-        AgentBarcode.where(agent_id: a.id).update_all(agent_id: a.canonical_id, original_agent_id: a.id)
-        AgentDataset.where(agent_id: a.id).update_all(agent_id: a.canonical_id, original_agent_id: a.id)
+        models.each do |model|
+          klass = Object.const_get model
+          klass.where(agent_id: a.id).update_all(agent_id: a.canonical_id, original_agent_id: a.id)
+        end
       end
       pbar.finish
     end
