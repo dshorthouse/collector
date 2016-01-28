@@ -50,7 +50,7 @@ module Collector
       vertex1 = [agent1.given, agent1.family].join(" ")
       vertex2 = [agent2.given, agent2.family].join(" ")
       common = agent1.recordings.pluck(:id) & agent2.recordings.pluck(:id)
-      @graph.add_edge(vertex1, vertex2, common.size) if common.size > 1
+      @graph.add_edge(vertex1, vertex2, common.size) if common.size > 0
     end
 
     def write_dot_file

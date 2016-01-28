@@ -173,6 +173,24 @@ module Collector
                     }
                   }
                 }
+              },
+              network: {
+                properties: {
+                  nodes: {
+                    properties: {
+                      id: { type: 'integer', index: 'not_analyzed' },
+                      label: { type: 'string', index: 'not_analyzed' },
+                      gender: { type: 'string', index: 'not_analyzed' }
+                    }
+                  },
+                  edges: {
+                    properties: {
+                      from: { type: 'integer', index: 'not_analyzed' },
+                      to: { type: 'integer', index: 'not_analyzed' },
+                      label: { type: 'integer', index: 'not_analyzed' }
+                    }
+                  }
+                }
               }
             }
           },
@@ -259,7 +277,8 @@ module Collector
                             barcodes: a.barcodes.pluck(:processid,:bin_uri).uniq.map{ |b| { processid: b[0], bin_uri: b[1] } },
                             named_species: a.descriptions,
                             datasets: a.datasets.pluck(:doi,:title).uniq.map{ |d| { doi: d[0], title: d[1] } }
-                          }
+                          },
+                          network: a.network
                         }
                       }
                     }
@@ -365,7 +384,8 @@ module Collector
             barcodes: a.barcodes.pluck(:processid,:bin_uri).uniq.map{ |b| { processid: b[0], bin_uri: b[1] } },
             named_species: a.descriptions,
             datasets: a.datasets.pluck(:doi,:title).uniq.map{ |d| { doi: d[0], title: d[1] } }
-          }
+          },
+          network: a.network
         }
       }
 

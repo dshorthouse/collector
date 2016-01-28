@@ -29,7 +29,7 @@ module Collector
 
     def add_elements(agent1, agent2)
       common = agent1.recordings.pluck(:id) & agent2.recordings.pluck(:id)
-      if common.size > 1
+      if common.size > 0
         @graph[:nodes].merge([ { id: agent1.id, label: agent1.fullname }, { id: agent2.id, label: agent2.fullname } ])
         edge = [agent1.id, agent2.id].sort
         @graph[:edges].add({ from: edge[0], to: edge[1] })

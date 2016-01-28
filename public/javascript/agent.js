@@ -7,18 +7,22 @@ var Agent = (function($, window) {
   var _private = {
 
     id: "",
+    graph: {
+      nodes: [],
+      edges: []
+    },
     activity: { hits: { total: "" }, aggregations: { determinations: { histogram: { buckets: [] } }, recordings: { histogram: { buckets: [] } } } },
     chartData: { determinations : [["Year", "Identifications"]], recordings : [["Year", "Collected specimens"]]},
     map: {},
     layers: [],
 
-    init: function(id, graph_size) {
+    init: function(id, graph) {
       this.id = id;
-      this.graph_size = graph_size;
       this.getActivity();
       this.createCharts();
       this.createMap();
-      if (graph_size > 1) {
+      if(graph) {
+        this.graph = graph;
         this.createGraph();
       }
       this.enableEdit();
@@ -193,10 +197,16 @@ var Agent = (function($, window) {
                 min: 10,
                 max: 30
               },
-              size: 12
+              size: 10,
+              font: {
+                size: 8
+              }
             },
             edges: {
-              width: 0.15
+              width: 0.15,
+              font: {
+                size: 8
+              }
             },
             interaction: {
               hideEdgesOnDrag: true
@@ -213,28 +223,19 @@ var Agent = (function($, window) {
           },
           data = {},
           node_color = {},
-          network = "",
+          network = {},
           parsed = "";
 
-      $.ajax({
-        type: 'GET',
-        url: '/images/graphs/agents/' + self.id + '.dot',
-        success: function(response) {
-          parsed = vis.network.convertDot(response);
-          data["nodes"] = parsed.nodes;
-          data["edges"] = parsed.edges;
-          $.map(data["nodes"], function(n) {
-            if(n["gender"] == "female") {
-              n["color"] = { background: "pink", highlight: { background: "#FFE4E1" } };
-            }
-            return n;
-          });
-          network = new vis.Network(container, data, options);
-        },
-        error: function(xhr, ajaxOptions, thrownError) {
-          //alert(xhr.responseText);
+      $.map(this.graph.nodes, function(n) {
+        if(n["gender"] == "female") {
+          n["color"] = { background: "pink", highlight: { background: "#FFE4E1" } };
         }
+        if(n["id"] == self.id) {
+          n["color"] = { background: "#FFFF33", highlight: { background: "#FFFF99" } };
+        }
+        return n;
       });
+      network = new vis.Network(container, this.graph, options);
     },
     enableEdit: function() {
       var self = this, obj = {};
@@ -265,8 +266,8 @@ var Agent = (function($, window) {
   };
 
   return {
-    init: function(id, graph_size) {
-      _private.init(id, graph_size);
+    init: function(id, graph) {
+      _private.init(id, graph);
     }
   };
 

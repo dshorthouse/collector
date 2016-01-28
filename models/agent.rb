@@ -40,7 +40,7 @@ class Agent < ActiveRecord::Base
       pbar.set(count)
 
       if !agent.family.empty? && !agent.given.empty?
-        max_year = [agent.determinations_year_range[1], agent.recordings_year_range[1]].compact.max
+        max_year = [agent.determinations_year_range.max, agent.recordings_year_range.max].compact.max
         given = URI::encode(agent.given.gsub(/\./, '. ').gsub(/&/,''))
         family = URI::encode(agent.family)
         if !max_year.nil? && max_year >= 1975
@@ -200,7 +200,7 @@ class Agent < ActiveRecord::Base
                           .minmax rescue [nil,nil]
     years[0] = years[1] if years[0].nil?
     years[1] = years[0] if years[1].nil?
-    years
+    Range.new(years[0], years[1])
   end
 
   def recordings_year_range
@@ -210,7 +210,7 @@ class Agent < ActiveRecord::Base
                       .minmax rescue [nil,nil]
     years[0] = years[1] if years[0].nil?
     years[1] = years[0] if years[1].nil?
-    years
+    Range.new(years[0], years[1])
   end
 
   def recordings_coordinates
@@ -254,6 +254,12 @@ class Agent < ActiveRecord::Base
 
   def aka
     (Agent.where(canonical_id: id).where.not(id: id) | Agent.where(canonical_id: canonical_id).where.not(id: id)).map{|a| {family: a.family, given: a.given}}
+  end
+
+  def network
+    network = Collector::AgentNetwork.new(id)
+    network.build
+    network.to_vis
   end
 
 end

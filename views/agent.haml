@@ -15,7 +15,9 @@
   %script{src: '/javascript/agent.js', type: 'text/javascript' }
   :javascript
     google.load("visualization", "1", { packages:["corechart", "bar"] });
-    $(function() { Agent.init(#{@result[:id]}, #{@result[:recordings][:with].size rescue nil}); });
+    $(function() {
+      Agent.init(#{@result[:id]}, #{@result[:network].to_json});
+    });
 
 -content_for :title do
   #{@result[:personal][:given]} #{@result[:personal][:family]}

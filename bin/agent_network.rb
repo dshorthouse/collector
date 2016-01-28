@@ -72,13 +72,15 @@ elsif options[:all_agents]
   agents.find_each do |agent|
     count += 1
     pbar.set(count)
-    graph = Collector::AgentNetwork.new(agent.id, options[:depth])
-    graph.build(options[:type])
+    graph = Collector::AgentNetwork.new(agent.id, options[:depth], options[:type])
+    graph.build
+    graph.write
   end
   pbar.finish
 elsif options[:agent_id]
   puts 'Creating agent network graph as ' + options[:type]
-  graph = Collector::AgentNetwork.new(options[:agent_id], options[:depth])
-  graph.build(options[:type])
+  graph = Collector::AgentNetwork.new(options[:agent_id], options[:depth], options[:type])
+  graph.build
+  graph.write
   puts 'Done creating agent network graph'
 end

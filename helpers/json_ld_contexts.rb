@@ -7,12 +7,14 @@ module Sinatra
       def collector_context
         @context = {
           "@context" => {
-            "given" => "http://schema.org/givenName",
-            "family" => "http://schema.org/familyName",
-            "gender" => "http://schema.org/gender",
-            "affiliation" => "http://schema.org/affiliation",
-            "position" => "http://schema.org/jobTitle",
-            "email" => "http://schema.org/email"
+            "schema" => "http://schema.org/",
+            "given" => "schema:givenName",
+            "family" => "schema:familyName",
+            "gender" => "schema:gender",
+            "affiliation" => "schema:affiliation",
+            "position" => "schema:jobTitle",
+            "email" => "schema:email",
+            "personal" => { "@id" => "schema:Person", "@container" => "@index" }
           }
         }
       end

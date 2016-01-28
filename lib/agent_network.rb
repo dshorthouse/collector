@@ -5,26 +5,31 @@ require 'rgl/connected_components'
 require 'rgl/dot'
 
 RGL::DOT::NODE_OPTS.push("gender")
+RGL::DOT::NODE_OPTS.push("id")
 
 module Collector
   class AgentNetwork
 
-    def initialize(id, depth = 1)
+    def initialize(id, depth = 1, type = "dot")
       @graph = WeightedGraph.new
       @agent = Agent.find(id)
       @agents = Set.new
       @depth = depth + 1
+      @type = type
     end
 
-    def build(type = "dot")
+    def build
       if @agent.id != @agent.canonical_id
         @agent = Agent.find(@agent.canonical_id)
       end
       collect_agents([@agent], @depth)
       add_edges
       add_attributes
+    end
+
+    def write
       if @graph.size > 2
-        if type == "dot"
+        if @type == "dot"
           write_dot_file
         else
           write_d3_file
@@ -50,6 +55,7 @@ module Collector
       @agents.each do |a|
         options = {}
         if @graph.has_vertex?(a.fullname)
+          options["id"] = a.id
           if a.id == @agent.id
             options["fillcolor"] = "#962825"
           end
@@ -63,7 +69,7 @@ module Collector
 
     def add_edge(agent1, agent2)
       common = agent1.recordings.pluck(:id) & agent2.recordings.pluck(:id)
-      @graph.add_edge(agent1.fullname, agent2.fullname, common.size) if common.size > 1
+      @graph.add_edge(agent1.fullname, agent2.fullname, common.size) if common.size > 0
     end
 
     def write_dot_file
@@ -72,6 +78,10 @@ module Collector
 
     def write_d3_file
       @graph.write_to_d3_file("public/images/graphs/agents/#{@agent.id}")
+    end
+
+    def to_vis
+      @graph.to_vis_graph
     end
 
   end

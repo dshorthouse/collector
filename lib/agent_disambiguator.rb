@@ -101,6 +101,14 @@ module Collector
       @graph.isolates.each { |v| @graph.remove_vertex v }
     end
 
+    def recordings_gap(agent1, agent2)
+      agent1_range = agent1.recordings_year_range
+      agent2_range = agent2.recordings_year_range
+      diff1 = (agent1_range.max - agent2_range.min).abs rescue nil
+      diff2 = (agent2_range.max - agent1_range.min).abs rescue nil
+      [diff1, diff2].min
+    end
+
     # TODO: not flexible enough to accommodate more nuances in score, maybe use neural network
     def name_similarity(agent1, agent2)
       given1 = agent1[:given]
@@ -115,6 +123,12 @@ module Collector
       shared_friends_boost = (shared_friends.size > 0) ? 0.4 : 0
       shared_ids = agent1[:determined_families] & agent2[:determined_families]
       shared_ids_boost = (shared_ids.size > 0) ? 0.1 : 0
+      recordings_gap = recordings_gap(agent1, agent2)
+
+      #kick out pairs if difference in year ranges > 30
+      if !recordings_gap.nil? && recordings_gap >= 30
+        return 0
+      end
 
       #Exact match - not going to happen with these data, but here anyway
       if given1 == given2
@@ -184,6 +198,21 @@ module Collector
         models.each do |model|
           klass = Object.const_get model
           klass.where(agent_id: a.id).update_all(agent_id: a.canonical_id, original_agent_id: a.id)
+        end
+      end
+      pbar.finish
+    end
+
+    def erroneous_reassignment
+      agents = Agent.where("id = canonical_id")
+      pbar = ProgressBar.new("Erroneous", agents.count)
+      counter = 0
+      agents.find_each do |a|
+        counter += 1
+        pbar.set(counter)
+        gap = a.recordings_year_range.max - a.recordings_year_range.min rescue 0
+        if gap >= 50
+          #Houston, we have a problem
         end
       end
       pbar.finish

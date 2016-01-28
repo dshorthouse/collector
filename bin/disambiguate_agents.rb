@@ -37,7 +37,8 @@ if options[:write]
 end
 
 puts 'Starting to disambiguate agents'
-graphs.disambiguate
+#graphs.disambiguate
+graphs.erroneous_reassignment
 
 if options[:reassign]
   puts 'Starting to reassign data'

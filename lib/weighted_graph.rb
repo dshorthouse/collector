@@ -115,6 +115,17 @@ module Collector
       { nodes: nodes, edges: links }
     end
 
+    def to_vis_graph
+      nodes = []
+      each_vertex do |v|
+        options = { 'label' => v.to_s }
+        options.merge! vertex_attributes(v)
+        nodes << options
+      end
+      links = edges.map{ |e| { from: vertex_attributes(e.source)["id"], to: vertex_attributes(e.target)["id"], label: e.weight } }
+      { nodes: nodes, edges: links }
+    end
+
     # Create a dot file and png to depict the graph's vertices with decorated edges
     def write_to_graphic_file(fmt='png', dotfile="graph")
       src = dotfile + ".dot"

@@ -35,6 +35,7 @@ module Sinatra
             if extension.nil?
               haml :agent
             elsif extension == ".json"
+              @result["@id"] = "http://orcid.org/#{@result[:orcid]}" if !@result[:orcid].nil?
               @result["@context"] = "#{request.base_url}/contexts/collector.jsonld"
               @result.to_json
             end
