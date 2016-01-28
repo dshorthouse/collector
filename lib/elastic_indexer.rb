@@ -239,7 +239,7 @@ module Collector
       pbar = ProgressBar.new("Agents", imports.count)
       counter = 0
 
-      imports.find_in_batches(batch_size: 25) do |group|
+      imports.find_in_batches(batch_size: 10) do |group|
         agents = []
         group.each do |a|
           counter += 1

@@ -36,7 +36,7 @@ module Sinatra
               haml :agent
             elsif extension == ".json"
               @result["@id"] = "http://orcid.org/#{@result[:orcid]}" if !@result[:orcid].nil?
-              @result["@context"] = "#{request.base_url}/contexts/collector.jsonld"
+              @result["@context"] = "#{request.base_url}/contexts/collector.json"
               @result.to_json
             end
           end
@@ -55,7 +55,7 @@ module Sinatra
             @result.to_json
           end
 
-          app.get '/contexts/collector.jsonld' do
+          app.get '/contexts/collector.json' do
             collector_context
             @context.to_json
           end
