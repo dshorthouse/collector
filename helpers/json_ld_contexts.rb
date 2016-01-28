@@ -14,7 +14,10 @@ module Sinatra
             "affiliation" => "schema:affiliation",
             "position" => "schema:jobTitle",
             "email" => "schema:email",
-            "personal" => { "@id" => "schema:Person", "@container" => "@index" }
+            "personal" => { 
+              "@id" => "schema:Person",
+              "@container" => "@set"
+            }
           }
         }
       end

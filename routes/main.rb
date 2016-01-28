@@ -35,8 +35,11 @@ module Sinatra
             if extension.nil?
               haml :agent
             elsif extension == ".json"
-              @result["@id"] = "http://orcid.org/#{@result[:orcid]}" if !@result[:orcid].nil?
-              @result["@context"] = "#{request.base_url}/contexts/collector.json"
+              header = {
+                "@id" => "http://orcid.org/#{@result[:orcid]}",
+                "@context" => "#{request.base_url}/contexts/collector.json"
+              }
+              @result = header.merge!(@result)
               @result.to_json
             end
           end
