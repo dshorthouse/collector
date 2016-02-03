@@ -186,11 +186,11 @@ class Agent < ActiveRecord::Base
   end
 
   def determinations_institutions
-    determinations.map{|o| o.institutionCode }.uniq
+    determinations.map{|o| o.institutionCode }.uniq.reject { |c| c.empty? }
   end
 
   def recordings_institutions
-    recordings.map{|o| o.institutionCode }.uniq
+    recordings.map{|o| o.institutionCode }.uniq.reject { |c| c.empty? }
   end
 
   def determinations_year_range
@@ -231,15 +231,17 @@ class Agent < ActiveRecord::Base
                       .sort_by { |a| a[:family] }
   end
 
-  def determined_species
-    parser = ScientificNameParser.new
-    determinations.pluck(:scientificName)
-                  .compact.uniq.sort
-                  .map{ |s| parser.parse(s)[:scientificName][:canonical] rescue s }
+  def identified_taxa
+    determinations.pluck(:scientificName).compact.uniq
+  end
+
+  def identified_species
+    identified_taxa.map{ |s| Collector::TaxonUtility.canonical_species_name(s) rescue nil }
+                   .compact.sort
   end
 
   def determined_families
-    determined_taxa.group_by{|i| i }.map {|k, v| { id: k.id, family: k.family, count: v.count } }.sort_by { |a| a[:family] }
+    determined_taxa.group_by{|i| i }.map {|k, v| { id: k.id, family: k.family, count: v.size } }.sort_by { |a| a[:family] }
   end
 
   def refresh_orcid_data
@@ -260,6 +262,22 @@ class Agent < ActiveRecord::Base
     network = Collector::AgentNetwork.new(id)
     network.build
     network.to_vis
+  end
+
+  def score
+    #Naturalist score
+    naturalist_score = 0
+    if !occurrence_recorders.empty? && !occurrence_determiners.empty? && !identified_species.empty?
+      naturalist_score = identified_species.size.to_f * ((occurrence_recorders.pluck(:occurrence_id) & occurrence_determiners.pluck(:occurrence_id)).size.to_f/occurrence_recorders.size.to_f)
+    end
+
+    #Sociability score
+    networking_score = 0
+    if !recordings_with.empty? && !recordings_institutions.empty?
+      networking_score = recordings_with.size.to_f + 2 * recordings_institutions.size.to_f
+    end
+
+    Math.sqrt(naturalist_score * networking_score).to_i
   end
 
 end

@@ -1,0 +1,50 @@
+-content_for :title do
+  About
+
+%h1 About
+
+%p
+  This proof-of-concept was produced by 
+  %a{href: "https://orcid.org/0000-0001-7618-5230" } David P. Shorthouse 
+  using biodiversity occurrence data from 
+  %a{href: "http://data.canadensys.net"} Canadensys 
+  and academic information from 
+  = succeed "." do
+    %a{href: "https://orcid.org" } ORCID
+  Collector and determiner names were parsed and cleaned using the 
+  %a{href: "https://rubygems.org/gems/namae" } Namae gem 
+  among other custom regular expressions.
+  Collector networks were produced with the 
+  = succeed "." do 
+    %a{href: "https://rubygems.org/gems/rgl" } Ruby Graph Language gem
+  Scientific authority information in scientific names were extracted using the 
+  = succeed "." do
+    %a{href: "https://rubygems.org/gems/biodiversity" } Biodiversity gem
+
+%h2
+  Collector Index
+  %span.badge 100
+
+%p
+  Collectors and determiners of specimens do not currently have a measure of impact for their activities comparable to that of the 
+  %a{href: "https://en.wikipedia.org/wiki/H-index"} h-index 
+  for their publications. An attempt was made to create such an index that is easy to calculate and that incorporates the effort required to identify specimens, organize collecting trips with colleagues, and deposit curated specimens in museums. The index rewards the identification of specimens to species (the "naturalist" component) and large networks of fellow collectors with deposition of specimens in multiple museums (the "sociability" component). All measures are obtainable from digitized specimen labels. The index is calculated as follows:
+
+%img{src: "/images/index_formula.png", alt: "Collector Index formula" }
+
+%ul
+  %li
+    %i s
+    \= Number of unique species identified
+  %li
+    %i a
+    \= Number of specimens both collected and identified
+  %li
+    %i n
+    \= Total number of specimens collected and/or identified
+  %li
+    %i r
+    \= Number of colleagues collected with
+  %li
+    %i i
+    \= Number of museums where specimens deposited

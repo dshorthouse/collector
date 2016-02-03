@@ -16,6 +16,10 @@ module Sinatra
             haml :home
           end
 
+          app.get '/about' do
+            haml :about
+          end
+
           app.get '/agent.json' do
             execute_search('agent')
             format_agents.to_json
@@ -37,7 +41,8 @@ module Sinatra
             elsif extension == ".json"
               header = {
                 "@id" => "http://orcid.org/#{@result[:orcid]}",
-                "@context" => "#{request.base_url}/contexts/collector.json"
+                "@context" => "#{request.base_url}/contexts/collector.json",
+                "@type" => "schema:Person"
               }
               @result = header.merge!(@result)
               @result.to_json

@@ -25,8 +25,8 @@
 %div{itemscope: true, itemtype: "http://schema.org/Person" }
 
   %h1{id: "agent-title"}
-    %span{contenteditable: authorized? ? "true" : "false", data: "given", itemprop: "givenName" }= @result[:personal][:given]
-    %span{contenteditable: authorized? ? "true" : "false", data: "family", itemprop: "familyName" }= @result[:personal][:family]
+    %span{itemprop: "givenName" }= @result[:personal][:given]
+    %span{itemprop: "familyName" }= @result[:personal][:family]
 
   .contact-details{itemprop: "jobTitle"} #{@result[:personal][:position]}
   .contact-details{itemprop: "affiliation"} #{@result[:personal][:affiliation]}
@@ -47,99 +47,107 @@
         - name = [a[:given].presence, a[:family].presence].join(" ")
         %li #{name}
 
-%h2 Collections
+%h3
+  Collector Index
+  %span.badge
+    %a{href: "/about"} #{@result[:score]}
 
-#recordings-wrapper.clear
+- if @result[:recordings][:count] > 0
+  %h2 Collections
 
-  #recordings-map
-    #map-wrapper
-      #map
-      #legend
+  #recordings-wrapper.clear
 
-  #recordings-chart
-    %h3 Collecting Activity
-    %p.sums Total: #{number_with_delimiter(@result[:recordings][:count])}
-    #recordings
+    #recordings-map
+      #map-wrapper
+        #map
+        #legend
 
-- if @result[:recordings][:institutions].size > 0
-  #recordings-institutions
-    %h3 Collected Specimens Deposited In
-    %ul
-      - @result[:recordings][:institutions].each do |i|
-        %li #{i}
+    #recordings-chart
+      %h3 Collecting Activity
+      %p.sums Total: #{number_with_delimiter(@result[:recordings][:count])}
+      #recordings
 
-#colleagues-wrapper
+  - if @result[:recordings][:institutions].size > 0
+    #recordings-institutions
+      %h3 Collected Specimens Deposited In
+      %ul
+        - @result[:recordings][:institutions].each do |i|
+          %li #{i}
+
   - if @result[:recordings][:with].size > 0
-    %h3 Fellow Collectors
-    %p.sums Total: #{number_with_delimiter(@result[:recordings][:with].size)}
-    %ul.collectors
-      - @result[:recordings][:with].sort_by { |a| a[:family] }.each do |c|
-        %li
-          - name = [c[:given].presence, c[:family].presence].join(" ")
-          %a{href: "/agent/#{c[:id]}" }=  name
-    - if @result[:recordings][:with].size > 1
-      #social-graph
+    #colleagues-wrapper
+      %h3 Fellow Collectors
+      %p.sums Total: #{number_with_delimiter(@result[:recordings][:with].size)}
+      %ul.collectors
+        - @result[:recordings][:with].sort_by { |a| a[:family] }.each do |c|
+          %li
+            - name = [c[:given].presence, c[:family].presence].join(" ")
+            %a{href: "/agent/#{c[:id]}" }=  name
+      - if @result[:recordings][:with].size > 1
+        #social-graph
 
-%h2 Identifications
+- if @result[:determinations][:count] > 0
+  %h2 Identifications
 
-- if @result[:determinations][:families] && @result[:determinations][:families].size > 0
-  %div{ itemscope: true, itemtype: "http://schema.org/ItemList" }
-    %h3 Top Families Identified (# Specimens)
-    %ol.ranked
-      - @result[:determinations][:families].sort_by { |a| a[:count] }.reverse.first(10).each do |t|
-        %li
-          %a{href: "/taxon/#{t[:family]}" }=  t[:family]
-          (#{number_with_delimiter(t[:count])})
+  - if @result[:determinations][:families].size > 0
+    %div{ itemscope: true, itemtype: "http://schema.org/ItemList" }
+      %h3 Top Families Identified (# Specimens)
+      %ol.ranked
+        - @result[:determinations][:families].sort_by { |a| a[:count] }.reverse.first(10).each do |t|
+          %li
+            %a{href: "/taxon/#{t[:family]}" }=  t[:family]
+            (#{number_with_delimiter(t[:count])})
 
-    %h3{ itemprop: "name" } Families Identified
-    %p.sums Total: #{number_with_delimiter(@result[:determinations][:families].size)}
-    %ul.determinations
-      - @result[:determinations][:families].sort_by { |d| d[:family] }.each do |t|
-        %li
-          %a{href: "/taxon/#{t[:family]}" }
-            %span{ itemprop: "itemListElement" }= t[:family]
+      %h3{ itemprop: "name" } Families Identified
+      %p.sums Total: #{number_with_delimiter(@result[:determinations][:families].size)}
+      %ul.determinations
+        - @result[:determinations][:families].sort_by { |d| d[:family] }.each do |t|
+          %li
+            %a{href: "/taxon/#{t[:family]}" }
+              %span{ itemprop: "itemListElement" }= t[:family]
 
-#determinations-wrapper
-  #identifications.chart
-    %h3 Identification Activity
-    %p.sums Total: #{number_with_delimiter(@result[:determinations][:count])}
-    #determinations
+  #determinations-wrapper
+    #identifications.chart
+      %h3 Identification Activity
+      %p.sums Total: #{number_with_delimiter(@result[:determinations][:count])}
+      #determinations
 
-- if @result[:determinations][:institutions].size > 0
-  #determinations-institutions
-    %h3 Identified Specimens Deposited In
-    %ul
-      - @result[:determinations][:institutions].each do |i|
-        %li #{i}
+  - if @result[:determinations][:institutions].size > 0
+    #determinations-institutions
+      %h3 Identified Specimens Deposited In
+      %ul
+        - @result[:determinations][:institutions].each do |i|
+          %li #{i}
 
-%h2 Works & Taxonomy
+- if @result[:works][:named_species].size > 0 || @result[:works][:publications].size > 0 || @result[:works][:datasets].size > 0 || @result[:works][:barcodes].size > 0
+  %h2 Works & Taxonomy
 
-#description-wrapper{ itemscope: true, itemtype: "http://schema.org/ItemList" }
-  - if @result[:works][:named_species] && @result[:works][:named_species].size > 0
+- if @result[:works][:named_species].size > 0
+  #description-wrapper{ itemscope: true, itemtype: "http://schema.org/ItemList" }
     %h3{itemprop: "name"} Species Described
     %p.sums Total: #{number_with_delimiter(@result[:works][:named_species].size)}
     %ul.descriptions
       - @result[:works][:named_species].each do |s|
         %li{ itemprop: "itemListElement" } #{s[:scientificName]}
 
-#publications-wrapper{ itemscope: true, itemtype: "http://schema.org/ItemList" }
-  - if @result[:works][:publications] && @result[:works][:publications].size > 0
+- if @result[:works][:publications].size > 0
+  #publications-wrapper{ itemscope: true, itemtype: "http://schema.org/ItemList" }
     %h3{ itemprop: "name" } Publications With DOIs
     %p.sums Total: #{number_with_delimiter(@result[:works][:publications].size)}
     - @result[:works][:publications].each do |w|
       %div.citation
         %a{href: "http://doi.org/#{w[:doi]}", itemprop: "itemListElement" }= w[:citation]
 
-#datasets-wrapper{ itemscope: true, itemtype: "http://schema.org/ItemList" }
-  - if @result[:works][:datasets] && @result[:works][:datasets].size > 0
+- if @result[:works][:datasets].size > 0
+  #datasets-wrapper{ itemscope: true, itemtype: "http://schema.org/ItemList" }
     %h3{ itemprop: "name" } Datasets With DOIs
     %p.sums Total: #{number_with_delimiter(@result[:works][:datasets].size)}
     - @result[:works][:datasets].each do |d|
       %div.citation
         %a{href: "http://doi.org/#{d[:doi]}", itemprop: "itemListElement" }= d[:title]
 
-#barcodes-wrapper{ itemscope: true, itemtype: "http://schema.org/ItemList" }
-  - if @result[:works][:barcodes] && @result[:works][:barcodes].size > 0
+- if @result[:works][:barcodes].size > 0
+  #barcodes-wrapper{ itemscope: true, itemtype: "http://schema.org/ItemList" }
     %h3{ itemprop: "name" } Barcode of Life Specimen Citations
     %p.sums Total: #{number_with_delimiter(@result[:works][:barcodes].size)}
     %ul.barcodes

@@ -9,6 +9,10 @@
     %script{src: '/javascript/jquery-1.11.0.min.js', type: 'text/javascript' }
     = yield_content :scripts
   %body
+    %nav
+      %ul
+        %li
+          %a{ href: '/about' } About
     %header
       %a{ href: '/', id: 'logo' }
         %img{ src: '/images/logo.png', title: 'Collector', alt: 'Collector' }
@@ -23,17 +27,5 @@
           %a{ href: "/auth/orcid" } Log in with ORCID
 
       %p.byline Search and explore collectors and determiners of biological specimens in Canada.
-    = yield
-    %footer
-      This proof-of-concept was produced by 
-      %a{href: "https://orcid.org/0000-0001-7618-5230" } David P. Shorthouse 
-      using biodiversity occurrence data from 
-      %a{href: "http://data.canadensys.net"} Canadensys 
-      and academic information from 
-      = succeed "." do
-        %a{href: "https://orcid.org" } ORCID
-      Collector and determiner names were parsed and cleaned using the 
-      %a{href: "https://rubygems.org/gems/namae" } Namae gem 
-      among other custom regular expressions. Scientific authority information in scientific names were extracted using the 
-      = succeed "." do
-        %a{href: "https://rubygems.org/gems/biodiversity" } Biodiversity gem
+    %section.main-content
+      = yield

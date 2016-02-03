@@ -5,11 +5,10 @@ body{
   height: auto !important;
   line-height:1em;
   margin:0px;
-  padding:20px;
   min-width:620px;
 }
 h1{
-  font-size:2em;
+  font-size:2.5em;
   line-height:1.5em;
   margin:0px;
 }
@@ -21,7 +20,6 @@ h2{
   line-height: 2em;
   text-shadow:0 -1px 2px #fff;
   margin:0.5em 0;
-  text-decoration:underline;
 }
 h3{
   color:#333;
@@ -42,6 +40,9 @@ ol, ul {
   padding:0px;
   margin:0px;
 }
+li {
+  line-height:1.5em;
+}
 a{
   color:#246D80;
   text-decoration: none;
@@ -58,14 +59,44 @@ label{
 }
 
 p.byline{
-  color:#777;
+  color:#444;
   margin-top:0px;
+  font-size:1.2em;
+}
+
+nav {
+    text-align:right;
+    background-color: #ddd;
+    margin: 0;
+    overflow: hidden;
+    font-size:1.5em;
+}
+
+nav ul{
+    margin: 0;
+    padding: 0;
+}
+nav ul li {
+    display: inline-block;
+    list-style-type: none;
+}
+
+nav > ul > li > a {
+    color:#444;
+    font-weight:600;
+    display: block;
+    line-height: 1em;
+    padding: 0.5em 0.5em;
+    text-decoration: none;
 }
 
 header {
-  border-bottom:2px solid #CCC;
+  border-bottom:2px solid #ddd;
   margin-bottom:2em;
   position:relative;
+  padding:2em 10px 10px;
+  background-color:#f1f1f1;
+  height:6em;
 }
 
 #account{
@@ -78,6 +109,37 @@ header {
   color:#777;
   font-size:1.25em;
   margin:0.5em 0;
+}
+
+.badge {
+  background: #15812B; /* Old browsers */
+  background: -moz-linear-gradient(top,  #15812B 0%, #359bb7 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#15812B), color-stop(100%,#189531)); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top,  #15812B 0%,#189531 100%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top,  #15812B 0%,#189531 100%); /* Opera 11.10+ */
+  background: -ms-linear-gradient(top,  #15812B 0%,#189531 100%); /* IE10+ */
+  background: linear-gradient(to bottom,  #15812B 0%,#189531 100%); /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#15812B', endColorstr='#189531',GradientType=0 ); /* IE6-9 */
+  border-radius:10px;
+  color:#FFFFFF;
+  display:inline-block;
+  font-size:20px;
+  font-weight:600;
+  line-height:1;
+  min-width:10px;
+  padding:5px;
+  text-align:center;
+  vertical-align:middle;
+  white-space:nowrap;
+}
+
+.badge a{
+  color:#FFFFFF;
+}
+
+section.main-content{
+  padding:0 20px;
+  margin-bottom:20px;
 }
 
 footer{

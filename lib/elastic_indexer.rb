@@ -191,7 +191,8 @@ module Collector
                     }
                   }
                 }
-              }
+              },
+              score: { type: 'integer' }
             }
           },
           occurrence: {
@@ -262,13 +263,13 @@ module Collector
                             affiliation: a.affiliation,
                           },
                           recordings: {
-                            count: a.recordings.size,
+                            count: a.occurrence_recorders.size,
                             with: a.recordings_with,
                             coordinates: a.recordings_coordinates,
                             institutions: a.recordings_institutions
                           },
                           determinations: {
-                            count: a.determinations.size,
+                            count: a.occurrence_determiners.size,
                             institutions: a.determinations_institutions,
                             families: a.determined_families,
                           },
@@ -278,7 +279,8 @@ module Collector
                             named_species: a.descriptions,
                             datasets: a.datasets.pluck(:doi,:title).uniq.map{ |d| { doi: d[0], title: d[1] } }
                           },
-                          network: a.network
+                          network: a.network,
+                          score: a.score
                         }
                       }
                     }
@@ -385,7 +387,8 @@ module Collector
             named_species: a.descriptions,
             datasets: a.datasets.pluck(:doi,:title).uniq.map{ |d| { doi: d[0], title: d[1] } }
           },
-          network: a.network
+          network: a.network,
+          score: a.score
         }
       }
 

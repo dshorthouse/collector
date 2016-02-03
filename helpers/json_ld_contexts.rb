@@ -17,6 +17,14 @@ module Sinatra
             "personal" => { 
               "@id" => "schema:Person",
               "@container" => "@set"
+            },
+            "recordings" => {
+              "@id" => "_id",
+              "container" => "@set",
+              "with" => {
+                "@id" => "schema:Person",
+                "@container" => "@set"
+              }
             }
           }
         }
