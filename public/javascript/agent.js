@@ -206,6 +206,9 @@ var Agent = (function($, window) {
               width: 0.15,
               font: {
                 size: 8
+              },
+              smooth: {
+                type: 'dynamic'
               }
             },
             interaction: {
@@ -226,6 +229,10 @@ var Agent = (function($, window) {
           network = {},
           parsed = "";
 
+          if(this.graph.nodes.length >= 50) {
+            options['edges']['smooth']['type'] = 'continuous';
+          }
+
       $.map(this.graph.nodes, function(n) {
         if(n["gender"] == "female") {
           n["color"] = { background: "pink", highlight: { background: "#FFE4E1" } };
@@ -236,6 +243,11 @@ var Agent = (function($, window) {
         return n;
       });
       network = new vis.Network(container, this.graph, options);
+      network.on("selectNode", function (params) {
+        if(self.id !== params["nodes"][0]) {
+          window.location.href = "/agent/" + params["nodes"][0];
+        }
+      });
     },
     enableEdit: function() {
       var self = this, obj = {};

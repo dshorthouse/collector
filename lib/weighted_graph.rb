@@ -122,7 +122,7 @@ module Collector
         options.merge! vertex_attributes(v)
         nodes << options
       end
-      links = edges.map{ |e| { from: vertex_attributes(e.source)["id"], to: vertex_attributes(e.target)["id"], label: e.weight } }
+      links = edges.map{ |e| { from: vertex_attributes(e.source)["id"], to: vertex_attributes(e.target)["id"], value: e.weight, title: e.weight } }
       { nodes: nodes, edges: links }
     end
 

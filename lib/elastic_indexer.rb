@@ -187,7 +187,8 @@ module Collector
                     properties: {
                       from: { type: 'integer', index: 'not_analyzed' },
                       to: { type: 'integer', index: 'not_analyzed' },
-                      label: { type: 'integer', index: 'not_analyzed' }
+                      value: { type: 'integer', index: 'not_analyzed' },
+                      title: { type: 'integer', index: 'not_analyzed' }
                     }
                   }
                 }
