@@ -243,7 +243,13 @@ var Agent = (function($, window) {
         return n;
       });
       network = new vis.Network(container, this.graph, options);
-      network.on("selectNode", function (params) {
+      network.on("showPopup", function(params) {
+        $(container).css("cursor", "pointer");
+      });
+      network.on("hidePopup", function(params) {
+        $(container).css("cursor", "normal");
+      });
+      network.on("selectNode", function(params) {
         if(self.id !== params["nodes"][0]) {
           window.location.href = "/agent/" + params["nodes"][0];
         }
