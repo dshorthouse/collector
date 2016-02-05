@@ -75,7 +75,7 @@ var Collector = (function($, window) {
     createMap: function() {
       var self = this, baseLayer, drawControl;
 
-      this.map = L.map('map').setView([55.0, -100.0], 3);
+      this.map = L.map('search-map').setView([57.0, -95.0], 3);
       baseLayer = new L.StamenTileLayer('toner-lite', {
         detectRetina: true
       });

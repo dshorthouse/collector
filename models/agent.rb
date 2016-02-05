@@ -265,14 +265,17 @@ class Agent < ActiveRecord::Base
   end
 
   def score
-    naturalist_score = 0
+    naturalist_score = 1
     if !occurrence_recorders.empty? && !occurrence_determiners.empty? && !identified_species.empty?
       naturalist_score = identified_species.size.to_f * ((occurrence_recorders.pluck(:occurrence_id) & occurrence_determiners.pluck(:occurrence_id)).size.to_f/occurrence_recorders.size.to_f)
     end
 
-    sociability_score = 0
-    if !recordings_with.empty? && !recordings_institutions.empty?
-      sociability_score = recordings_with.size.to_f + 2 * recordings_institutions.size.to_f
+    sociability_score = 1
+    if !recordings_with.empty?
+      sociability_score = recordings_with.size
+    end
+    if !recordings_institutions.empty?
+      sociability_score = sociability_score + 2 * recordings_institutions.size
     end
 
     Math.sqrt(naturalist_score * sociability_score).to_i

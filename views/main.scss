@@ -175,8 +175,10 @@ footer{
 }
 #form-wrapper .search-agent{
   vertical-align:middle;
-  margin-right:2em;
+  margin:2em 1em 1em 0em;
   font-size:1.25em;
+  width:575px;
+  float:left;
 }
 #form-wrapper .search-agent div.inputs{
   margin-bottom:1em;
@@ -299,19 +301,12 @@ label input {
 
 #summary {
   color:#A0A0A0;
-  font-size:1.25em;
   margin-bottom:1em;
 }
 
-#results {
-  padding-left:625px;
-}
 .result {
-  font-size:1.25em;
   line-height:1.5em;
 }
-
-
 
 /* AGENT */
 
@@ -385,18 +380,25 @@ ul.barcodes li:hover { background-color: #F57208; }
   float:left;
 }
 
-
 #recordings-chart{
-margin-left:40px;
+  margin-left:40px;
 }
 
-#map-wrapper{
+#search-map-wrapper{
+  margin-left:650px;
   position:relative;
 }
 
+#search-map{
+  width:500px;
+  height:300px;
+}
+#map-wrapper{
+  position:relative;
+}
 #map{
-  width:600px;height:400px;
-  float:left;
+  width:600px;
+  height:400px;
 }
 #legend {
   height: 100px;

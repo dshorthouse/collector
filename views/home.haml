@@ -14,9 +14,9 @@
 -content_for :title do
   Collector
 
-%form{ id: "search_form", method: "get", action: "/", "accept-charset" => "UTF-8", class: "clear" }
-  #form-wrapper.clear
-    %div.search-agent
+#form-wrapper.clear
+  %div.search-agent
+    %form{ id: "search_form", method: "get", action: "/", "accept-charset" => "UTF-8" }
       %div.inputs
         %label{for: "typeahead-taxon"}= "Collector"
         %input.typeahead{id: "typeahead-agent", type: :text, name: "q", placeholder: "Terry Wheeler", value: "#{params[:q]}", size: 30}
@@ -26,55 +26,52 @@
       %div{id: "form-buttons" }
         %input.form-button.submit-button{type: :submit, value: "Search"}
         %input.form-button.submit-button{id: "reset_form", type: :reset, value: "Reset"}
+        %input{type: :hidden, name: "geo", id: "geo_type", value: "#{params[:geo]}"}
+        %input{type: :hidden, name: "c", id: "geo_center", value: "#{params[:c]}"}
+        %input{type: :hidden, name: "r", id: "geo_radius", value: "#{params[:r]}"}
+        %input{type: :hidden, name: "b", id: "geo_bounds", value: "#{params[:b]}"}
+        %input{type: :hidden, name: "p", id: "geo_polygon", value: "#{params[:p]}"}
+    #results
+      - if @results.respond_to?('total_entries') && @results.total_entries == 0 && !params[:q].nil?
+        #summary No results found.
 
-      %input{type: :hidden, name: "geo", id: "geo_type", value: "#{params[:geo]}"}
-      %input{type: :hidden, name: "c", id: "geo_center", value: "#{params[:c]}"}
-      %input{type: :hidden, name: "r", id: "geo_radius", value: "#{params[:r]}"}
-      %input{type: :hidden, name: "b", id: "geo_bounds", value: "#{params[:b]}"}
-      %input{type: :hidden, name: "p", id: "geo_polygon", value: "#{params[:p]}"}
+      - if @results.respond_to?('total_entries') && @results.total_entries > 0
+        #summary= "Page #{@results.current_page.to_i} of #{@results.total_entries} results"
+        - @results.each do |r|
+          %div.result
+            %div.agent
+              - if r[:_type] == 'taxon'
+                %a{href: "/taxon/#{r[:fields][:"personal.family"][0]}"}= r[:fields][:"personal.family"][0]
+              - elsif r[:_type] == 'agent'
+                - id = r[:fields][:id][0]
+                - if r[:fields].has_key? :orcid
+                  - id = r[:fields][:orcid][0].presence
+                %a{href: "/agent/#{id}"}= [r[:fields][:"personal.family"][0].presence,r[:fields][:"personal.given"][0].presence].compact.join(", ")
 
-  #map
+        = paginate @results
+  #search-map-wrapper
+    #search-map
+    %h2 Examples
+    %ul.agent-examples
+      %li
+        %a{ href: "/agent/0000-0002-7260-0350" } Terry A. Wheeler
+      %li
+        %a{ href: "/agent/0000-0002-5177-2815" } M.D. Schwarzfeld
+      %li
+        %a{ href: "/agent/0000-0002-0257-6252" } Crystal Ernst
+      %li
+        %a{ href: "/agent/0000-0002-5684-9420" } Stuart G. Hay
 
-  #results
-    - if @results.respond_to?('total_entries') && @results.total_entries == 0 && !params[:q].nil?
-      #summary No results found.
+    %ul.taxon-examples
+      %li
+        %a{ href: "/taxon/Carabidae" } Carabidae
+      %li
+        %a{ href: "/taxon/Cannabaceae" } Cannabaceae
 
-    - if @results.respond_to?('total_entries') && @results.total_entries > 0
-      #summary= "Page #{@results.current_page.to_i} of #{@results.total_entries} results"
-      - @results.each do |r|
-        %div.result
-          %div.agent
-            - if r[:_type] == 'taxon'
-              %a{href: "/taxon/#{r[:fields][:"personal.family"][0]}"}= r[:fields][:"personal.family"][0]
-            - elsif r[:_type] == 'agent'
-              - id = r[:fields][:id][0]
-              - if r[:fields].has_key? :orcid
-                - id = r[:fields][:orcid][0].presence
-              %a{href: "/agent/#{id}"}= [r[:fields][:"personal.family"][0].presence,r[:fields][:"personal.given"][0].presence].compact.join(", ")
-
-      = paginate @results
-
-%h2 Examples
-%ul.agent-examples
-  %li
-    %a{ href: "/agent/0000-0002-7260-0350" } Terry A. Wheeler
-  %li
-    %a{ href: "/agent/0000-0002-5177-2815" } M.D. Schwarzfeld
-  %li
-    %a{ href: "/agent/0000-0002-0257-6252" } Crystal Ernst
-  %li
-    %a{ href: "/agent/0000-0002-5684-9420" } Stuart G. Hay
-
-%ul.taxon-examples
-  %li
-    %a{ href: "/taxon/Carabidae" } Carabidae
-  %li
-    %a{ href: "/taxon/Cannabaceae" } Cannabaceae
-
-%ul.location-examples
-  %li
-    %a{ href: "/?q=&geo=polygon&c=&r=&b=&p=%5B%5B51.645294049305406%2C-55.8984375%5D%2C%5B50.98609893339354%2C-57.39257812499999%5D%2C%5B49.18170338770663%2C-58.62304687499999%5D%2C%5B47.724544549099676%2C-59.501953125%5D%2C%5B47.368594345213374%2C-57.9638671875%5D%2C%5B47.42808726171425%2C-56.1181640625%5D%2C%5B46.76996843356982%2C-56.2060546875%5D%2C%5B46.58906908309182%2C-53.9208984375%5D%2C%5B46.40756396630067%2C-51.85546874999999%5D%2C%5B48.3416461723746%2C-51.85546874999999%5D%2C%5B50.14874640066278%2C-53.4814453125%5D%2C%5B51.069016659603896%2C-55.1513671875%5D%5D" } Newfoundland
-  %li
-    %a{ href: "/?q=&geo=circle&c=81.79562207979932%2C-71.103515625&r=49.87033031208762&b=&p=" } Lake Hazen
-  %li
-    %a{ href: "/?q=&geo=polygon&c=&r=&b=&p=%5B%5B30.372875188118016%2C81.40869140625%5D%2C%5B28.632746799225856%2C84.9462890625%5D%2C%5B27.819644755099446%2C87.86865234374999%5D%2C%5B26.509904531413927%2C88.04443359375%5D%2C%5B26.725986812271756%2C85.01220703125%5D%2C%5B27.994401411046148%2C81.5185546875%5D%2C%5B28.786918085420226%2C80.09033203125%5D%2C%5B29.897805610155874%2C80.48583984375%5D%2C%5B30.20211367909724%2C80.9912109375%5D%5D" } Nepal
+    %ul.location-examples
+      %li
+        %a{ href: "/?q=&geo=polygon&c=&r=&b=&p=%5B%5B51.645294049305406%2C-55.8984375%5D%2C%5B50.98609893339354%2C-57.39257812499999%5D%2C%5B49.18170338770663%2C-58.62304687499999%5D%2C%5B47.724544549099676%2C-59.501953125%5D%2C%5B47.368594345213374%2C-57.9638671875%5D%2C%5B47.42808726171425%2C-56.1181640625%5D%2C%5B46.76996843356982%2C-56.2060546875%5D%2C%5B46.58906908309182%2C-53.9208984375%5D%2C%5B46.40756396630067%2C-51.85546874999999%5D%2C%5B48.3416461723746%2C-51.85546874999999%5D%2C%5B50.14874640066278%2C-53.4814453125%5D%2C%5B51.069016659603896%2C-55.1513671875%5D%5D" } Newfoundland
+      %li
+        %a{ href: "/?q=&geo=circle&c=81.79562207979932%2C-71.103515625&r=49.87033031208762&b=&p=" } Lake Hazen
+      %li
+        %a{ href: "/?q=&geo=polygon&c=&r=&b=&p=%5B%5B30.372875188118016%2C81.40869140625%5D%2C%5B28.632746799225856%2C84.9462890625%5D%2C%5B27.819644755099446%2C87.86865234374999%5D%2C%5B26.509904531413927%2C88.04443359375%5D%2C%5B26.725986812271756%2C85.01220703125%5D%2C%5B27.994401411046148%2C81.5185546875%5D%2C%5B28.786918085420226%2C80.09033203125%5D%2C%5B29.897805610155874%2C80.48583984375%5D%2C%5B30.20211367909724%2C80.9912109375%5D%5D" } Nepal
