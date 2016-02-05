@@ -186,11 +186,11 @@ class Agent < ActiveRecord::Base
   end
 
   def determinations_institutions
-    determinations.map{|o| o.institutionCode }.uniq.reject { |c| c.empty? }
+    determinations.pluck(:institutionCode).uniq.reject { |c| c.empty? }
   end
 
   def recordings_institutions
-    recordings.map{|o| o.institutionCode }.uniq.reject { |c| c.empty? }
+    recordings.pluck(:institutionCode).uniq.reject { |c| c.empty? }
   end
 
   def determinations_year_range
@@ -220,15 +220,7 @@ class Agent < ActiveRecord::Base
   end
 
   def recordings_with
-    occurrence_ids = occurrence_recorders.pluck(:occurrence_id)
-    return [] if occurrence_ids.empty?
-    OccurrenceRecorder.joins("JOIN agents ON occurrence_recorders.agent_id = agents.id")
-                      .where(occurrence_id: occurrence_ids)
-                      .where.not(agent_id: id)
-                      .pluck(:agent_id, :given, :family)
-                      .uniq
-                      .map{ |a| { id: a[0], given: a[1], family: a[2] } }
-                      .sort_by { |a| a[:family] }
+    Agent.joins(occurrence_recorders: :occurrence).where(occurrences: {id: recordings.pluck(:id)}).where.not(id: id).uniq
   end
 
   def identified_taxa
@@ -236,12 +228,20 @@ class Agent < ActiveRecord::Base
   end
 
   def identified_species
-    identified_taxa.map{ |s| Collector::TaxonUtility.canonical_species_name(s) rescue nil }
-                   .compact.sort
+    parser = ScientificNameParser.new
+    species = identified_taxa.map do |n|
+      species_name = nil
+      parsed = parser.parse(n)
+      if parsed[:scientificName][:parsed] && parsed[:scientificName][:details][0].has_key?(:species)
+        species_name = parsed[:scientificName][:canonical]
+      end
+      species_name
+    end
+    species.compact.sort
   end
 
   def determined_families
-    determined_taxa.group_by{|i| i }.map {|k, v| { id: k.id, family: k.family, count: v.size } }.sort_by { |a| a[:family] }
+    determined_taxa.group_by{|i| i }.map{|k, v| { id: k.id, family: k.family, count: v.size } }.sort_by { |a| a[:family] }
   end
 
   def refresh_orcid_data
@@ -267,7 +267,7 @@ class Agent < ActiveRecord::Base
   def score
     naturalist_score = 1
     if !occurrence_recorders.empty? && !occurrence_determiners.empty? && !identified_species.empty?
-      naturalist_score = identified_species.size.to_f * ((occurrence_recorders.pluck(:occurrence_id) & occurrence_determiners.pluck(:occurrence_id)).size.to_f/occurrence_recorders.size.to_f)
+      naturalist_score = (identified_species.size + (occurrence_recorders.pluck(:occurrence_id) & occurrence_determiners.pluck(:occurrence_id)).size)/2
     end
 
     sociability_score = 1
@@ -278,7 +278,7 @@ class Agent < ActiveRecord::Base
       sociability_score = sociability_score + 2 * recordings_institutions.size
     end
 
-    Math.sqrt(naturalist_score * sociability_score).to_i
+    Math.sqrt(naturalist_score + sociability_score).to_i
   end
 
 end

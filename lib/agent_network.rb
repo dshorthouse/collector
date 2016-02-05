@@ -40,8 +40,8 @@ module Collector
     def collect_agents(agents, depth)
       return if depth.zero?
       agents.each do |agent|
-        @agents.add(agent)
-        collect_agents(Agent.find(agent.recordings_with.map{|n| n[:id]}), depth-1)
+        @agents.add({ agent: agent, recordings: agent.recordings.pluck(:id) })
+        collect_agents(agent.recordings_with, depth-1)
       end
     end
 
@@ -54,22 +54,22 @@ module Collector
     def add_attributes
       @agents.each do |a|
         options = {}
-        if @graph.has_vertex?(a.fullname)
-          options["id"] = a.id
-          if a.id == @agent.id
+        if @graph.has_vertex?(a[:agent].fullname)
+          options["id"] = a[:agent].id
+          if a[:agent].id == @agent.id
             options["fillcolor"] = "#962825"
           end
-          if !a.gender.nil?
-            options["gender"] = a.gender
+          if !a[:agent].gender.nil?
+            options["gender"] = a[:agent].gender
           end
-          @graph.add_vertex_attributes(a.fullname, options)
+          @graph.add_vertex_attributes(a[:agent].fullname, options)
         end
       end
     end
 
     def add_edge(agent1, agent2)
-      common = agent1.recordings.pluck(:id) & agent2.recordings.pluck(:id)
-      @graph.add_edge(agent1.fullname, agent2.fullname, common.size) if common.size > 0
+      common = agent1[:recordings] & agent2[:recordings]
+      @graph.add_edge(agent1[:agent].fullname, agent2[:agent].fullname, common.size) if common.size > 0
     end
 
     def write_dot_file

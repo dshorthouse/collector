@@ -265,7 +265,7 @@ module Collector
                           },
                           recordings: {
                             count: a.occurrence_recorders.size,
-                            with: a.recordings_with,
+                            with: a.recordings_with.pluck(:id, :given, :family).map{|a| { id: a[0], given: a[1], family: a[2] }},
                             coordinates: a.recordings_coordinates,
                             institutions: a.recordings_institutions
                           },
@@ -373,7 +373,7 @@ module Collector
           },
           recordings: {
             count: a.recordings.size,
-            with: a.recordings_with,
+            with: a.recordings_with.pluck(:id, :given, :family).map{|a| { id: a[0], given: a[1], family: a[2] }},
             institutions: a.recordings_institutions,
             coordinates: a.recordings_coordinates
           },
