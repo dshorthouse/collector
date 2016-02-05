@@ -22,35 +22,38 @@
 -content_for :title do
   #{@result[:personal][:given]} #{@result[:personal][:family]}
 
-%div{itemscope: true, itemtype: "http://schema.org/Person" }
+%div{id: "agent-biography", itemscope: true, itemtype: "http://schema.org/Person", class: "clear" }
 
   %h1{id: "agent-title"}
     %span{itemprop: "givenName" }= @result[:personal][:given]
     %span{itemprop: "familyName" }= @result[:personal][:family]
 
-  .contact-details{itemprop: "jobTitle"} #{@result[:personal][:position]}
-  .contact-details{itemprop: "affiliation"} #{@result[:personal][:affiliation]}
-  .contact-details
-    - if @result[:personal][:email]
-      %a{href: "mailto:#{@result[:personal][:email]}", itemprop: "email" }= @result[:personal][:email]
-  .contact-details
-    - if @result[:orcid]
-      ORCID
+  - if @result[:personal][:aka] && @result[:personal][:aka].size > 0
+    Alternate Names: #{@result[:personal][:aka].map{|a| [a[:given].presence, a[:family].presence].join(" ")}.join(", ")}
+
+  - if !@result[:personal][:position].nil?
+    .contact-details{itemprop: "jobTitle"} #{@result[:personal][:position]}
+
+  - if !@result[:personal][:affiliation].nil?
+    .contact-details{itemprop: "affiliation"} #{@result[:personal][:affiliation]}
+
+  - if !@result[:personal][:email].nil?
+    .contact-details
+      - if @result[:personal][:email]
+        %a{href: "mailto:#{@result[:personal][:email]}", itemprop: "email" }= @result[:personal][:email]
+
+  - if !@result[:orcid].nil?
+    .contact-details.orcid
+      %span{id: "orcid-icon"}
       %a{href: "https://orcid.org/#{@result[:orcid]}", itemprop: "sameAs" }
-        https://orcid.org/#{@result[:orcid]}
+        orcid.org/#{@result[:orcid]}
 
-- if @result[:personal][:aka] && @result[:personal][:aka].size > 0
-  #aka-wrapper
-    %h4 Other Recognized Names
-    %ul.aka
-      - @result[:personal][:aka].each do |a|
-        - name = [a[:given].presence, a[:family].presence].join(" ")
-        %li #{name}
-
-%h3
-  Collector Index
-  %span.badge
-    %a{href: "/about"} #{@result[:score]}
+- if @result[:score] > 0
+  .btn.btn-primary
+    %a{href: "/about"}
+      Collector Index
+      %span.badge
+        #{@result[:score]}
 
 - if @result[:recordings][:count] > 0
   %h2 Collections
