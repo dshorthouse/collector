@@ -48,12 +48,12 @@
       %a{href: "https://orcid.org/#{@result[:orcid]}", itemprop: "sameAs" }
         orcid.org/#{@result[:orcid]}
 
-- if @result[:score] > 0
+- if @result[:collector_index] > 0
   .btn.btn-primary
     %a{href: "/about"}
       Collector Index
       %span.badge
-        #{@result[:score]}
+        #{@result[:collector_index]}
 
 - if @result[:recordings][:count] > 0
   %h2 Collections

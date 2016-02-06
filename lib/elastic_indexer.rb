@@ -193,7 +193,7 @@ module Collector
                   }
                 }
               },
-              score: { type: 'integer' }
+              collector_index: { type: 'integer' }
             }
           },
           occurrence: {
@@ -281,7 +281,7 @@ module Collector
                             datasets: a.datasets.pluck(:doi,:title).uniq.map{ |d| { doi: d[0], title: d[1] } }
                           },
                           network: a.network,
-                          score: a.score
+                          collector_index: a.collector_index
                         }
                       }
                     }
@@ -389,7 +389,7 @@ module Collector
             datasets: a.datasets.pluck(:doi,:title).uniq.map{ |d| { doi: d[0], title: d[1] } }
           },
           network: a.network,
-          score: a.score
+          collector_index: a.collector_index
         }
       }
 

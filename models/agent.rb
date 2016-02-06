@@ -229,10 +229,10 @@ class Agent < ActiveRecord::Base
 
   def identified_species
     parser = ScientificNameParser.new
-    species = identified_taxa.map do |n|
+    species = identified_taxa.map do |name|
       species_name = nil
-      parsed = parser.parse(n)
-      if parsed[:scientificName][:parsed] && parsed[:scientificName][:details][0].has_key?(:species)
+      parsed = parser.parse(name) rescue nil
+      if !parsed.nil? && parsed[:scientificName][:parsed] && parsed[:scientificName][:details][0].has_key?(:species)
         species_name = parsed[:scientificName][:canonical]
       end
       species_name
@@ -264,7 +264,7 @@ class Agent < ActiveRecord::Base
     network.to_vis
   end
 
-  def score
+  def collector_index
     naturalist_score = 1
     if !occurrence_recorders.empty? && !occurrence_determiners.empty? && !identified_species.empty?
       naturalist_score = (identified_species.size + (occurrence_recorders.pluck(:occurrence_id) & occurrence_determiners.pluck(:occurrence_id)).size)/2

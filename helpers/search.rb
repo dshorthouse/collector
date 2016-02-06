@@ -21,7 +21,7 @@ module Sinatra
         polygon = YAML::load(params[:p] || "[[0,0]]").map{ |n| n.reverse } rescue []
 
         body = { query: { match_all: {} } }
-        fields = "id,family,personal.family,personal.given,orcid"
+        fields = "id,family,personal.family,personal.given,orcid,collector_index"
         sort = ""
 
         client = Elasticsearch::Client.new
@@ -91,7 +91,7 @@ module Sinatra
 
         response = client.search index: settings.elastic_index, type: type, fields: fields, from: from, size: search_size, sort: sort, body: body
         results = response["hits"].deep_symbolize_keys
-        
+
         @results = WillPaginate::Collection.create(page, search_size, results[:total]) do |pager|
           pager.replace results[:hits]
         end
@@ -223,12 +223,36 @@ module Sinatra
         @result = response.deep_symbolize_keys!
       end
 
+      def agent_roster
+        @results = []
+
+        client = Elasticsearch::Client.new
+
+        body = {
+          query: {
+            match_all: {}
+          },
+          from: 0,
+          size: 25,
+          fields: ["id","personal.family","personal.given","orcid","collector_index"],
+          sort: {
+            collector_index: { order: "desc" }
+          }
+        }
+
+        response = client.search index: settings.elastic_index, type: 'agent', body: body
+        results = response["hits"].deep_symbolize_keys
+        @results = results[:hits]
+      end
+
       def format_agents
         @results.map{ |n|
           orcid = n[:fields][:orcid][0].presence if n[:fields].has_key? :orcid
           { id: n[:fields][:id][0],
             name: [n[:fields][:"personal.family"][0].presence, n[:fields][:"personal.given"][0].presence].compact.join(", "),
-            orcid: orcid }
+            orcid: orcid,
+            collector_index:  n[:fields][:collector_index][0]
+          }
         }
       end
 

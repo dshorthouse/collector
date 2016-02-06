@@ -20,6 +20,12 @@ module Sinatra
             haml :about
           end
 
+          app.get '/roster' do
+            agent_roster
+            format_agents
+            haml :roster
+          end
+
           app.get '/agent.json' do
             execute_search('agent')
             format_agents.to_json
