@@ -1,7 +1,19 @@
 -content_for :title do
   Roster
 
-%h1 Top Collectors
+%h1 Top 50 Collectors
 
-- @results.each do |a|
+%table{id: "roster"}
+  %thead
+    %tr
+      %th Name
+      %th.column Collector Index
+  %tbody
+  - @results.each do |agent|
+    %tr{class: cycle}
+      %td
+        - slug = !agent[:orcid].nil? ? agent[:orcid] : agent[:id]
+        %a{href: "/agent/#{slug.to_s}" }= agent[:name]
+      %td.column #{agent[:collector_index]}
+
   

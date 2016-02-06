@@ -49,6 +49,10 @@ module Sinatra
         number.to_s.reverse.gsub(/(\d{3}(?=(\d)))/, "\\1#{options[:delimiter]}").reverse
       end
 
+      def cycle
+        %w{even odd}[@_cycle = ((@_cycle || -1) + 1) % 2]
+      end
+
     end
   end
 end

@@ -233,7 +233,7 @@ module Sinatra
             match_all: {}
           },
           from: 0,
-          size: 25,
+          size: 50,
           fields: ["id","personal.family","personal.given","orcid","collector_index"],
           sort: {
             collector_index: { order: "desc" }

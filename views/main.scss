@@ -498,3 +498,45 @@ ol.ranked li {
     height: 1%; }
   *:first-child + html .pagination {
     overflow: hidden; }
+
+/* Roster */
+
+#roster {
+  border-top:1px solid #e5eff8;
+  border-right:1px solid #e5eff8;
+  border-collapse:collapse;
+  margin-top:2em;
+  }
+#roster tr{
+  line-height:1.5em;
+}
+#roster tr.odd td {
+  background:#f7fbff
+  }
+#roster td {
+  border-bottom:1px solid #e5eff8;
+  border-left:1px solid #e5eff8;
+  padding:.3em 1em;
+  text-align:left;
+  }
+#roster th {
+  font-weight:normal;
+  color: #678197;
+  text-align:left;
+  border-bottom: 1px solid #2E6DA4;
+  border-left:1px solid #2E6DA4;
+  padding:.3em 1em;
+  width:200px;
+  }
+#roster thead th {
+  background:#246D80;
+  text-align:left;
+  font-weight:bold;
+  font-size: 1.2em;
+  color:#fff;
+  padding:0.5em;
+  }
+#roster .column {
+  width:150px;
+  text-align:center;
+}

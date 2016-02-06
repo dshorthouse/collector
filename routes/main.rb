@@ -22,7 +22,7 @@ module Sinatra
 
           app.get '/roster' do
             agent_roster
-            format_agents
+            @results = format_agents
             haml :roster
           end
 
