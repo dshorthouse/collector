@@ -23,6 +23,9 @@
       %div.inputs
         %label{for: "typeahead-taxon"}= "Taxon Family"
         %input.typeahead{id: "typeahead-taxon", type: :text, name: "taxon", placeholder: "Sarcophagidae", value: "#{params[:taxon]}", size: 30}
+      %div.inputs.collector-sort
+        %label{for: "sort-collector-index"}= "Sort by Collector Index"
+        %input{id: "sort-collector-index", type: :checkbox, name: "sort", checked: params[:sort] }
       %div{id: "form-buttons" }
         %input.form-button.submit-button{type: :submit, value: "Search"}
         %input.form-button.submit-button{id: "reset_form", type: :reset, value: "Reset"}

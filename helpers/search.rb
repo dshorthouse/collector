@@ -10,6 +10,7 @@ module Sinatra
         searched_term = params[:q]
         geo = params[:geo]
         taxon = params[:taxon]
+        sort = params[:sort] ? ["collector_index:desc"] : []
         return if !(searched_term.present? || geo.present? || taxon.present?)
 
         page = (params[:page] || 1).to_i
@@ -22,7 +23,6 @@ module Sinatra
 
         body = { query: { match_all: {} } }
         fields = "id,family,personal.family,personal.given,orcid,collector_index"
-        sort = ""
 
         client = Elasticsearch::Client.new
 
@@ -50,9 +50,9 @@ module Sinatra
         if geo.present?
           if !searched_term.present?
             if type == "taxon"
-              sort = "family"
+              sort.push("family:asc")
             elsif type == "agent"
-              sort = "personal.family"
+              sort.push("personal.family:asc")
             end
           end
 
@@ -78,7 +78,7 @@ module Sinatra
 
         if taxon.present?
           if !searched_term.present?
-            sort = "family"
+            sort.push("family:asc")
           end
           filters << { term: { "determinations.families.family" => taxon } }
         end

@@ -93,10 +93,6 @@ module Sinatra
             haml :graph
           end
 
-          app.get '/socialgraph' do
-            haml :socialgraph
-          end
-
           app.get '/taxon.json' do
             execute_search('taxon')
             format_taxa.to_json
