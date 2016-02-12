@@ -1,7 +1,9 @@
 -content_for :title do
   Roster
 
-%h1 Top 50 Collectors
+%h1 Roster of #{number_with_delimiter(@results.total_entries)} Collectors and Determiners
+%p
+  #summary= "Page #{@results.current_page.to_i}"
 
 %table{id: "roster"}
   %thead
@@ -9,11 +11,14 @@
       %th Name
       %th.column Collector Index
   %tbody
-  - @results.each do |agent|
+  - @results.each do |r|
+    - agent = format_agent(r)
     %tr{class: cycle}
       %td
         - slug = !agent[:orcid].nil? ? agent[:orcid] : agent[:id]
         %a{href: "/agent/#{slug.to_s}" }= agent[:name]
       %td.column #{agent[:collector_index]}
+
+= paginate @results
 
   

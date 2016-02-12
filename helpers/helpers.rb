@@ -49,6 +49,15 @@ module Sinatra
         number.to_s.reverse.gsub(/(\d{3}(?=(\d)))/, "\\1#{options[:delimiter]}").reverse
       end
 
+      def format_agent(n)
+        orcid = n[:fields][:orcid][0].presence if n[:fields].has_key? :orcid
+        { id: n[:fields][:id][0],
+          name: [n[:fields][:"personal.family"][0].presence, n[:fields][:"personal.given"][0].presence].compact.join(", "),
+          orcid: orcid,
+          collector_index:  n[:fields][:collector_index][0]
+        }
+      end
+
       def cycle
         %w{even odd}[@_cycle = ((@_cycle || -1) + 1) % 2]
       end

@@ -225,24 +225,28 @@ module Sinatra
 
       def agent_roster
         @results = []
-
         client = Elasticsearch::Client.new
 
         body = {
           query: {
             match_all: {}
           },
-          from: 0,
-          size: 50,
           fields: ["id","personal.family","personal.given","orcid","collector_index"],
           sort: {
             collector_index: { order: "desc" }
           }
         }
 
-        response = client.search index: settings.elastic_index, type: 'agent', body: body
+        page = (params[:page] || 1).to_i
+        search_size = (params[:per] || 50).to_i
+        from = (page -1) * search_size
+
+        response = client.search index: settings.elastic_index, type: 'agent', from: from, size: search_size, body: body
         results = response["hits"].deep_symbolize_keys
-        @results = results[:hits]
+
+        @results = WillPaginate::Collection.create(page, search_size, results[:total]) do |pager|
+          pager.replace results[:hits]
+        end
       end
 
       def format_agents
