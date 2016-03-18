@@ -13,7 +13,7 @@ development:
   elastic_server: 'http://localhost:9200'
   elastic_index: 'collector'
   eol_api: 'http://eol.org/api/'
-  google_analytcis: ''
+  google_analytics: ''
 
 test:
   adapter: mysql2
