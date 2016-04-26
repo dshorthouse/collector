@@ -102,8 +102,8 @@ module Collector
               orcid: { type: 'string', index: 'not_analyzed' },
               personal: {
                 properties: {
-                  family: { type: 'string', search_analyzer: :family_search, index_analyzer: :family_index, omit_norms: true },
-                  given: { type: 'string', search_analyzer: :given_search, index_analyzer: :given_index, omit_norms: true },
+                  family: { type: 'string', search_analyzer: :family_search, analyzer: :family_index, omit_norms: true },
+                  given: { type: 'string', search_analyzer: :given_search, analyzer: :given_index, omit_norms: true },
                   gender: { type: 'string', index: 'not_analyzed' },
                   aka: {
                     type: 'nested',
@@ -199,17 +199,31 @@ module Collector
           occurrence: {
             properties: {
               id: { type: 'integer', index: 'not_analyzed' },
-              coordinates: { type: 'geo_point', lat_lon: true, fielddata: { format: 'compressed', precision: "100m" }, index: 'not_analyzed' },
+              occurrence_coordinates: { type: 'geo_point', lat_lon: true, fielddata: { format: 'compressed', precision: "100m" }, index: 'not_analyzed' },
               dateIdentified: { type: 'date', format: 'year' },
-              identifiedBy: { type: 'integer', index: 'not_analyzed' },
+              identifiedBy: {
+                type: 'nested',
+                properties: {
+                  id: { type: 'integer', index: 'not_analyzed' },
+                  family: { type: 'string', index: 'not_analyzed' },
+                  given: { type: 'string', index: 'not_analyzed' }
+                }
+              },
               eventDate: { type: 'date', format: 'year' },
-              recordedBy: { type: 'integer', index: 'not_analyzed' }
+              recordedBy: {
+                type: 'nested',
+                properties: {
+                  id: { type: 'integer', index: 'not_analyzed' },
+                  family: { type: 'string', index: 'not_analyzed' },
+                  given: { type: 'string', index: 'not_analyzed' }
+                }
+              }
             }
           },
           taxon: {
             properties: {
               id: { type: 'integer', index: 'not_analyzed' },
-              family: { type: 'string', search_analyzer: :scientific_name_search, index_analyzer: :scientific_name_index, omit_norms: true },
+              family: { type: 'string', search_analyzer: :scientific_name_search, analyzer: :scientific_name_index, omit_norms: true },
               common_name: { type: 'string', index: 'not_analyzed' },
               image_data: {
                 properties: {
@@ -228,7 +242,7 @@ module Collector
                   count: { type: 'integer', index: 'not_analyzed' }
                 }
               },
-              coordinates: { type: 'geo_point', lat_lon: true, fielddata: { format: 'compressed', precision: "5km" }, index: 'not_analyzed' },
+              taxon_coordinates: { type: 'geo_point', lat_lon: true, fielddata: { format: 'compressed', precision: "5km" }, index: 'not_analyzed' },
             }
           }
         }
@@ -241,7 +255,7 @@ module Collector
       pbar = ProgressBar.new("Agents", imports.count)
       counter = 0
 
-      imports.find_in_batches(batch_size: 10) do |group|
+      imports.find_in_batches(batch_size: 100) do |group|
         agents = []
         group.each do |a|
           counter += 1
@@ -297,13 +311,12 @@ module Collector
       counter = 0
       parser = ScientificNameParser.new
 
-      Occurrence.find_in_batches(batch_size: 1_000) do |group|
+      Occurrence.find_in_batches do |group|
         occurrences = []
         group.each do |o|
           counter += 1
           pbar.set(counter)
 
-          agents = o.agents
           date_identified = Collector::AgentUtility.valid_year(o.dateIdentified)
           event_date = Collector::AgentUtility.valid_year(o.eventDate)
           occurrences << {
@@ -311,10 +324,10 @@ module Collector
               _id: o.id,
               data: {
                 id: o.id,
-                coordinates: o.coordinates,
-                identifiedBy: agents[:determiners],
+                occurrence_coordinates: o.coordinates,
+                identifiedBy: o.determiners.pluck(:id, :given, :family).map {|d| { id: d[0], given: d[1], family: d[2] } },
                 dateIdentified: !date_identified.nil? ? date_identified.to_s : nil,
-                recordedBy: agents[:recorders],
+                recordedBy: o.recorders.pluck(:id, :given, :family).map {|d| { id: d[0], given: d[1], family: d[2] } },
                 eventDate: !event_date.nil? ? event_date.to_s : nil
               }
             }
@@ -344,8 +357,8 @@ module Collector
                         family: t.family,
                         common_name: t.common,
                         image_data: t.image_data,
-                        identifiedBy: t.determinations.group_by{ |i| i }.map {|k, v| { id: k.id, given: k.given, family: k.family, count: v.count } },
-                        coordinates: t.occurrence_coordinates
+                        identifiedBy: t.determinations.pluck(:id, :given, :family).group_by{ |i| i }.map {|k, v| { id: k[0], given: k[1], family: k[2], count: v.count } },
+                        taxon_coordinates: t.occurrence_coordinates
                       }
                     }
                   }

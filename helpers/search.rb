@@ -59,7 +59,7 @@ module Sinatra
           if type == "taxon"
             geo_circle = { geo_distance: { coordinates: center, distance: radius } }
             geo_bounding_box = { geo_bounding_box: { coordinates: { top_left: [bounds[1],bounds[2]], bottom_right: [bounds[3],bounds[0]] } } }
-            geo_polygon = { geo_polygon: { coordinates: { points: polygon } } }
+            geo_polygon = { geo_polygon: { taxon_coordinates: { points: polygon } } }
           elsif type == "agent"
             geo_circle = { geo_distance: { "recordings.coordinates" => center, distance: radius } }
             geo_bounding_box = { geo_bounding_box: { "recordings.coordinates" => { top_left: [bounds[1],bounds[2]], bottom_right: [bounds[3],bounds[0]] } } }
