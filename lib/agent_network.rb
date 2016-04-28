@@ -5,6 +5,8 @@ require 'rgl/connected_components'
 require 'rgl/dot'
 
 RGL::DOT::NODE_OPTS.push("gender")
+RGL::DOT::NODE_OPTS.push("given")
+RGL::DOT::NODE_OPTS.push("family")
 RGL::DOT::NODE_OPTS.push("id")
 
 module Collector
@@ -56,6 +58,8 @@ module Collector
         options = {}
         if @graph.has_vertex?(a[:agent].fullname)
           options["id"] = a[:agent].id
+          options["given"] = a[:agent].given
+          options["family"] = a[:agent].family
           if a[:agent].id == @agent.id
             options["fillcolor"] = "#962825"
           end

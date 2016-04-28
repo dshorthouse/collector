@@ -48,7 +48,7 @@ class Dataset < ActiveRecord::Base
     Dataset.transaction do
       datasets.each do |d|
         dataset = Dataset.create_with(title: d[:title][0]).find_or_create_by(doi: d[:doi])
-        AgentDataset.create(agent_id: agent.id, dataset_id: dataset.id)
+        AgentDataset.find_or_create_by(agent_id: agent.id, dataset_id: dataset.id)
       end
     end
   end

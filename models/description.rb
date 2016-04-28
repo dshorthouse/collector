@@ -30,7 +30,7 @@ class Description < ActiveRecord::Base
                 if agent.canonical_id.nil?
                   agent.update(canonical_id: agent.id)
                 end
-                AgentDescription.create(description_id: description.id, agent_id: agent.id)
+                AgentDescription.find_or_create_by(description_id: description.id, agent_id: agent.id)
               end
             end
           end

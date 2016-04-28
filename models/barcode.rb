@@ -52,7 +52,7 @@ class Barcode < ActiveRecord::Base
       Barcode.transaction do
         barcodes.each do |b|
           barcode = Barcode.create_with(bin_uri: b[:bin_uri], catalognum: b[:catalognum]).find_or_create_by(processid: b[:processid])
-          AgentBarcode.create(agent_id: agent.id, barcode_id: barcode.id)
+          AgentBarcode.find_or_create_by(agent_id: agent.id, barcode_id: barcode.id)
         end
         agent.processed_barcodes = true
         agent.save!

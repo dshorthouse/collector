@@ -1,4 +1,7 @@
 class Agent < ActiveRecord::Base
+
+  alias_attribute :orcid, :orcid_identifier
+
   has_many :determinations, :through => :occurrence_determiners, :source => :occurrence
   has_many :occurrence_determiners
 
@@ -172,7 +175,7 @@ class Agent < ActiveRecord::Base
             if identifier[:"work-external-identifier-type"] == "DOI"
               doi = Collector::AgentUtility.doi_clean(identifier[:"work-external-identifier-id"][:value])
               work = Work.where(doi: doi).first_or_create
-              AgentWork.create(agent_id: agent.id, work_id: work.id)
+              AgentWork.find_or_create_by(agent_id: agent.id, work_id: work.id)
               break
             end
         end
@@ -186,11 +189,15 @@ class Agent < ActiveRecord::Base
   end
 
   def determinations_institutions
-    determinations.pluck(:institutionCode).uniq.reject { |c| c.empty? }
+    @determinations_institutions ||= begin
+      determinations.pluck(:institutionCode).uniq.reject { |c| c.empty? }
+    end
   end
 
   def recordings_institutions
-    recordings.pluck(:institutionCode).uniq.reject { |c| c.empty? }
+    @recordings_institutions || begin
+      recordings.pluck(:institutionCode).uniq.reject { |c| c.empty? }
+    end
   end
 
   def determinations_year_range
@@ -220,11 +227,15 @@ class Agent < ActiveRecord::Base
   end
 
   def recordings_with
-    Agent.joins(occurrence_recorders: :occurrence).where(occurrences: {id: recordings.pluck(:id)}).where.not(id: id).uniq
+    @recordings_with ||= begin
+      Agent.joins(:occurrence_recorders).where(occurrence_recorders: { occurrence_id: occurrence_recorders.pluck(:occurrence_id) }).where.not(occurrence_recorders: { agent_id: id }).uniq
+    end
   end
 
   def identified_taxa
-    determinations.pluck(:scientificName).compact.uniq
+    @identified_taxa ||= begin
+      determinations.pluck(:scientificName).compact.uniq
+    end
   end
 
   def identified_species

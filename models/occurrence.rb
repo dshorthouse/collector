@@ -56,7 +56,7 @@ class Occurrence < ActiveRecord::Base
 
       Occurrence.transaction do
         taxon = Taxon.where(family: o.family).first_or_create
-        TaxonOccurrence.create(taxon_id: taxon.id, occurrence_id: o.id)
+        TaxonOccurrence.find_or_create_by(taxon_id: taxon.id, occurrence_id: o.id)
 
         o.occurrence_determiners.each do |d|
           save_taxon_determiner(taxon.id, d.agent_id)
@@ -77,17 +77,17 @@ class Occurrence < ActiveRecord::Base
       agent = Agent.where(family: family, given: given).first_or_create
       agent.update(canonical_id: agent.id)
       if type == "determiner"
-        OccurrenceDeterminer.create(occurrence_id: id, agent_id: agent.id)
+        OccurrenceDeterminer.find_or_create_by(occurrence_id: id, agent_id: agent.id)
       end
       if type == "recorder"
-        OccurrenceRecorder.create(occurrence_id: id, agent_id: agent.id)
+        OccurrenceRecorder.find_or_create_by(occurrence_id: id, agent_id: agent.id)
       end
     end
   end
 
   def self.save_taxon_determiner(taxon_id, agent_id)
     return if taxon_id.nil? || agent_id.nil?
-    TaxonDeterminer.create(taxon_id: taxon_id, agent_id: agent_id)
+    TaxonDeterminer.find_or_create_by(taxon_id: taxon_id, agent_id: agent_id)
   end
 
   def coordinates
@@ -98,19 +98,26 @@ class Occurrence < ActiveRecord::Base
   def agents
     response = Occurrence.connection.select_all("
       SELECT
-        d.agent_id as determiner, null as recorder 
+        d.agent_id as determiner, null as recorder, a.given, a.family
       FROM 
-        occurrences o JOIN occurrence_determiners d on d.occurrence_id = o.id 
+        occurrences o 
+      JOIN occurrence_determiners d on d.occurrence_id = o.id 
+      JOIN agents a on d.agent_id = a.id
       WHERE 
         o.id = %s 
       UNION ALL 
       SELECT 
-        null as determiner, r.agent_id as recorder 
+        null as determiner, r.agent_id as recorder, a.given, a.family
       FROM 
-        occurrences o JOIN occurrence_recorders r on r.occurrence_id = o.id 
+        occurrences o 
+      JOIN occurrence_recorders r on r.occurrence_id = o.id 
+      JOIN agents a on r.agent_id = a.id
       WHERE 
         o.id = %s" % [id,id])
-    { determiners: response.map{|d| d["determiner"]}.compact, recorders: response.map{|r| r["recorder"]}.compact }
+    { 
+      determiners: response.map{|d| { id: d["determiner"], given: d["given"], family: d["family"] } if d["determiner"]}.compact, 
+      recorders: response.map{|r|  { id: r["recorder"], given: r["given"], family: r["family"] } if r["recorder"]}.compact
+    }
   end
 
 end

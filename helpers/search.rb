@@ -183,7 +183,7 @@ module Sinatra
           },
           aggregations: {
             determinations: {
-              filter: { query: { match: { identifiedBy: id } } },
+              filter: { query: { match: { identifiedBy: { id: id } } } },
               aggregations: {
                 histogram: {
                   date_histogram: {
@@ -196,7 +196,7 @@ module Sinatra
               }
             },
             recordings: {
-              filter: { query: { match: { recordedBy: id } } },
+              filter: { query: { match: { recordedBy: { id: id } } } },
               aggregations: {
                 histogram: {
                   date_histogram: {

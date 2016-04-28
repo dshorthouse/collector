@@ -255,19 +255,20 @@ module Collector
       pbar = ProgressBar.new("Agents", imports.count)
       counter = 0
 
-      imports.find_in_batches(batch_size: 100) do |group|
+      imports.find_in_batches(batch_size: 5) do |group|
         agents = []
         group.each do |a|
           counter += 1
           pbar.set(counter)
 
+          network = a.network
           agents << {
                       index: {
                         _id: a.id,
                         data: {
                           id: a.id,
                           canonical_id: a.canonical_id,
-                          orcid: a.orcid_identifier,
+                          orcid: a.orcid,
                           personal: {
                             family: a.family,
                             given: a.given,
@@ -279,7 +280,7 @@ module Collector
                           },
                           recordings: {
                             count: a.occurrence_recorders.size,
-                            with: a.recordings_with.pluck(:id, :given, :family).map{|a| { id: a[0], given: a[1], family: a[2] }},
+                            with: network[:nodes].map{|b| { id: b["id"], given: b["given"], family: b["family"] } if b["id"] != a.id }.compact,
                             coordinates: a.recordings_coordinates,
                             institutions: a.recordings_institutions
                           },
@@ -289,12 +290,12 @@ module Collector
                             families: a.determined_families,
                           },
                           works: {
-                            publications: a.works.pluck(:doi,:citation).uniq.map{ |c| { doi: c[0], citation: c[1] } },
-                            barcodes: a.barcodes.pluck(:processid,:bin_uri).uniq.map{ |b| { processid: b[0], bin_uri: b[1] } },
+                            publications: a.works.select(:doi,:citation).uniq,
+                            barcodes: a.barcodes.select(:processid,:bin_uri).uniq,
                             named_species: a.descriptions,
-                            datasets: a.datasets.pluck(:doi,:title).uniq.map{ |d| { doi: d[0], title: d[1] } }
+                            datasets: a.datasets.select(:doi,:title).uniq
                           },
-                          network: a.network,
+                          network: network,
                           collector_index: a.collector_index
                         }
                       }
@@ -309,7 +310,6 @@ module Collector
     def import_occurrences
       pbar = ProgressBar.new("Occurrences", Occurrence.count)
       counter = 0
-      parser = ScientificNameParser.new
 
       Occurrence.find_in_batches do |group|
         occurrences = []
@@ -319,15 +319,16 @@ module Collector
 
           date_identified = Collector::AgentUtility.valid_year(o.dateIdentified)
           event_date = Collector::AgentUtility.valid_year(o.eventDate)
+          agents = o.agents
           occurrences << {
             index: {
               _id: o.id,
               data: {
                 id: o.id,
                 occurrence_coordinates: o.coordinates,
-                identifiedBy: o.determiners.pluck(:id, :given, :family).map {|d| { id: d[0], given: d[1], family: d[2] } },
+                identifiedBy: agents[:determiners],
                 dateIdentified: !date_identified.nil? ? date_identified.to_s : nil,
-                recordedBy: o.recorders.pluck(:id, :given, :family).map {|d| { id: d[0], given: d[1], family: d[2] } },
+                recordedBy: agents[:recorders],
                 eventDate: !event_date.nil? ? event_date.to_s : nil
               }
             }
@@ -370,6 +371,7 @@ module Collector
     end
 
     def update_agent(a)
+      network = a.network
       doc = {
         doc: {
           id: a.id,
@@ -385,8 +387,8 @@ module Collector
             affiliation: a.affiliation,
           },
           recordings: {
-            count: a.recordings.size,
-            with: a.recordings_with.pluck(:id, :given, :family).map{|a| { id: a[0], given: a[1], family: a[2] }},
+            count: a.occurrence_recorders.size,
+            with: network[:nodes].map{|b| { id: b["id"], given: b["given"], family: b["family"] } if b["id"] != a.id }.compact,
             institutions: a.recordings_institutions,
             coordinates: a.recordings_coordinates
           },
@@ -396,12 +398,12 @@ module Collector
             families: a.determined_families
           },
           works: {
-            publications: a.works.pluck(:doi,:citation).uniq.map{ |c| { doi: c[0], citation: c[1] } },
-            barcodes: a.barcodes.pluck(:processid,:bin_uri).uniq.map{ |b| { processid: b[0], bin_uri: b[1] } },
+            publications: a.works.select(:doi,:citation).uniq,
+            barcodes: a.barcodes.select(:processid,:bin_uri).uniq,
             named_species: a.descriptions,
-            datasets: a.datasets.pluck(:doi,:title).uniq.map{ |d| { doi: d[0], title: d[1] } }
+            datasets: a.datasets.select(:doi,:title).uniq
           },
-          network: a.network,
+          network: network,
           collector_index: a.collector_index
         }
       }
