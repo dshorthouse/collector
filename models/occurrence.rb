@@ -101,8 +101,8 @@ class Occurrence < ActiveRecord::Base
         d.agent_id as determiner, null as recorder, a.given, a.family
       FROM 
         occurrences o 
-      JOIN occurrence_determiners d on d.occurrence_id = o.id 
-      JOIN agents a on d.agent_id = a.id
+      JOIN occurrence_determiners d ON d.occurrence_id = o.id 
+      JOIN agents a ON d.agent_id = a.id
       WHERE 
         o.id = %s 
       UNION ALL 
@@ -110,8 +110,8 @@ class Occurrence < ActiveRecord::Base
         null as determiner, r.agent_id as recorder, a.given, a.family
       FROM 
         occurrences o 
-      JOIN occurrence_recorders r on r.occurrence_id = o.id 
-      JOIN agents a on r.agent_id = a.id
+      JOIN occurrence_recorders r ON r.occurrence_id = o.id 
+      JOIN agents a ON r.agent_id = a.id
       WHERE 
         o.id = %s" % [id,id])
     { 

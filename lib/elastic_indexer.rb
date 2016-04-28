@@ -261,43 +261,10 @@ module Collector
           counter += 1
           pbar.set(counter)
 
-          network = a.network
           agents << {
                       index: {
                         _id: a.id,
-                        data: {
-                          id: a.id,
-                          canonical_id: a.canonical_id,
-                          orcid: a.orcid,
-                          personal: {
-                            family: a.family,
-                            given: a.given,
-                            gender: a.gender,
-                            aka: a.aka,
-                            email: a.email,
-                            position: a.position,
-                            affiliation: a.affiliation,
-                          },
-                          recordings: {
-                            count: a.occurrence_recorders.size,
-                            with: network[:nodes].map{|b| { id: b["id"], given: b["given"], family: b["family"] } if b["id"] != a.id }.compact,
-                            coordinates: a.recordings_coordinates,
-                            institutions: a.recordings_institutions
-                          },
-                          determinations: {
-                            count: a.occurrence_determiners.size,
-                            institutions: a.determinations_institutions,
-                            families: a.determined_families,
-                          },
-                          works: {
-                            publications: a.works.select(:doi,:citation).uniq,
-                            barcodes: a.barcodes.select(:processid,:bin_uri).uniq,
-                            named_species: a.descriptions,
-                            datasets: a.datasets.select(:doi,:title).uniq
-                          },
-                          network: network,
-                          collector_index: a.collector_index
-                        }
+                        data: agent_document(a)
                       }
                     }
         end
@@ -371,44 +338,46 @@ module Collector
     end
 
     def update_agent(a)
-      network = a.network
-      doc = {
-        doc: {
-          id: a.id,
-          canonical_id: a.canonical_id,
-          orcid: a.orcid_identifier,
-          personal: {
-            family: a.family,
-            given: a.given,
-            gender: a.gender,
-            aka: a.aka,
-            email: a.email,
-            position: a.position,
-            affiliation: a.affiliation,
-          },
-          recordings: {
-            count: a.occurrence_recorders.size,
-            with: network[:nodes].map{|b| { id: b["id"], given: b["given"], family: b["family"] } if b["id"] != a.id }.compact,
-            institutions: a.recordings_institutions,
-            coordinates: a.recordings_coordinates
-          },
-          determinations: {
-            count: a.determinations.size,
-            institutions: a.determinations_institutions,
-            families: a.determined_families
-          },
-          works: {
-            publications: a.works.select(:doi,:citation).uniq,
-            barcodes: a.barcodes.select(:processid,:bin_uri).uniq,
-            named_species: a.descriptions,
-            datasets: a.datasets.select(:doi,:title).uniq
-          },
-          network: network,
-          collector_index: a.collector_index
-        }
-      }
+      doc = { doc: agent_document(a) }
 
       @client.update index: @settings.elastic_index, type: 'agent', id: a.id, body: doc
+    end
+
+    def agent_document(a)
+      network = a.network
+      {
+        id: a.id,
+        canonical_id: a.canonical_id,
+        orcid: a.orcid_identifier,
+        personal: {
+          family: a.family,
+          given: a.given,
+          gender: a.gender,
+          aka: a.aka,
+          email: a.email,
+          position: a.position,
+          affiliation: a.affiliation,
+        },
+        recordings: {
+          count: a.occurrence_recorders.size,
+          with: network[:nodes].map{|b| { id: b["id"], given: b["given"], family: b["family"] } if b["id"] != a.id }.compact,
+          institutions: a.recordings_institutions,
+          coordinates: a.recordings_coordinates
+        },
+        determinations: {
+          count: a.determinations.size,
+          institutions: a.determinations_institutions,
+          families: a.determined_families
+        },
+        works: {
+          publications: a.works.select(:doi,:citation).uniq,
+          barcodes: a.barcodes.select(:processid,:bin_uri).uniq,
+          named_species: a.descriptions,
+          datasets: a.datasets.select(:doi,:title).uniq
+        },
+        network: network,
+        collector_index: a.collector_index
+      }
     end
 
     def refresh
