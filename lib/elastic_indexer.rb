@@ -156,8 +156,7 @@ module Collector
                   barcodes: {
                     properties: {
                       processid: { type: 'string', index: 'not_analyzed' },
-                      bin_uri: { type: 'string', index: 'not_analyzed' },
-                      catalognum: { type: 'string', index: 'not_analyzed' }
+                      bin_uri: { type: 'string', index: 'not_analyzed' }
                     }
                   },
                   named_species: {
@@ -360,7 +359,7 @@ module Collector
         },
         recordings: {
           count: a.occurrence_recorders.size,
-          with: network[:nodes].delete_if{|h| h[:id] == a.id },
+          with: network[:nodes].reject{|h| h[:id] == a.id },
           institutions: a.recordings_institutions,
           coordinates: a.recordings_coordinates
         },

@@ -176,14 +176,27 @@ module Sinatra
 
         body = {
           query: {
-            multi_match: {
-              query: id,
-              fields: ["identifiedBy", "recordedBy"]
+            bool: {
+              should: [
+                {
+                  nested: {
+                    path: "identifiedBy",
+                    query: { match: { "identifiedBy.id" => id } }
+                  }
+                },
+                {
+                  nested: {
+                    path: "recordedBy",
+                    query: { match: { "recordedBy.id" => id } }
+                  }
+                }
+              ]
             }
           },
+
           aggregations: {
             determinations: {
-              filter: { query: { match: { identifiedBy: { id: id } } } },
+              filter: { query: { nested: { path: "identifiedBy", query: { match: { "identifiedBy.id" => id } } } } },
               aggregations: {
                 histogram: {
                   date_histogram: {
@@ -196,7 +209,7 @@ module Sinatra
               }
             },
             recordings: {
-              filter: { query: { match: { recordedBy: { id: id } } } },
+              filter: { query: { nested: { path: "recordedBy", query: { match: { "recordedBy.id" => id } } } } },
               aggregations: {
                 histogram: {
                   date_histogram: {
@@ -208,7 +221,7 @@ module Sinatra
                   aggregations: {
                     geohash: {
                       geohash_grid: {
-                        field: "coordinates",
+                        field: "occurrence_coordinates",
                         precision: precision
                       }
                     }
@@ -217,6 +230,7 @@ module Sinatra
               }
             }
           }
+
         }
 
         response = client.search index: settings.elastic_index, type: "occurrence", search_type: "count", body: body
