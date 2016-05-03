@@ -4,10 +4,10 @@ require 'rgl/adjacency'
 require 'rgl/connected_components'
 require 'rgl/dot'
 
-RGL::DOT::NODE_OPTS.push("gender")
-RGL::DOT::NODE_OPTS.push("given")
-RGL::DOT::NODE_OPTS.push("family")
-RGL::DOT::NODE_OPTS.push("id")
+RGL::DOT::NODE_OPTS.push(:gender)
+RGL::DOT::NODE_OPTS.push(:given)
+RGL::DOT::NODE_OPTS.push(:family)
+RGL::DOT::NODE_OPTS.push(:id)
 
 module Collector
   class AgentNetwork
@@ -57,14 +57,14 @@ module Collector
       @agents.each do |a|
         options = {}
         if @graph.has_vertex?(a[:agent].fullname)
-          options["id"] = a[:agent].id
-          options["given"] = a[:agent].given
-          options["family"] = a[:agent].family
+          options[:id] = a[:agent].id
+          options[:given] = a[:agent].given
+          options[:family] = a[:agent].family
           if a[:agent].id == @agent.id
-            options["fillcolor"] = "#962825"
+            options[:fillcolor] = "#962825"
           end
           if !a[:agent].gender.nil?
-            options["gender"] = a[:agent].gender
+            options[:gender] = a[:agent].gender
           end
           @graph.add_vertex_attributes(a[:agent].fullname, options)
         end

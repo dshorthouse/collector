@@ -121,17 +121,17 @@ module Collector
     end
 
     def to_dot_graph(params = {})
-      params['name'] ||= self.class.name.gsub(/:/, '_')
-      fontsize       = params['fontsize'] ? params['fontsize'] : '8'
+      params[:name] ||= self.class.name.gsub(/:/, '_')
+      fontsize       = params[:fontsize] ? params[:fontsize] : '8'
       graph          = RGL::DOT::Graph.new(params)
       edge_class     = RGL::DOT::Edge
 
       each_vertex do |v|
         name = v.to_s
         options = {
-          'name'     => name,
-          'fontsize' => fontsize,
-          'label'    => name
+          name: name,
+          fontsize: fontsize,
+          label: name
         }
         options.merge! vertex_attributes(v)
         graph << RGL::DOT::Node.new(options)
@@ -139,10 +139,10 @@ module Collector
 
       each_edge do |u, v|
         graph << edge_class.new(
-            'from'     => u.to_s,
-            'to'       => v.to_s,
-            'fontsize' => fontsize,
-            'label'    => weight(u,v)
+            from: u.to_s,
+            to: v.to_s,
+            fontsize: fontsize,
+            label: weight(u,v)
         )
       end
 

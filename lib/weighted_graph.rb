@@ -107,7 +107,7 @@ module Collector
     def to_d3_graph
       nodes = []
       each_vertex do |v|
-        options = { 'name' => v.to_s }
+        options = { name: v.to_s }
         options.merge! vertex_attributes(v)
         nodes << options
       end
@@ -118,11 +118,11 @@ module Collector
     def to_vis_graph
       nodes = []
       each_vertex do |v|
-        options = { 'label' => v.to_s }
+        options = { label: v.to_s }
         options.merge! vertex_attributes(v)
         nodes << options
       end
-      links = edges.map{ |e| { from: vertex_attributes(e.source)["id"], to: vertex_attributes(e.target)["id"], value: e.weight, title: e.weight } }
+      links = edges.map{ |e| { from: vertex_attributes(e.source)[:id], to: vertex_attributes(e.target)[:id], value: e.weight, title: e.weight } }
       { nodes: nodes, edges: links }
     end
 
@@ -140,17 +140,17 @@ module Collector
     end
 
     def to_dot_graph(params = {})
-      params['name'] ||= self.class.name.gsub(/:/, '_')
-      fontsize       = params['fontsize'] ? params['fontsize'] : '8'
+      params[:name] ||= self.class.name.gsub(/:/, '_')
+      fontsize       = params[:fontsize] ? params[:fontsize] : '8'
       graph          = RGL::DOT::Graph.new(params)
       edge_class     = RGL::DOT::Edge
 
       each_vertex do |v|
         name = v.to_s
         options = {
-          'name'     => name,
-          'fontsize' => fontsize,
-          'label'    => name
+          name: name,
+          fontsize: fontsize,
+          label: name
         }
         options.merge! vertex_attributes(v)
         graph << RGL::DOT::Node.new(options)
@@ -158,10 +158,10 @@ module Collector
 
       each_edge do |u, v|
         graph << edge_class.new(
-            'from'     => u.to_s,
-            'to'       => v.to_s,
-            'fontsize' => fontsize,
-            'label'    => weight(u,v)
+            from: u.to_s,
+            to: v.to_s,
+            fontsize: fontsize,
+            label: weight(u,v)
         )
       end
 

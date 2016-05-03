@@ -1,7 +1,5 @@
 class Agent < ActiveRecord::Base
 
-  alias_attribute :orcid, :orcid_identifier
-
   has_many :determinations, :through => :occurrence_determiners, :source => :occurrence
   has_many :occurrence_determiners
 
@@ -76,12 +74,12 @@ class Agent < ActiveRecord::Base
       matches[orcid_given] = orcid_id
       matches[orcid_credit] = orcid_id
     end
-    agent.orcid_identifier = matches[agent.fullname] || matches[agent.given]
+    agent.orcid = matches[agent.fullname] || matches[agent.given]
   end
 
   def self.populate_profiles
     count = 0
-    agents = Agent.where.not(orcid_identifier: nil)
+    agents = Agent.where.not(orcid: nil)
     pbar = ProgressBar.new("Profiles", agents.count)
 
     agents.find_each do |agent|
@@ -91,7 +89,7 @@ class Agent < ActiveRecord::Base
       next if agent.processed_profile
       response = RestClient::Request.execute(
         method: :get,
-        url: Sinatra::Application.settings.orcid_api_url + agent.orcid_identifier + '/orcid-profile',
+        url: Sinatra::Application.settings.orcid_api_url + agent.orcid + '/orcid-profile',
         headers: { accept: 'application/orcid+json' }
       )
       parse_profile_orcid_response(agent, response)
@@ -189,15 +187,11 @@ class Agent < ActiveRecord::Base
   end
 
   def determinations_institutions
-    @determinations_institutions ||= begin
-      determinations.pluck(:institutionCode).uniq.reject { |c| c.empty? }
-    end
+    determinations.pluck(:institutionCode).uniq.reject { |c| c.empty? }
   end
 
   def recordings_institutions
-    @recordings_institutions || begin
-      recordings.pluck(:institutionCode).uniq.reject { |c| c.empty? }
-    end
+    recordings.pluck(:institutionCode).uniq.reject { |c| c.empty? }
   end
 
   def determinations_year_range
@@ -227,15 +221,11 @@ class Agent < ActiveRecord::Base
   end
 
   def recordings_with
-    @recordings_with ||= begin
-      Agent.joins(:occurrence_recorders).where(occurrence_recorders: { occurrence_id: occurrence_recorders.pluck(:occurrence_id) }).where.not(occurrence_recorders: { agent_id: id }).uniq
-    end
+    Agent.joins(:occurrence_recorders).where(occurrence_recorders: { occurrence_id: occurrence_recorders.pluck(:occurrence_id) }).where.not(occurrence_recorders: { agent_id: id }).uniq
   end
 
   def identified_taxa
-    @identified_taxa ||= begin
-      determinations.pluck(:scientificName).compact.uniq
-    end
+    determinations.pluck(:scientificName).compact.uniq
   end
 
   def identified_species
@@ -256,10 +246,10 @@ class Agent < ActiveRecord::Base
   end
 
   def refresh_orcid_data
-    return if !orcid_identifier.present?
+    return if !orcid.present?
     response = RestClient::Request.execute(
       method: :get,
-      url: Sinatra::Application.settings.orcid_api_url + orcid_identifier + '/orcid-profile',
+      url: Sinatra::Application.settings.orcid_api_url + orcid + '/orcid-profile',
       headers: { accept: 'application/orcid+json' }
     )
     self.class.parse_profile_orcid_response(self, response)
@@ -269,10 +259,14 @@ class Agent < ActiveRecord::Base
     (Agent.where(canonical_id: id).where.not(id: id) | Agent.where(canonical_id: canonical_id).where.not(id: id)).map{|a| {family: a.family, given: a.given}}
   end
 
-  def network
-    network = Collector::AgentNetwork.new(id)
-    network.build
-    network.to_vis
+  def network(use_cache: true)
+    if use_cache && network_cache
+      JSON.parse(network_cache, symbolize_names: true)
+    else
+      network = Collector::AgentNetwork.new(id)
+      network.build
+      network.to_vis
+    end
   end
 
   def collector_index
@@ -282,9 +276,13 @@ class Agent < ActiveRecord::Base
     end
 
     sociability_score = 1
-    if !recordings_with.empty?
+    if network_cache
+      nodes = JSON.parse(network_cache, symbolize_names: true)[:nodes].size
+      sociability_score =  nodes - 1 if nodes > 2
+    elsif !recordings_with.empty?
       sociability_score = recordings_with.size
     end
+
     if !recordings_institutions.empty?
       sociability_score = sociability_score + 2 * recordings_institutions.size
     end

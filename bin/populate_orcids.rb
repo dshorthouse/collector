@@ -19,7 +19,7 @@ end.parse!
 
 if options[:reset]
   puts "Resetting data"
-  Agent.connection.execute("UPDATE agents set processed_orcid = NULL and orcid_identifier = NULL")
+  Agent.connection.execute("UPDATE agents set processed_orcid = NULL and orcid = NULL")
 end
 
 puts 'Starting to populate ORCIDs'

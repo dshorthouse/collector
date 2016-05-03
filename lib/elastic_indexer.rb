@@ -255,7 +255,7 @@ module Collector
       pbar = ProgressBar.new("Agents", imports.count)
       counter = 0
 
-      imports.find_in_batches(batch_size: 5) do |group|
+      imports.find_in_batches(batch_size: 15) do |group|
         agents = []
         group.each do |a|
           counter += 1
@@ -348,7 +348,7 @@ module Collector
       {
         id: a.id,
         canonical_id: a.canonical_id,
-        orcid: a.orcid_identifier,
+        orcid: a.orcid,
         personal: {
           family: a.family,
           given: a.given,
@@ -360,7 +360,7 @@ module Collector
         },
         recordings: {
           count: a.occurrence_recorders.size,
-          with: network[:nodes].map{|b| { id: b["id"], given: b["given"], family: b["family"] } if b["id"] != a.id }.compact,
+          with: network[:nodes].delete_if{|h| h[:id] == a.id },
           institutions: a.recordings_institutions,
           coordinates: a.recordings_coordinates
         },
