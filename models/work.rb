@@ -3,13 +3,11 @@ class Work < ActiveRecord::Base
   has_many :agent_works
 
   def self.populate_citations
-    count = 0
     works = Work.where(processed: nil)
-    pbar = ProgressBar.new("Works", works.count)
+    pbar = ProgressBar.create(title: "Works", total: works.count, autofinish: false, format: '%t %b>> %i| %e')
 
     works.find_each do |w|
-      count += 1
-      pbar.set(count)
+      pbar.increment
       response = RestClient::Request.execute(
         method: :get,
         url: "http://crosscite.org/citeproc/format?style=entomologia-experimentalis-et-applicata&lang=en-US&doi=" + w.doi

@@ -7,11 +7,10 @@ class Taxon < ActiveRecord::Base
 
   def self.populate_metadata
     count = 0
-    pbar = ProgressBar.new("Metadata", Taxon.count)
+    pbar = ProgressBar.create(title: "Metadata", total: Taxon.count, autofinish: false, format: '%t %b>> %i| %e')
 
     Taxon.find_each do |t|
-      count += 1
-      pbar.set(count)
+      pbar.increment
       eol_metadata(t)
       gn_hierarchies(t)
     end

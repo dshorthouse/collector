@@ -26,12 +26,10 @@ OptionParser.new do |opts|
 end.parse!
 
 if options[:all_agents]
-  count = 0
   agents = Agent.where("id = canonical_id")
-  pbar = ProgressBar.new("Agents", agents.count)
+  pbar = ProgressBar.create(title: "Agents", total: agents.count, autofinish: false, format: '%t %b>> %i| %e')
   agents.find_each do |a|
-    count += 1
-    pbar.set(count)
+    pbar.increment
     index = Collector::ElasticIndexer.new
     index.update_agent(a)
   end

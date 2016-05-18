@@ -4,15 +4,13 @@ class Description < ActiveRecord::Base
 
   def self.populate_agents
     types = Occurrence.where("typeStatus LIKE '%type%'")
-    pbar = ProgressBar.new("Descriptions", types.count)
-    count = 0
+    pbar = ProgressBar.create(title: "Descriptions", total: types.count, autofinish: false, format: '%t %b>> %i| %e')
     parser = ScientificNameParser.new
 
     types.pluck(:scientificName).uniq.each do |namestring|
       authors = []
       year = nil
-      count += 1
-      pbar.set(count)
+      pbar.increment
 
       parsed_scientific_name = parser.parse(namestring.gsub(/\A"|"\Z/, ''))[:scientificName] rescue nil
       normalized_scientific_name = parsed_scientific_name[:normalized] rescue nil

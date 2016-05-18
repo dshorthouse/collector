@@ -1,6 +1,5 @@
 #!/bin/sh
 
-./bin/populate_occurrences.rb --truncate
 ./bin/populate_agents.rb --truncate
 ./bin/populate_taxa.rb --truncate
 ./bin/populate_genders.rb

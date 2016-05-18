@@ -28,11 +28,9 @@ end.parse!
 if options[:all_agents]
   puts 'Creating agent waypoint graphs for errors'
   agents = Agent.where("id = canonical_id")
-  pbar = ProgressBar.new("Agents", agents.count)
-  count = 0
+  pbar = ProgressBar.create(title: "Agents", total: agents.count, autofinish: false, format: '%t %b>> %i| %e')
   agents.find_each do |a|
-    count += 1
-    pbar.set(count)
+    pbar.increment
     next if File.file?("public/images/graphs/waypoints/#{a.id}.dot")
     graph = Collector::AgentWaypoint.new(a.id)
     graph.build

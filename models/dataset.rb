@@ -2,12 +2,10 @@ class Dataset < ActiveRecord::Base
 
   def self.populate_datasets
     datasets = Agent.where("id = canonical_id AND processed_datasets IS NULL").where.not(given: [nil,''])
-    pbar = ProgressBar.new("Datasets", datasets.count)
-    count = 0
+    pbar = ProgressBar.create(title: "Datasets", total: datasets.count, autofinish: false, format: '%t %b>> %i| %e')
 
     datasets.find_each do |agent|
-      count += 1
-      pbar.set(count)
+      pbar.increment
 
       search = 'contributor:' + URI::encode(agent.fullname)
       response = send_datacite_request(search)

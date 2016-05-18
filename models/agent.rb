@@ -32,13 +32,11 @@ class Agent < ActiveRecord::Base
   end
 
   def self.populate_orcids
-    count = 0
     agents = Agent.where("id = canonical_id AND length(given) > 0 AND processed_orcid IS NULL")
-    pbar = ProgressBar.new("ORCID", agents.count)
+    pbar = ProgressBar.create(title: "ORCID", total: agents.count, autofinish: false, format: '%t %b>> %i| %e')
 
     agents.find_each do |agent|
-      count += 1
-      pbar.set(count)
+      pbar.increment
 
       if !agent.family.empty? && !agent.given.empty?
         max_year = [agent.determinations_year_range.max, agent.recordings_year_range.max].compact.max
@@ -78,13 +76,11 @@ class Agent < ActiveRecord::Base
   end
 
   def self.populate_profiles
-    count = 0
     agents = Agent.where.not(orcid: nil)
-    pbar = ProgressBar.new("Profiles", agents.count)
+    pbar = ProgressBar.create(title: "Profiles", total: agents.count, autofinish: false, format: '%t %b>> %i| %e')
 
     agents.find_each do |agent|
-      count += 1
-      pbar.set(count)
+      pbar.increment
 
       next if agent.processed_profile
       response = RestClient::Request.execute(
@@ -110,13 +106,11 @@ class Agent < ActiveRecord::Base
 
   # Using data from https://github.com/guydavis/babynamemap/blob/master/db.sql.gz
   def self.search_gender
-    count = 0
     agents = Agent.where("length(given) > 1", gender: nil)
-    pbar = ProgressBar.new("Genders", agents.count)
+    pbar = ProgressBar.create(title: "Genders", total: agents.count, autofinish: false, format: '%t %b>> %i| %e')
 
     agents.find_each do |a|
-      count += 1
-      pbar.set(count)
+      pbar.increment
 
       first_name = a.given.split.first.strip
       next if first_name.include? "."

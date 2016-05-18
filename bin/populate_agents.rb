@@ -19,14 +19,19 @@ end.parse!
 
 if options[:truncate]
   puts "Truncating data"
-  Occurrence.connection.execute("TRUNCATE TABLE agents")
-  Occurrence.connection.execute("TRUNCATE TABLE occurrence_determiners")
-  Occurrence.connection.execute("TRUNCATE TABLE occurrence_recorders")
-  Occurrence.connection.execute("TRUNCATE TABLE agent_barcodes")
-  Occurrence.connection.execute("TRUNCATE TABLE agent_descriptions")
-  Occurrence.connection.execute("TRUNCATE TABLE agent_works")
-  Occurrence.connection.execute("TRUNCATE TABLE agent_datasets")
-  Occurrence.connection.execute("TRUNCATE TABLE taxon_determiners")
+  tables = [
+    "agents", 
+    "occurrence_determiners", 
+    "occurrence_recorders", 
+    "agent_barcodes", 
+    "agent_descriptions",
+    "agent_works",
+    "agent_datasets",
+    "taxon_determiners"
+  ]
+  tables.each do |table|
+    Occurrence.connection.execute("TRUNCATE TABLE #{table}")
+  end
 end
 
 puts 'Starting to populate agents'

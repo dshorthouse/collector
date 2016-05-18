@@ -6,6 +6,7 @@ module Collector
     def initialize
       @client = Elasticsearch::Client.new
       @settings = Sinatra::Application.settings
+      @processes = 8
     end
 
     def delete
@@ -251,72 +252,58 @@ module Collector
 
     def import_agents
       imports = Agent.where("id = canonical_id")
-      pbar = ProgressBar.new("Agents", imports.count)
-      counter = 0
-
-      imports.find_in_batches(batch_size: 15) do |group|
-        agents = []
-        group.each do |a|
-          counter += 1
-          pbar.set(counter)
-
-          agents << {
-                      index: {
-                        _id: a.id,
-                        data: agent_document(a)
-                      }
-                    }
+      unit = imports.count/@processes
+      Parallel.map(0..@processes, progress: "Agents", in_processes: @processes) do |i|
+        imports.find_in_batches(batch_size: 50, start: unit * i) do |group|
+          agents = []
+          group.each do |a|
+              agents << {
+                index: {
+                  _id: a.id,
+                  data: agent_document(a)
+                }
+              }
+          end
+          @client.bulk index: @settings.elastic_index, type: 'agent', refresh: false, body: agents
         end
-        @client.bulk index: @settings.elastic_index, type: 'agent', body: agents
-      end
-
-      pbar.finish
+      end 
     end
 
     def import_occurrences
-      pbar = ProgressBar.new("Occurrences", Occurrence.count)
-      counter = 0
-
-      Occurrence.find_in_batches do |group|
-        occurrences = []
-        group.each do |o|
-          counter += 1
-          pbar.set(counter)
-
-          date_identified = Collector::AgentUtility.valid_year(o.dateIdentified)
-          event_date = Collector::AgentUtility.valid_year(o.eventDate)
-          agents = o.agents
-          occurrences << {
-            index: {
-              _id: o.id,
-              data: {
-                id: o.id,
-                occurrence_coordinates: o.coordinates,
-                identifiedBy: agents[:determiners],
-                dateIdentified: !date_identified.nil? ? date_identified.to_s : nil,
-                recordedBy: agents[:recorders],
-                eventDate: !event_date.nil? ? event_date.to_s : nil
+      unit = Occurrence.count/@processes
+      Parallel.map(0..@processes, progress: "Occurrences", in_processes: @processes) do |i|
+        Occurrence.find_in_batches(start: unit * i) do |group|
+          occurrences = []
+          group.each do |o|
+            date_identified = Collector::AgentUtility.valid_year(o.dateIdentified)
+            event_date = Collector::AgentUtility.valid_year(o.eventDate)
+            agents = o.agents
+            occurrences << {
+              index: {
+                _id: o.id,
+                data: {
+                  id: o.id,
+                  occurrence_coordinates: o.coordinates,
+                  identifiedBy: agents[:determiners],
+                  dateIdentified: !date_identified.nil? ? date_identified.to_s : nil,
+                  recordedBy: agents[:recorders],
+                  eventDate: !event_date.nil? ? event_date.to_s : nil
+                }
               }
             }
-          }
+          end
+          @client.bulk index: @settings.elastic_index, type: 'occurrence', refresh: false, body: occurrences
         end
-        @client.bulk index: @settings.elastic_index, type: 'occurrence', body: occurrences
       end
-
-      pbar.finish
     end
 
     def import_taxa
-      pbar = ProgressBar.new("Taxa", Taxon.count)
-      counter = 0
-
-      Taxon.find_in_batches(batch_size: 50) do |group|
-        taxa = []
-        group.each do |t|
-          counter += 1
-          pbar.set(counter)
-
-          taxa << {
+      unit = Taxon.count/@processes
+      Parallel.map(0..@processes, progress: "Taxa", in_processes: @processes) do |i|
+        Taxon.find_in_batches(batch_size: 1_000, start: unit * i) do |group|
+          taxa = []
+          group.each do |t|
+            taxa << {
                     index: {
                       _id: t.id,
                       data: {
@@ -329,11 +316,10 @@ module Collector
                       }
                     }
                   }
+          end
+          @client.bulk index: @settings.elastic_index, type: 'taxon', refresh: false, body: taxa
         end
-        @client.bulk index: @settings.elastic_index, type: 'taxon', body: taxa
       end
-
-      pbar.finish
     end
 
     def update_agent(a)

@@ -22,7 +22,9 @@ gem 'require_all'
 gem 'rgl'
 gem 'rack-google-analytics'
 gem 'nokogiri'
-gem 'progressbar'
+gem 'ruby-progressbar'
+gem 'parallel'
+gem 'dwc-archive'
 
 group :production do
 end

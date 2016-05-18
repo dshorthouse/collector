@@ -8,24 +8,10 @@ class Occurrence < ActiveRecord::Base
   has_many :taxa, :through => :taxon_occurrences, :source => :taxon
   has_many :taxon_occurrences
 
-  def self.populate_data(infile)
-    # data file downloaded and extracted from http://data.canadensys.net
-    sql = "LOAD DATA LOCAL INFILE '#{infile}' 
-           INTO TABLE occurrences 
-           FIELDS TERMINATED BY '\t' 
-           LINES TERMINATED BY '\n' 
-           IGNORE 1 LINES"
-    Occurrence.connection.execute(sql)
-  end
-
   def self.populate_agents
-    pbar = ProgressBar.new("Agents", Occurrence.count)
-    count = 0
-
+    pbar = ProgressBar.create(title: "Agents", total: Occurrence.count, autofinish: false, format: '%t %b>> %i| %e')
     Occurrence.find_each do |o|
-      count += 1
-      pbar.set(count)
-
+      pbar.increment
       next if o.identifiedBy.nil? && o.recordedBy.nil?
 
       if o.identifiedBy
@@ -41,18 +27,14 @@ class Occurrence < ActiveRecord::Base
       end
 
     end
-
     pbar.finish
   end
 
   def self.populate_taxa
     taxa = Occurrence.where.not(identifiedBy: [nil, ''], family: [nil,''])
-    pbar = ProgressBar.new("Taxa", taxa.count)
-    count = 0
-
+    pbar = ProgressBar.create(title: "Taxa", total: taxa.count, autofinish: false, format: '%t %b>> %i| %e')
     taxa.find_each do |o|
-      count += 1
-      pbar.set(count)
+      pbar.increment
 
       Occurrence.transaction do
         taxon = Taxon.where(family: o.family).first_or_create

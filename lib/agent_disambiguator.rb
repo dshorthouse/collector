@@ -22,8 +22,7 @@ module Collector
 
     def disambiguate
       duplicates = Agent.where("family NOT LIKE '%.%'").group(:family).count.map{ |k,v| k if v > 1 }.compact
-      pbar = ProgressBar.new("Agents", duplicates.count)
-      counter = 0
+      pbar = ProgressBar.create(title: "Agents", total: duplicates.count, autofinish: false, format: '%t %b>> %i| %e')
 
       duplicates.each do |d|
         @graph = WeightedGraph.new
@@ -47,8 +46,7 @@ module Collector
         write_graphic_file('pruned') if @write_graphics
         combine_subgraphs
 
-        counter += 1
-        pbar.set(counter)
+        pbar.increment
       end
 
       pbar.finish
@@ -190,11 +188,9 @@ module Collector
     def reassign_data
       agents = Agent.where("id != canonical_id")
       models = ["OccurrenceDeterminer", "OccurrenceRecorder", "TaxonDeterminer", "AgentWork", "AgentDescription", "AgentBarcode", "AgentDataset"]
-      pbar = ProgressBar.new("Reassign", agents.count)
-      counter = 0
+      pbar = ProgressBar.create(title: "Reassign", total: agents.count, autofinish: false, format: '%t %b>> %i| %e')
       agents.find_each do |a|
-        counter += 1
-        pbar.set(counter)
+        pbar.increment
         models.each do |model|
           klass = Object.const_get model
           klass.where(agent_id: a.id).update_all(agent_id: a.canonical_id, original_agent_id: a.id)
@@ -205,11 +201,9 @@ module Collector
 
     def erroneous_reassignment
       agents = Agent.where("id = canonical_id")
-      pbar = ProgressBar.new("Erroneous", agents.count)
-      counter = 0
+      pbar = ProgressBar.create(title: "Erroneous", total: agents.count, autofinish: false, format: '%t %b>> %i| %e')
       agents.find_each do |a|
-        counter += 1
-        pbar.set(counter)
+        pbar.increment
         gap = a.recordings_year_range.max - a.recordings_year_range.min rescue 0
         if gap >= 50
           #Houston, we have a problem

@@ -1,13 +1,11 @@
 class Barcode < ActiveRecord::Base
 
   def self.populate_barcodes
-    count = 0
     barcodes = Agent.where("id = canonical_id AND processed_barcodes IS NULL").where.not(given: [nil,''])
-    pbar = ProgressBar.new("Barcodes", barcodes.count)
+    pbar = ProgressBar.create(title: "Barcodes", total: barcodes.count, autofinish: false, format: '%t %b>> %i| %e')
 
     barcodes.find_each do |agent|
-      count += 1
-      pbar.set(count)
+      pbar.increment
 
       barcodes = []
       tmp_file = "/tmp/%s.xml" % agent.id

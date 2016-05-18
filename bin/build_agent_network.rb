@@ -42,11 +42,9 @@ end
 
 if options[:all_agents]
   agents = Agent.where("id = canonical_id")
-  pbar = ProgressBar.new("Networks", agents.count)
-  count = 0
+  pbar = ProgressBar.create(title: "Networks", total: agents.count, autofinish: false, format: '%t %b>> %i| %e')
   agents.find_each do |agent|
-    count += 1
-    pbar.set(count)
+    pbar.increment
     next if agent.network_cache
     agent.network_cache = agent.network(use_cache: false).to_json
     agent.save
