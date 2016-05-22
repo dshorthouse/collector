@@ -25,6 +25,7 @@ gem 'nokogiri'
 gem 'ruby-progressbar'
 gem 'parallel'
 gem 'dwc-archive'
+gem 'redis'
 
 group :production do
 end

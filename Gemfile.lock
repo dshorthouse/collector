@@ -198,6 +198,7 @@ DEPENDENCIES
   parallel
   rack-google-analytics
   rake
+  redis
   require_all
   rest-client
   rgl

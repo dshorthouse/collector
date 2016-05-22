@@ -34,6 +34,7 @@ require 'ruby-progressbar'
 require 'rack/google-analytics'
 require 'parallel'
 require 'dwc-archive'
+require 'redis'
 
 require_all 'lib'
 require_all 'helpers'
