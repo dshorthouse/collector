@@ -14,7 +14,7 @@ OptionParser.new do |opts|
     options[:file] = file
   end
 
-  opts.on("-d", "--directory [directory]", String, "Directory containing 1+ dwc archive file(s)") do |directory|
+  opts.on("-d", "--directory [directory]", String, "Directory containing 1+ DwC archive file(s)") do |directory|
     options[:directory] = directory
   end
 
@@ -25,27 +25,33 @@ OptionParser.new do |opts|
 
 end.parse!
 
-def import_file(dwc_file)
-  dwc = DarwinCore.new(dwc_file)
-  file = File.new(dwc.core.file_path)
-  title = dwc.metadata.data[:eml][:dataset][:title] rescue "Import"
-  pbar = ProgressBar.create(title: title, total: file.readlines.size, autofinish: false, format: '%t %b>> %i| %e')
-  fields = dwc.core.data[:field].map{|f| { index: f[:attributes][:index], field: f[:attributes][:term].split("/")[-1].to_sym }}
+def import_file(dwc_file, progress = true)
+  begin
+    dwc = DarwinCore.new(dwc_file)
+    title = dwc.metadata.data[:eml][:dataset][:title] rescue "DwC"
+    fields = {}
+    dwc.core.data[:field].each{|f| fields[f[:attributes][:index].to_s] = f[:attributes][:term].split("/")[-1].to_sym}
+    file = File.new(dwc.core.file_path)
+    pbar = ProgressBar.create(title: title, total: file.readlines.size, autofinish: false, format: '%t %b>> %i| %e') if progress
 
-  dwc.core.read do |data, errors|
-    data.each do |record|
-      pbar.increment
-      new_record = {}
-      record.each_with_index do |value, index|
-        field = fields.select{|f| f[:index] == index}[0][:field] rescue :nil
-        new_record[field] = value
+    attributes = Occurrence.attribute_names
+    dwc.core.read(500) do |data, errors|
+      Occurrence.transaction do
+        data.each do |record|
+          pbar.increment if progress
+          new_record = {}
+          record.each_with_index do |value, index|
+            field = fields[index.to_s]
+            new_record[field] = value if attributes.member?(field.to_s)
+          end
+          Occurrence.create(new_record)
+        end
       end
-      occurrence = Occurrence.new
-      occurrence.attributes = new_record.reject{|k,v| !occurrence.attributes.keys.member?(k.to_s) }
-      occurrence.save
     end
+    pbar.finish if progress
+  rescue Exception => e
+    puts "#{dwc_file} failed"
   end
-  pbar.finish
 end
 
 if options[:file]
@@ -59,7 +65,9 @@ if options[:directory]
   raise "Directory not foud" unless File.directory?(directory)
   accepted_formats = [".zip", ".gzip"]
   files = Dir.entries(directory).select {|f| accepted_formats.include?(File.extname(f))}
-  files.each do |file|
-    import_file(File.join(directory, file))
+  Parallel.map(files.in_groups_of(5, false), progress: "Bulk") do |batch|
+    batch.each do |file|
+      import_file(File.join(directory, file), false)
+    end
   end
 end
