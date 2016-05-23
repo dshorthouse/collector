@@ -2,11 +2,8 @@ class Barcode < ActiveRecord::Base
 
   def self.populate_barcodes
     barcodes = Agent.where("id = canonical_id AND processed_barcodes IS NULL").where.not(given: [nil,''])
-    pbar = ProgressBar.create(title: "Barcodes", total: barcodes.count, autofinish: false, format: '%t %b>> %i| %e')
 
-    barcodes.find_each do |agent|
-      pbar.increment
-
+    Parallel.map(barcodes.find_each, progress: "Barcodes") do |agent|
       barcodes = []
       tmp_file = "/tmp/%s.xml" % agent.id
 
@@ -53,12 +50,11 @@ class Barcode < ActiveRecord::Base
           AgentBarcode.find_or_create_by(agent_id: agent.id, barcode_id: barcode.id)
         end
         agent.processed_barcodes = true
-        agent.save!
+        agent.save
       end
 
     end
 
-    pbar.finish
   end
 
 end

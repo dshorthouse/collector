@@ -18,10 +18,7 @@ OptionParser.new do |opts|
 end.parse!
 
 if options[:reset]
-  puts "Resetting data"
   Agent.connection.execute("UPDATE agents set processed_orcid = NULL and orcid = NULL")
 end
 
-puts 'Starting to populate ORCIDs'
 Agent.populate_orcids
-puts 'Done populating ORCIDs'

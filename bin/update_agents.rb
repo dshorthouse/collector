@@ -25,26 +25,19 @@ OptionParser.new do |opts|
   end
 end.parse!
 
+index = Collector::ElasticIndexer.new
+
 if options[:all_agents]
-  agents = Agent.where("id = canonical_id")
-  pbar = ProgressBar.create(title: "Agents", total: agents.count, autofinish: false, format: '%t %b>> %i| %e')
-  agents.find_each do |a|
-    pbar.increment
-    index = Collector::ElasticIndexer.new
+  Parallel.map(Agent.where("id = canonical_id").find_each, progress: "Agents") do |a|
     index.update_agent(a)
   end
-  pbar.finish
 else
   attributes = options[:agent_attributes]
   a = Agent.find(attributes["id"])
   puts "Updating %{name} ..." % { name: a.fullname }
   a.update_attributes(attributes)
-  puts "Refreshing ORCID data..."
   a.refresh_orcid_data
   Work.populate_citations
-  puts "Refreshing the search index..."
-  index = Collector::ElasticIndexer.new
   index.update_agent(a)
-  puts "Done"
 end
 

@@ -33,11 +33,7 @@ class Agent < ActiveRecord::Base
 
   def self.populate_orcids
     agents = Agent.where("id = canonical_id AND length(given) > 0 AND processed_orcid IS NULL")
-    pbar = ProgressBar.create(title: "ORCID", total: agents.count, autofinish: false, format: '%t %b>> %i| %e')
-
-    agents.find_each do |agent|
-      pbar.increment
-
+    Parallel.map(agents.find_each, progress: "ORCIDs") do |agent|
       if !agent.family.empty? && !agent.given.empty?
         max_year = [agent.determinations_year_range.max, agent.recordings_year_range.max].compact.max
         given = URI::encode(agent.given.gsub(/\./, '. ').gsub(/&/,''))
@@ -54,10 +50,8 @@ class Agent < ActiveRecord::Base
       end
 
       agent.processed_orcid = true
-      agent.save!
+      agent.save
     end
-
-    pbar.finish
   end
 
   def self.parse_search_orcid_response(agent, response)
@@ -76,13 +70,7 @@ class Agent < ActiveRecord::Base
   end
 
   def self.populate_profiles
-    agents = Agent.where.not(orcid: nil)
-    pbar = ProgressBar.create(title: "Profiles", total: agents.count, autofinish: false, format: '%t %b>> %i| %e')
-
-    agents.find_each do |agent|
-      pbar.increment
-
-      next if agent.processed_profile
+    Parallel.map(Agent.where.not(orcid: nil).where(processed_profile: nil).find_each, progress: "Profiles") do |agent|
       response = RestClient::Request.execute(
         method: :get,
         url: Sinatra::Application.settings.orcid_api_url + agent.orcid + '/orcid-profile',
@@ -90,10 +78,8 @@ class Agent < ActiveRecord::Base
       )
       parse_profile_orcid_response(agent, response)
       agent.processed_profile = true
-      agent.save!
+      agent.save
     end
-
-    pbar.finish
   end
 
   def self.rebuild_gender_hash
@@ -106,12 +92,7 @@ class Agent < ActiveRecord::Base
 
   # Using data from https://github.com/guydavis/babynamemap/blob/master/db.sql.gz
   def self.search_gender
-    agents = Agent.where("length(given) > 1", gender: nil)
-    pbar = ProgressBar.create(title: "Genders", total: agents.count, autofinish: false, format: '%t %b>> %i| %e')
-
-    agents.find_each do |a|
-      pbar.increment
-
+    Parallel.map(Agent.where("length(given) > 1", gender: nil).find_each, progress: "Genders") do |a|
       first_name = a.given.split.first.strip
       next if first_name.include? "."
       gender = Agent::GENDER_HASH[first_name]
@@ -143,16 +124,13 @@ class Agent < ActiveRecord::Base
 
       if gender
         a.gender = gender
-        a.save!
+        a.save
       end
 
     end
-
-    pbar.finish
   end
 
   def self.parse_profile_orcid_response(agent, response)
-
     Agent.transaction do
       AgentWork.delete_all(agent_id: agent.id)
       profile = JSON.parse(response, :symbolize_names => true)[:"orcid-profile"]

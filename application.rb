@@ -19,7 +19,7 @@ class COLLECTOR < Sinatra::Base
         :scope => '/authenticate'
       },
       :client_options => {
-        :site => settings.orcid_site, 
+        :site => settings.orcid_site,
         :authorize_url => settings.orcid_authorize_url,
         :token_url => settings.orcid_token_url,
         :scope => '/authenticate'

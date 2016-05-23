@@ -45,49 +45,34 @@ end.parse!
 index = Collector::ElasticIndexer.new
 
 if options[:flush]
-  puts "Flushing the #{settings.elastic_index} index"
   index.delete
-  puts "Flushed"
 end
 
 if options[:refresh]
-  puts "Refreshing the index..."
   index.refresh
-  puts "Finished refreshing the index."
 end
 
 if options[:rebuild_all]
-  puts "Flushing the index..."
   index.delete
   index.create
-  puts "Populating taxa..."
   index.import_taxa
-  puts "Populating occurrences..."
   index.import_occurrences
-  puts "Populating agents..."
   index.import_agents
-  puts "Refreshing the index..."
   index.refresh
   puts "Finished indexing #{settings.elastic_index}"
 elsif options[:rebuild_agents]
-  puts "Populating agents..."
   index.delete_agents
   index.import_agents
-  puts "Refreshing the index..."
   index.refresh
   puts "Finished indexing #{settings.elastic_index} agents"
 elsif options [:rebuild_occurrences]
-  puts "Populating occurrences..."
   index.delete_occurrences
   index.import_occurrences
-  puts "Refreshing the index..."
   index.refresh
   puts "Finished indexing #{settings.elastic_index} occurrences"
 elsif options[:rebuild_taxa]
-  puts "Populating taxa..."
   index.delete_taxa
   index.import_taxa
-  puts "Refreshing the index..."
   index.refresh
   puts "Finished indexing #{settings.elastic_index} taxa"
 end

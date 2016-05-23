@@ -36,13 +36,8 @@ if options[:write]
   graphs.write_graphics = true
 end
 
-puts 'Starting to disambiguate agents'
-#graphs.disambiguate
-graphs.erroneous_reassignment
+graphs.disambiguate
 
 if options[:reassign]
-  puts 'Starting to reassign data'
   graphs.reassign_data
 end
-
-puts 'Done disambiguating agents'

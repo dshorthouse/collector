@@ -12,7 +12,6 @@ module Collector
 
     def initialize
       @graph = {}
-      @family = nil
       @cutoff_weight = 0.8
     end
 
@@ -22,34 +21,29 @@ module Collector
 
     def disambiguate
       duplicates = Agent.where("family NOT LIKE '%.%'").group(:family).count.map{ |k,v| k if v > 1 }.compact
-      pbar = ProgressBar.create(title: "Agents", total: duplicates.count, autofinish: false, format: '%t %b>> %i| %e')
+      Parallel.map(duplicates.in_groups_of(100), progress: "Disambiguations") do |batch|
+        batch.each do |d|
+          @graph = WeightedGraph.new
+          agents = []
 
-      duplicates.each do |d|
-        @graph = WeightedGraph.new
-        @family = d
-        agents = []
-
-        Agent.where(family: d).find_each do |a|
-           if !a.given.empty?
-            agents << {
-              id: a.id, 
-              given: a.given,
-              collected_with: a.recordings_with.map{ |k| k[:family] },
-              determined_families: a.determined_families
-            }
+          Agent.where(family: d).find_each do |a|
+             if !a.given.empty?
+              agents << {
+                id: a.id, 
+                given: a.given,
+                collected_with: a.recordings_with.map{ |k| k[:family] }.uniq,
+                determined_families: a.determined_families,
+                recordings_year_range: a.recordings_year_range
+              }
+            end
           end
+          add_edges(agents)
+          write_graphic_file(d, 'raw') if @write_graphics
+          prune_graph
+          write_graphic_file(d, 'pruned') if @write_graphics
+          combine_subgraphs
         end
-
-        add_edges(agents)
-        write_graphic_file('raw') if @write_graphics
-        prune_graph
-        write_graphic_file('pruned') if @write_graphics
-        combine_subgraphs
-
-        pbar.increment
       end
-
-      pbar.finish
     end
 
     def add_edges(agents)
@@ -69,9 +63,9 @@ module Collector
       remove_isolates
     end
 
-    def write_graphic_file(type)
+    def write_graphic_file(family, type)
       if @graph.length > 1
-        @graph.write_to_graphic_file('png', 'public/images/graphs/' + @family.gsub(/[^0-9A-Za-z.\-]/, '_') + "_" + type)
+        @graph.write_to_graphic_file('png', 'public/images/graphs/' + family.gsub(/[^0-9A-Za-z.\-]/, '_') + "_" + type)
       end
     end
 
@@ -100,8 +94,8 @@ module Collector
     end
 
     def recordings_gap(agent1, agent2)
-      agent1_range = agent1.recordings_year_range
-      agent2_range = agent2.recordings_year_range
+      agent1_range = agent1[:recordings_year_range]
+      agent2_range = agent2[:recordings_year_range]
       diff1 = (agent1_range.max - agent2_range.min).abs rescue nil
       diff2 = (agent2_range.max - agent1_range.min).abs rescue nil
       [diff1, diff2].min

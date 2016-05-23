@@ -18,10 +18,7 @@ OptionParser.new do |opts|
 end.parse!
 
 if options[:reset]
-  puts "Resetting data"
   Agent.connection.execute("UPDATE agents SET gender = NULL")
 end
 
-puts 'Starting to populate genders'
 Agent.populate_genders
-puts 'Done populating genders'

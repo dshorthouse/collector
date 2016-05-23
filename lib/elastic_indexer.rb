@@ -251,74 +251,64 @@ module Collector
     end
 
     def import_agents
-      imports = Agent.where("id = canonical_id")
-      unit = imports.count/@processes
-      Parallel.map(0..@processes, progress: "Agents", in_processes: @processes) do |i|
-        imports.find_in_batches(batch_size: 50, start: unit * i) do |group|
-          agents = []
-          group.each do |a|
-              agents << {
-                index: {
-                  _id: a.id,
-                  data: agent_document(a)
-                }
+      Parallel.map(Agent.where("id = canonical_id").find_in_batches, progress: "Agents") do |batch|
+        agents = []
+        batch.each do |a|
+            agents << {
+              index: {
+                _id: a.id,
+                data: agent_document(a)
               }
-          end
-          @client.bulk index: @settings.elastic_index, type: 'agent', refresh: false, body: agents
+            }
         end
-      end 
+        @client.bulk index: @settings.elastic_index, type: 'agent', refresh: false, body: agents
+      end
     end
 
     def import_occurrences
-      unit = Occurrence.count/@processes
-      Parallel.map(0..@processes, progress: "Occurrences", in_processes: @processes) do |i|
-        Occurrence.find_in_batches(start: unit * i) do |group|
-          occurrences = []
-          group.each do |o|
-            date_identified = Collector::AgentUtility.valid_year(o.dateIdentified)
-            event_date = Collector::AgentUtility.valid_year(o.eventDate)
-            agents = o.agents
-            occurrences << {
-              index: {
-                _id: o.id,
-                data: {
-                  id: o.id,
-                  occurrence_coordinates: o.coordinates,
-                  identifiedBy: agents[:determiners],
-                  dateIdentified: !date_identified.nil? ? date_identified.to_s : nil,
-                  recordedBy: agents[:recorders],
-                  eventDate: !event_date.nil? ? event_date.to_s : nil
-                }
+      Parallel.map(Occurrence.find_in_batches, progress: "Occurrences") do |batch|
+        occurrences = []
+        batch.each do |o|
+          date_identified = Collector::AgentUtility.valid_year(o.dateIdentified)
+          event_date = Collector::AgentUtility.valid_year(o.eventDate)
+          agents = o.agents
+          occurrences << {
+            index: {
+              _id: o.id,
+              data: {
+                id: o.id,
+                occurrence_coordinates: o.coordinates,
+                identifiedBy: agents[:determiners],
+                dateIdentified: !date_identified.nil? ? date_identified.to_s : nil,
+                recordedBy: agents[:recorders],
+                eventDate: !event_date.nil? ? event_date.to_s : nil
               }
             }
-          end
-          @client.bulk index: @settings.elastic_index, type: 'occurrence', refresh: false, body: occurrences
+          }
         end
+        @client.bulk index: @settings.elastic_index, type: 'occurrence', refresh: false, body: occurrences
       end
     end
 
     def import_taxa
-      unit = Taxon.count/@processes
-      Parallel.map(0..@processes, progress: "Taxa", in_processes: @processes) do |i|
-        Taxon.find_in_batches(batch_size: 1_000, start: unit * i) do |group|
-          taxa = []
-          group.each do |t|
-            taxa << {
-                    index: {
-                      _id: t.id,
-                      data: {
-                        id: t.id,
-                        family: t.family,
-                        common_name: t.common,
-                        image_data: t.image_data,
-                        identifiedBy: t.determinations.pluck(:id, :given, :family).group_by{ |i| i }.map {|k, v| { id: k[0], given: k[1], family: k[2], count: v.count } },
-                        taxon_coordinates: t.occurrence_coordinates
-                      }
+      Parallel.map(Taxon.find_in_batches, progress: "Taxa") do |batch|
+        taxa = []
+        batch.each do |t|
+          taxa << {
+                  index: {
+                    _id: t.id,
+                    data: {
+                      id: t.id,
+                      family: t.family,
+                      common_name: t.common,
+                      image_data: t.image_data,
+                      identifiedBy: t.determinations.pluck(:id, :given, :family).group_by{ |i| i }.map {|k, v| { id: k[0], given: k[1], family: k[2], count: v.count } },
+                      taxon_coordinates: t.occurrence_coordinates
                     }
                   }
-          end
-          @client.bulk index: @settings.elastic_index, type: 'taxon', refresh: false, body: taxa
+                }
         end
+        @client.bulk index: @settings.elastic_index, type: 'taxon', refresh: false, body: taxa
       end
     end
 

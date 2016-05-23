@@ -6,32 +6,13 @@ class Taxon < ActiveRecord::Base
   has_many :taxon_occurrences
 
   def self.populate_metadata
-    count = 0
-    pbar = ProgressBar.create(title: "Metadata", total: Taxon.count, autofinish: false, format: '%t %b>> %i| %e')
-
-    Taxon.find_each do |t|
-      pbar.increment
-      eol_metadata(t)
-      gn_hierarchies(t)
+    Parallel.map(Taxon.find_each, progress: "Metadata") do |t|
+      response = RestClient::Request.execute(
+        method: :get,
+        url: Sinatra::Application.settings.eol_api + 'search/1.0.json?exact=true&q=' + URI::encode(t.family),
+      )
+      parse_search_eol_response(t, response)
     end
-
-    pbar.finish
-  end
-
-  def self.eol_metadata(t)
-    response = RestClient::Request.execute(
-      method: :get,
-      url: Sinatra::Application.settings.eol_api + 'search/1.0.json?exact=true&q=' + URI::encode(t.family),
-    )
-    parse_search_eol_response(t, response)
-  end
-
-  def self.gn_hierarchies(t)
-    response = RestClient::Request.execute(
-      method: :get,
-      url: Sinatra::Application.settings.gn_api + 'name_resolvers.json?preferred_data_sources=1&names=' + URI::encode(t.family)
-    )
-    parse_gn_response(t,response)
   end
 
   def self.parse_search_eol_response(taxon, response)
@@ -44,20 +25,6 @@ class Taxon < ActiveRecord::Base
       ) rescue nil
       parse_page_eol_response(taxon, response) if !response.nil?
     end
-  end
-
-  def self.parse_gn_response(taxon,response)
-    results = JSON.parse(response, :symbolize_names => true)
-    path = results[:data][0][:results][0][:classification_path].split("|") rescue []
-    path_ranks = results[:data][0][:results][0][:classification_path_ranks] rescue ""
-    if path.size == 5 && path_ranks == "kingdom|phylum|class|order|family"
-      taxon.kingdom = path[0]
-      taxon.phylum = path[1]
-      taxon._class = path[2]
-      taxon._order = path[3]
-      taxon.save
-    end
-    puts "\t...finished GN"
   end
 
   def self.parse_page_eol_response(taxon, response)
@@ -76,7 +43,6 @@ class Taxon < ActiveRecord::Base
     taxon.common = common
     taxon.image = image
     taxon.save
-    puts "\t...finished EOL"
   end
 
   def image_data

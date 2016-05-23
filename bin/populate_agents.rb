@@ -18,7 +18,6 @@ OptionParser.new do |opts|
 end.parse!
 
 if options[:truncate]
-  puts "Truncating data"
   tables = [
     "agents", 
     "occurrence_determiners", 
@@ -34,7 +33,5 @@ if options[:truncate]
   end
 end
 
-puts 'Starting to populate agents'
 Occurrence.populate_agents
 Description.populate_agents
-puts 'Done populating agents'

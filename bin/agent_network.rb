@@ -24,14 +24,6 @@ OptionParser.new do |opts|
     options[:social_network] = true
   end
 
-  opts.on("-k", "--kingdom [KINGDOM]", "Generate graph file for Kingdoms") do |k|
-    options[:kingdom] = k
-  end
-
-  opts.on("-p", "--phylum [PHYLUM]", "Generate graph file for Phyla") do |p|
-    options[:phylum] = p
-  end
-
   opts.on("-t", "--type [TYPE]", "Type of output, options are dot or d3") do |t|
     if ['dot', 'd3'].include? t
       options[:type] = t
@@ -54,24 +46,13 @@ if options[:social_network]
   graph = Collector::SocialNetwork.new
   graph.build
   puts 'Done creating whole network'
-elsif options[:kingdom]
-  puts 'Starting to create graph for Kingdoms as ' + options[:type]
-  graph = Collector::KingdomNetwork.new(options[:kingdom])
-  graph.build(options[:type])
-  puts 'Done creating Kingdom networks'
-elsif options[:phylum]
-  puts 'Starting to create graph for Phyla as ' + options[:type]
-  graph = Collector::PhylumNetwork.new(options[:phylum])
-  graph.build(options[:type])
-  puts 'Done creating Phylum networks'
 elsif options[:all_agents]
   puts 'Starting to create all agent network graphs as ' + options[:type]
   count = 0
   agents = Agent.where("id = canonical_id")
-  pbar = ProgressBar.new("Networks", agents.count)
+  pbar = ProgressBar.create(title: "Networks", total: agents.count, autofinish: false, format: '%t %b>> %i| %e')
   agents.find_each do |agent|
-    count += 1
-    pbar.set(count)
+    pbar.increment
     graph = Collector::AgentNetwork.new(agent.id, options[:depth], options[:type])
     graph.build
     graph.write

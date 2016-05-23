@@ -12,30 +12,41 @@ class Occurrence < ActiveRecord::Base
     @redis = Redis.new(db: 1)
     @redis.flushdb
 
-    pbar = ProgressBar.create(title: "Agents", total: Occurrence.count, autofinish: false, format: '%t %b>> %i| %e')
+    @recorders = File.open("/tmp/recorders", "w")
+    @determiners = File.open("/tmp/determiners", "w")
 
-    Occurrence.find_in_batches(batch_size: 2000) do |batches|
-      batches.each do |o|
-        pbar.increment
-        next if o.identifiedBy.nil? && o.recordedBy.nil?
+    occurrences = Occurrence.pluck(:id, :recordedBy, :identifiedBy)
+    Parallel.map(occurrences.in_groups_of(1000, false), progress: "Agents") do |batch|
+      batch.each do |o|
+        next if o[1].nil? && o[2].nil?
 
-        if o.recordedBy == o.identifiedBy
-          save_agents(parse_agents(o.recordedBy), o.id, ["recorder", "determiner"])
-        elsif o.identifiedBy.nil?
-          save_agents(parse_agents(o.recordedBy), o.id, ["recorder"])
-        elsif o.recordedBy.nil?
-          save_agents(parse_agents(o.identifiedBy), o.id, ["determiner"])
+        if o[1] == o[2]
+          save_agents(parse_agents(o[1]), o[0], ["recorder", "determiner"])
+        elsif o[2].nil?
+          save_agents(parse_agents(o[1]), o[0], ["recorder"])
+        elsif o[1].nil?
+          save_agents(parse_agents(o[2]), o[0], ["determiner"])
         else
-          save_agents(parse_agents(o.recordedBy), o.id, ["recorder"])
-          save_agents(parse_agents(o.identifiedBy), o.id, ["determiner"])
+          save_agents(parse_agents(o[1]), o[0], ["recorder"])
+          save_agents(parse_agents(o[2]), o[0], ["determiner"])
         end
       end
     end
-    pbar.finish
 
     Agent.update_all("canonical_id = id")
+
+    [@recorders,@determiners].each do |file|
+      sql = "LOAD DATA INFILE '#{file.path}' 
+             INTO TABLE occurrence_#{File.basename(file)} 
+             FIELDS TERMINATED BY ',' 
+             LINES TERMINATED BY '\n' 
+             (occurrence_id, agent_id)"
+      Occurrence.connection.execute sql
+      file.close
+      File.unlink(file)
+    end
+
     @redis.flushdb
-    pbar.finish
   end
 
   def self.parse_agents(namestring)
@@ -57,7 +68,6 @@ class Occurrence < ActiveRecord::Base
       agent_id = @redis.get(fullname)
 
       if !agent_id
-        #accommodate potential race conditions with a rescue
         begin
           agent = Agent.find_or_create_by(family: family, given: given)
           agent_id = agent.id
@@ -68,32 +78,63 @@ class Occurrence < ActiveRecord::Base
       end
 
       roles.each do |role|
-        "Occurrence#{role.capitalize}".constantize.create(occurrence_id: id, agent_id: agent_id)
+        if role == "recorder"
+          @recorders.write([id,agent_id].join(",")+"\n")
+        end
+        if role == "determiner"
+          @determiners.write([id,agent_id].join(",")+"\n")
+        end
       end
     end
   end
 
   def self.populate_taxa
-    taxa = Occurrence.where.not(identifiedBy: [nil, ''], family: [nil,''])
-    pbar = ProgressBar.create(title: "Taxa", total: taxa.count, autofinish: false, format: '%t %b>> %i| %e')
-    taxa.find_each do |o|
-      pbar.increment
+    @redis = Redis.new(db: 1)
+    @redis.flushdb
 
-      Occurrence.transaction do
-        taxon = Taxon.where(family: o.family).first_or_create
-        TaxonOccurrence.create(taxon_id: taxon.id, occurrence_id: o.id)
+    @taxon_occurrences = File.open("/tmp/taxon_occurrences", "w")
+    @taxon_determiners = File.open("/tmp/taxon_determiners", "w")
 
-        o.occurrence_determiners.each do |d|
-          save_taxon_determiner(taxon.id, d.agent_id)
+    taxa = Occurrence.where.not(identifiedBy: [nil, ''], family: [nil,'']).pluck(:id, :family)
+    Parallel.map(taxa.in_groups_of(1000, false), progress: "Taxa") do |batch|
+      batch.each do |o|
+        taxon_id = @redis.get(o[1])
+        if taxon_id.nil?
+          begin
+            taxon = Taxon.find_or_create_by(family: o[1])
+            taxon_id = taxon.id
+            @redis.set(o[1], taxon_id)
+          rescue ActiveRecord::RecordNotUnique
+            retry
+          end
+        end
+        @taxon_occurrences.write([o[0],taxon_id].join(",")+"\n")
+        OccurrenceDeterminer.where(occurrence_id: o[0]).pluck(:agent_id).each do |od|
+          @taxon_determiners.write([od,taxon_id].join(",")+"\n")
         end
       end
     end
-    pbar.finish
-  end
 
-  def self.save_taxon_determiner(taxon_id, agent_id)
-    return if taxon_id.nil? || agent_id.nil?
-    TaxonDeterminer.find_or_create_by(taxon_id: taxon_id, agent_id: agent_id)
+    sql = "LOAD DATA INFILE '#{@taxon_occurrences.path}' 
+           INTO TABLE #{File.basename(@taxon_occurrences)}
+           FIELDS TERMINATED BY ',' 
+           LINES TERMINATED BY '\n' 
+           (occurrence_id, taxon_id)"
+    Occurrence.connection.execute sql
+
+    sql = "LOAD DATA INFILE '#{@taxon_determiners.path}' 
+           INTO TABLE #{File.basename(@taxon_determiners)}
+           FIELDS TERMINATED BY ',' 
+           LINES TERMINATED BY '\n' 
+           (agent_id, taxon_id)"
+    Occurrence.connection.execute sql
+
+    [@taxon_occurrences,@taxon_determiners].each do |file|
+      file.close
+      File.unlink(file)
+    end
+
+    @redis.flushdb
   end
 
   def coordinates

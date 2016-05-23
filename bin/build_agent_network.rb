@@ -51,5 +51,3 @@ if options[:all_agents]
   end
   pbar.finish
 end
-
-puts 'Done building network'

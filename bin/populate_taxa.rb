@@ -18,13 +18,10 @@ OptionParser.new do |opts|
 end.parse!
 
 if options[:truncate]
-  puts "Truncating data"
   Occurrence.connection.execute("TRUNCATE TABLE taxa")
   Occurrence.connection.execute("TRUNCATE TABLE taxon_occurrences")
   Occurrence.connection.execute("TRUNCATE TABLE taxon_determiners")
 end
 
-puts 'Starting to populate taxa'
 Occurrence.populate_taxa
 Taxon.populate_metadata
-puts 'Done populating taxa'

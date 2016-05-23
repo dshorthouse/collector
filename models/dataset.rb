@@ -1,12 +1,9 @@
 class Dataset < ActiveRecord::Base
 
   def self.populate_datasets
-    datasets = Agent.where("id = canonical_id AND processed_datasets IS NULL").where.not(given: [nil,''])
-    pbar = ProgressBar.create(title: "Datasets", total: datasets.count, autofinish: false, format: '%t %b>> %i| %e')
+    datasets = Agent.where("id = canonical_id").where(processed_datasets: nil).where.not(given: [nil,''])
 
-    datasets.find_each do |agent|
-      pbar.increment
-
+    Parallel.map(datasets.find_each, progress: "Datasets") do |agent|
       search = 'contributor:' + URI::encode(agent.fullname)
       response = send_datacite_request(search)
       if response[:numFound] > 0
@@ -23,10 +20,8 @@ class Dataset < ActiveRecord::Base
         save_datasets(agent, datasets.compact)
       end
       agent.processed_datasets = true
-      agent.save!
+      agent.save
     end
-
-    pbar.finish
   end
 
   def self.send_datacite_request(search, start = 0)
@@ -45,8 +40,12 @@ class Dataset < ActiveRecord::Base
   def self.save_datasets(agent, datasets)
     Dataset.transaction do
       datasets.each do |d|
-        dataset = Dataset.create_with(title: d[:title][0]).find_or_create_by(doi: d[:doi])
-        AgentDataset.find_or_create_by(agent_id: agent.id, dataset_id: dataset.id)
+        begin
+          dataset = Dataset.create_with(title: d[:title][0]).find_or_create_by(doi: d[:doi])
+          AgentDataset.find_or_create_by(agent_id: agent.id, dataset_id: dataset.id)
+        rescue ActiveRecord::RecordNotUnique
+          retry
+        end
       end
     end
   end

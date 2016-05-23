@@ -18,12 +18,9 @@ OptionParser.new do |opts|
 end.parse!
 
 if options[:truncate]
-  puts "Truncating data"
   Barcode.connection.execute("TRUNCATE TABLE barcodes")
   Barcode.connection.execute("TRUNCATE TABLE agent_barcodes")
   Barcode.connection.execute("UPDATE agents SET processed_barcodes = NULL")
 end
 
-puts 'Starting to populate barcodes'
 Barcode.populate_barcodes
-puts 'Done populating barcodes'

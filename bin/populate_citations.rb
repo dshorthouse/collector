@@ -18,10 +18,7 @@ OptionParser.new do |opts|
 end.parse!
 
 if options[:reset]
-  puts "Resetting data"
   Work.connection.execute("UPDATE works SET citation = NULL, processed = NULL")
 end
 
-puts 'Starting to populate citations'
 Work.populate_citations
-puts 'Done populating citations'
