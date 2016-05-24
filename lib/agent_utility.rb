@@ -66,7 +66,8 @@ module Collector
       [,;]\z|
       ^\w{0,2}\z|
       ^[A-Z]{2,}\z|
-      \s+(?i:stet)\s*!?\s*\z
+      \s+(?i:stet)\s*!?\s*\z|
+      \s+(?i:prep)\.?\s*\z
     }x
 
     SPLIT_BY = %r{
@@ -83,7 +84,7 @@ module Collector
       \b(?i:in?dentified(\s+by)?)\s*\b|
       \b(?i:in\s+part(\s+by)?)\s*\b|
       \b(?i:or)\s+|
-      \b(?i:prep\.?(\s+by)?)\s*\b|
+      \b(?i:prep\.?\s+(?i:by)?)\s*\b|
       \b(?i:redet\.?(\s+by?)?)\s*\b|
       \b(?i:reidentified(\s+by)?)\s*\b|
       \b(?i:stet)\s*\b|
@@ -141,7 +142,13 @@ module Collector
     end
 
     def self.clean(parsed_namae)
-      return { given: nil, family: nil } if parsed_namae.display_order =~ BLACKLIST
+      blank_name = { given: nil, family: nil }
+      if parsed_namae.display_order =~ BLACKLIST
+        return blank_name
+      end
+      if parsed_namae.given && parsed_namae.given.count('.') >= 3 && /\.\s*[a-zA-Z]{4,}\s+[a-zA-Z]{1,}\./.match(parsed_namae.given)
+        return blank_name
+      end
 
       family = parsed_namae.family.gsub(/\.\z/, '').strip rescue nil
       given = parsed_namae.normalize_initials.given.strip rescue nil

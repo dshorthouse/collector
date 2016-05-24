@@ -184,11 +184,25 @@ describe "Utility functions to handle names of people" do
     expect(parsed[0].values_at(:given, :family)).to eq(['C.J.', 'Guiguet'])
   end
 
-  it "should explode by 'prep.' at the start of the string" do
+  it "should explode by 'prep. by' at the start of the string" do
+    input = "prep. C.J. Guiguet"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(['C.J.', 'Guiguet'])
+  end
+  
+  it "should explode by 'prep. by' at the start of the string" do
     input = "prep. by C.J. Guiguet"
     parsed = @utility.parse(input)
     expect(parsed.size).to eq(1)
     expect(parsed[0].values_at(:given, :family)).to eq(['C.J.', 'Guiguet'])
+  end
+
+  it "should strip out 'prep.' at the end of the string" do
+    input = "B. Pfeiffer prep."
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(['B.', 'Pfeiffer'])
   end
 
   it "should explode by 'prep'" do
@@ -955,6 +969,14 @@ describe "Utility functions to handle names of people" do
     expect(parsed.size).to eq(1)
     expect(parsed[0].values_at(:given, :family)).to eq(['Léas', 'Sicard'])
     expect(@utility.clean(parsed[0]).to_h).to eq({ family: "Sicard", given: "Léas"})
+  end
+
+  it "should ignore poorly parsed names with long given names and many periods" do
+    input = "J. Green; R. Driskill; J. W. Markham L. D. Druehl"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(3)
+    expect(parsed[0].values_at(:given, :family)).to eq(['J.', 'Green'])
+    expect(@utility.clean(parsed[2]).to_h).to eq({ family: nil, given: nil })
   end
 
   it "should clean a doi with http://dx.doi.org" do
