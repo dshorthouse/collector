@@ -46,6 +46,7 @@ module Collector
       \d+\s+(?i:Nov|Novemb(er|re))\.?\b|
       \d+\s+(?i:Dec|D(e|é)cemb(er|re))\.?\b|
       (?i:autres?\s+de|probably)|
+      (?i:game\s+dept)\.?\s*\b|
       (?i:see\s+notes?\s*(inside)?)|
       (?i:see\s+letter\s+enclosed)|
       (?i:pers\.?\s+comm\.?)|
@@ -73,6 +74,7 @@ module Collector
       \s+-\s+|
       \b(?i:and|et|with|per)\s+|
       \b(?i:annotated(\s+by)?)\s*\b|
+      \b(?i:coll\.)\s*\b|
       \b(?i:conf\.?(\s+by)?|confirmed(\s+by)?)\s*\b|
       \b(?i:checked?(\s+by)?)\s*\b|
       \b(?i:det\.?(\s+by)?)\s*\b|
@@ -81,6 +83,7 @@ module Collector
       \b(?i:in?dentified(\s+by)?)\s*\b|
       \b(?i:in\s+part(\s+by)?)\s*\b|
       \b(?i:or)\s+|
+      \b(?i:prep\.?(\s+by)?)\s*\b|
       \b(?i:redet\.?(\s+by?)?)\s*\b|
       \b(?i:reidentified(\s+by)?)\s*\b|
       \b(?i:stet)\s*\b|

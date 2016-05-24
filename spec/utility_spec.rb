@@ -177,6 +177,27 @@ describe "Utility functions to handle names of people" do
     expect(parsed[0].values_at(:given, :family)).to eq(['W.P.', 'Coreneuk'])
   end
 
+  it "should remove 'Game Dept.'" do
+    input = "Game Dept.  prep. C.J. Guiguet"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(['C.J.', 'Guiguet'])
+  end
+
+  it "should explode by 'prep.' at the start of the string" do
+    input = "prep. by C.J. Guiguet"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(['C.J.', 'Guiguet'])
+  end
+
+  it "should explode by 'prep'" do
+    input = "R.H. Mackay  prep. I. McTaggart-Cowan"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(2)
+    expect(parsed[0].values_at(:given, :family)).to eq(['R.H.', 'Mackay'])
+  end
+
   it "should explode by 'via" do
     input = "via Serena Lowartz"
     parsed = @utility.parse(input)
