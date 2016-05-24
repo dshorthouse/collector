@@ -29,7 +29,10 @@
     %span{itemprop: "familyName" }= @result[:personal][:family]
 
   - if @result[:personal][:aka] && @result[:personal][:aka].size > 0
-    Alternate Names: #{@result[:personal][:aka].map{|a| [a[:given].presence, a[:family].presence].join(" ")}.join(", ")}
+    #alternate-names
+      Alternate Names:
+      - @result[:personal][:aka].each do |alt|
+        %span{itemprop: "alternateName"} #{[alt[:given].presence, alt[:family].presence].join(" ")}
 
   - if !@result[:personal][:position].nil?
     .contact-details{itemprop: "jobTitle"} #{@result[:personal][:position]}

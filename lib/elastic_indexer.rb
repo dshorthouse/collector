@@ -320,9 +320,43 @@ module Collector
       end
     end
 
+    def bulk_agent(batches)
+      agents = []
+      batches.each do |a|
+        agents << {
+          index: {
+            _id: a,
+              data: agent_document(Agent.find(a))
+          }
+        }
+      end
+      @client.bulk index: @settings.elastic_index, type: 'agent', refresh: false, body: agents
+    end
+
+    def add_agent(a)
+      @client.index index: @settings.elastic_index, type: 'agent', id: a.id, body: agent_document(a)
+    end
+
     def update_agent(a)
       doc = { doc: agent_document(a) }
       @client.update index: @settings.elastic_index, type: 'agent', id: a.id, body: doc
+    end
+
+    def delete_agent(a)
+      @client.delete index: @settings.elastic_index, type: 'agent', id: a.id
+    end
+
+    def bulk_occurrence(batches)
+      occurrences = []
+      batches.each do |a|
+        occurrences << {
+          index: {
+            _id: a,
+              data: occurrence_document(Occurrence.find(a))
+          }
+        }
+      end
+      @client.bulk index: @settings.elastic_index, type: 'occurrence', refresh: false, body: occurrences
     end
 
     def update_occurrence(o)

@@ -59,20 +59,16 @@ if options[:rebuild_all]
   index.import_occurrences
   index.import_agents
   index.refresh
-  puts "Finished indexing #{settings.elastic_index}"
 elsif options[:rebuild_agents]
   index.delete_agents
   index.import_agents
   index.refresh
-  puts "Finished indexing #{settings.elastic_index} agents"
 elsif options [:rebuild_occurrences]
   index.delete_occurrences
   index.import_occurrences
   index.refresh
-  puts "Finished indexing #{settings.elastic_index} occurrences"
 elsif options[:rebuild_taxa]
   index.delete_taxa
   index.import_taxa
   index.refresh
-  puts "Finished indexing #{settings.elastic_index} taxa"
 end

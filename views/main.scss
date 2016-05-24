@@ -326,6 +326,18 @@ label input {
   padding:10px;
 }
 
+#alternate-names{
+  line-height:1.5em;
+}
+
+#alternate-names span:after{
+  content:", ";
+}
+
+#alternate-names span:last-child:after{
+  content:"";
+}
+
 .orcid{
   height:20px;
   line-height:20px;

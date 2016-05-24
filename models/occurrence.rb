@@ -138,8 +138,10 @@ class Occurrence < ActiveRecord::Base
   end
 
   def coordinates
-    return [] if decimalLatitude.presence.nil? || decimalLongitude.presence.nil?
-    [decimalLongitude.to_f, decimalLatitude.to_f]
+    lat = decimalLatitude.to_f
+    long = decimalLongitude.to_f
+    return nil if lat == 0 || long == 0 || lat > 90 || lat < -90 || long > 180 || long < -180
+    [long, lat]
   end
 
   def agents

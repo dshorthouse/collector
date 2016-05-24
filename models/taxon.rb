@@ -52,9 +52,7 @@ class Taxon < ActiveRecord::Base
   end
 
   def occurrence_coordinates
-    occurrences.pluck(:decimalLongitude, :decimalLatitude)
-              .compact.uniq
-              .map{ |c| [c[0].to_f, c[1].to_f] }
+    occurrences.map(&:coordinates).uniq.compact
   end
 
 end

@@ -160,11 +160,11 @@ class Agent < ActiveRecord::Base
   end
 
   def determinations_institutions
-    determinations.pluck(:institutionCode).uniq.compact.reject { |c| c.empty? }
+    determinations.pluck(:institutionCode).uniq.compact.reject{ |c| c.empty? }
   end
 
   def recordings_institutions
-    recordings.pluck(:institutionCode).uniq.compact.reject { |c| c.empty? }
+    recordings.pluck(:institutionCode).uniq.compact.reject{ |c| c.empty? }
   end
 
   def determinations_year_range
@@ -188,11 +188,7 @@ class Agent < ActiveRecord::Base
   end
 
   def recordings_coordinates
-    recordings.where.not(decimalLongitude: nil)
-              .where.not(decimalLatitude: nil)
-              .pluck(:decimalLongitude, :decimalLatitude)
-              .uniq
-              .map{ |c| [c[0].to_f, c[1].to_f] }
+    recordings.map(&:coordinates).uniq.compact
   end
 
   def recordings_with
