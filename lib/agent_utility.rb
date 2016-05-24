@@ -46,6 +46,7 @@ module Collector
       \d+\s+(?i:Nov|Novemb(er|re))\.?\b|
       \d+\s+(?i:Dec|D(e|é)cemb(er|re))\.?\b|
       (?i:autres?\s+de|probably)|
+      (?i:fide)\:?\s*\b|
       (?i:game\s+dept)\.?\s*\b|
       (?i:see\s+notes?\s*(inside)?)|
       (?i:see\s+letter\s+enclosed)|
@@ -148,6 +149,13 @@ module Collector
       end
       if parsed_namae.given && parsed_namae.given.count('.') >= 3 && /\.\s*[a-zA-Z]{4,}\s+[a-zA-Z]{1,}\./.match(parsed_namae.given)
         return blank_name
+      end
+
+      if parsed_namae.given && parsed_namae.family && parsed_namae.family.length - parsed_namae.family.count(".") <= 3
+        given = parsed_namae.given
+        family = parsed_namae.family
+        parsed_namae.family = given
+        parsed_namae.given = family
       end
 
       family = parsed_namae.family.gsub(/\.\z/, '').strip rescue nil

@@ -843,6 +843,14 @@ describe "Utility functions to handle names of people" do
     expect(parsed[0].values_at(:given, :family)).to eq(['Jeffery M.', 'Saarela'])
   end
 
+  it "should strip out 'Fide:'" do
+    input = "Bird, Carolyn J.; Fide: Lindsay, J.G."
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(2)
+    expect(parsed[0].values_at(:given, :family)).to eq(['Carolyn J.', 'Bird'])
+    expect(parsed[1].values_at(:given, :family)).to eq(['J.G.', 'Lindsay'])
+  end
+
   it "should explode names with Jan. 14, 2013 included in string" do
     input = "Jan Jones Jan. 14, 2013"
     parsed = @utility.parse(input)
@@ -944,6 +952,14 @@ describe "Utility functions to handle names of people" do
     parsed = @utility.parse(input)
     expect(parsed.size).to eq(1)
     expect(parsed[0].values_at(:given, :family)).to eq(['JH', 'Picard'])
+    expect(@utility.clean(parsed[0]).to_h).to eq({ family: "Picard", given: "J.H."})
+  end
+
+  it "should parse name when given is initalized and order is reversed without separator" do
+    input = "Picard J.H."
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(['Picard', 'J.H.'])
     expect(@utility.clean(parsed[0]).to_h).to eq({ family: "Picard", given: "J.H."})
   end
 
