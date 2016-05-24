@@ -25,6 +25,7 @@ class Agent < ActiveRecord::Base
   belongs_to :canonical, class_name: "Agent"
 
   GENDER_HASH = {}
+  PARSER = ScientificNameParser.new
 
   def self.populate_genders
     rebuild_gender_hash
@@ -159,11 +160,11 @@ class Agent < ActiveRecord::Base
   end
 
   def determinations_institutions
-    determinations.pluck(:institutionCode).uniq.reject { |c| c.empty? }
+    determinations.pluck(:institutionCode).uniq.compact.reject { |c| c.empty? }
   end
 
   def recordings_institutions
-    recordings.pluck(:institutionCode).uniq.reject { |c| c.empty? }
+    recordings.pluck(:institutionCode).uniq.compact.reject { |c| c.empty? }
   end
 
   def determinations_year_range
@@ -187,13 +188,17 @@ class Agent < ActiveRecord::Base
   end
 
   def recordings_coordinates
-    recordings.pluck(:decimalLongitude, :decimalLatitude)
-              .compact.uniq
+    recordings.where.not(decimalLongitude: nil)
+              .where.not(decimalLatitude: nil)
+              .pluck(:decimalLongitude, :decimalLatitude)
+              .uniq
               .map{ |c| [c[0].to_f, c[1].to_f] }
   end
 
   def recordings_with
-    Agent.joins(:occurrence_recorders).where(occurrence_recorders: { occurrence_id: occurrence_recorders.pluck(:occurrence_id) }).where.not(occurrence_recorders: { agent_id: id }).uniq
+    Agent.uniq.joins(:occurrence_recorders)
+         .where(occurrence_recorders: { occurrence_id: occurrence_recorders.pluck(:occurrence_id) })
+         .where.not(occurrence_recorders: { agent_id: id })
   end
 
   def identified_taxa
@@ -201,10 +206,9 @@ class Agent < ActiveRecord::Base
   end
 
   def identified_species
-    parser = ScientificNameParser.new
     species = identified_taxa.map do |name|
       species_name = nil
-      parsed = parser.parse(name) rescue nil
+      parsed = PARSER.parse(name) rescue nil
       if !parsed.nil? && parsed[:scientificName][:parsed] && parsed[:scientificName][:details][0].has_key?(:species)
         species_name = parsed[:scientificName][:canonical]
       end
@@ -228,17 +232,16 @@ class Agent < ActiveRecord::Base
   end
 
   def aka
-    (Agent.where(canonical_id: id).where.not(id: id) | Agent.where(canonical_id: canonical_id).where.not(id: id)).map{|a| {family: a.family, given: a.given}}
+    (
+      Agent.where(canonical_id: id).where.not(id: id).pluck(:given, :family) | 
+      Agent.where(canonical_id: canonical_id).where.not(id: id).pluck(:given, :family)
+    ).map{|a| { family: a[1], given: a[0]}}
   end
 
-  def network(use_cache: true)
-    if use_cache && network_cache
-      JSON.parse(network_cache, symbolize_names: true)
-    else
-      network = Collector::AgentNetwork.new(id)
-      network.build
-      network.to_vis
-    end
+  def network
+    network = Collector::AgentNetwork.new(self)
+    network.build
+    network.to_vis
   end
 
   def collector_index
@@ -248,10 +251,7 @@ class Agent < ActiveRecord::Base
     end
 
     sociability_score = 1
-    if network_cache
-      nodes = JSON.parse(network_cache, symbolize_names: true)[:nodes].size
-      sociability_score =  nodes - 1 if nodes > 2
-    elsif !recordings_with.empty?
+    if !recordings_with.empty?
       sociability_score = recordings_with.size
     end
 

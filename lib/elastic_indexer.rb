@@ -16,14 +16,17 @@ module Collector
     end
 
     def delete_agents
+      #requires ES plugin. See: https://www.elastic.co/guide/en/elasticsearch/plugins/current/plugins-delete-by-query.html
       @client.delete_by_query index: @settings.elastic_index, type: 'agent', q: '*'
     end
 
     def delete_occurrences
+      #requires ES plugin. See: https://www.elastic.co/guide/en/elasticsearch/plugins/current/plugins-delete-by-query.html
       @client.delete_by_query index: @settings.elastic_index, type: 'occurrence', q: '*'
     end
 
     def delete_taxa
+      #requires ES plugin. See: https://www.elastic.co/guide/en/elasticsearch/plugins/current/plugins-delete-by-query.html
       @client.delete_by_query index: @settings.elastic_index, type: 'taxon', q: '*'
     end
 
@@ -251,38 +254,29 @@ module Collector
     end
 
     def import_agents
-      Parallel.map(Agent.where("id = canonical_id").find_in_batches, progress: "Agents") do |batch|
+      agents = Agent.where("id = canonical_id").pluck(:id)
+      Parallel.map(agents.in_groups_of(10, false), progress: "Search-Agents") do |batch|
         agents = []
         batch.each do |a|
-            agents << {
-              index: {
-                _id: a.id,
-                data: agent_document(a)
-              }
+          agents << {
+            index: {
+              _id: a,
+                data: agent_document(Agent.find(a))
             }
+          }
         end
         @client.bulk index: @settings.elastic_index, type: 'agent', refresh: false, body: agents
       end
     end
 
     def import_occurrences
-      Parallel.map(Occurrence.find_in_batches, progress: "Occurrences") do |batch|
+      Parallel.map(Occurrence.find_in_batches(batch_size: 100), progress: "Search-Occurrences") do |batch|
         occurrences = []
         batch.each do |o|
-          date_identified = Collector::AgentUtility.valid_year(o.dateIdentified)
-          event_date = Collector::AgentUtility.valid_year(o.eventDate)
-          agents = o.agents
           occurrences << {
             index: {
               _id: o.id,
-              data: {
-                id: o.id,
-                occurrence_coordinates: o.coordinates,
-                identifiedBy: agents[:determiners],
-                dateIdentified: !date_identified.nil? ? date_identified.to_s : nil,
-                recordedBy: agents[:recorders],
-                eventDate: !event_date.nil? ? event_date.to_s : nil
-              }
+              data: occurrence_document(o)
             }
           }
         end
@@ -290,8 +284,22 @@ module Collector
       end
     end
 
+    def occurrence_document(o)
+      date_identified = Collector::AgentUtility.valid_year(o.dateIdentified)
+      event_date = Collector::AgentUtility.valid_year(o.eventDate)
+      agents = o.agents
+      {
+        id: o.id,
+        occurrence_coordinates: o.coordinates,
+        identifiedBy: agents[:determiners],
+        dateIdentified: !date_identified.nil? ? date_identified.to_s : nil,
+        recordedBy: agents[:recorders],
+        eventDate: !event_date.nil? ? event_date.to_s : nil
+      }
+    end
+
     def import_taxa
-      Parallel.map(Taxon.find_in_batches, progress: "Taxa") do |batch|
+      Parallel.map(Taxon.find_in_batches, progress: "Search-Taxa") do |batch|
         taxa = []
         batch.each do |t|
           taxa << {
@@ -314,8 +322,12 @@ module Collector
 
     def update_agent(a)
       doc = { doc: agent_document(a) }
-
       @client.update index: @settings.elastic_index, type: 'agent', id: a.id, body: doc
+    end
+
+    def update_occurrence(o)
+      doc = { doc: occurrence_document(o) }
+      @client.update index: @settings.elastic_index, type: 'occurrence', id: o.id, body: doc
     end
 
     def agent_document(a)
@@ -340,7 +352,7 @@ module Collector
           coordinates: a.recordings_coordinates
         },
         determinations: {
-          count: a.determinations.size,
+          count: a.taxon_determiners.size,
           institutions: a.determinations_institutions,
           families: a.determined_families
         },

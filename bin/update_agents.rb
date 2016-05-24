@@ -2,7 +2,6 @@
 # encoding: utf-8
 require_relative '../environment.rb'
 require 'optparse'
-require 'progressbar'
 
 ARGV << '-h' if ARGV.empty?
 

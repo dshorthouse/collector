@@ -12,10 +12,10 @@ RGL::DOT::NODE_OPTS.push(:id)
 module Collector
   class AgentNetwork
 
-    def initialize(id, depth = 1, type = "dot")
+    def initialize(agent, depth = 1, type = "dot")
       @graph = WeightedGraph.new
-      @agent = Agent.find(id)
-      @agents = Set.new
+      @agent = agent
+      @agents = []
       @depth = depth + 1
       @type = type
     end
@@ -42,7 +42,9 @@ module Collector
     def collect_agents(agents, depth)
       return if depth.zero?
       agents.each do |agent|
-        @agents.add({ agent: agent, recordings: agent.recordings.pluck(:id) })
+        if !@agents.map{|a| a[:agent]}.include? agent
+          @agents << { agent: agent, recordings: agent.occurrence_recorders.pluck(:occurrence_id) }
+        end
         collect_agents(agent.recordings_with, depth-1)
       end
     end
