@@ -16,7 +16,7 @@ module Collector
       @graph = WeightedGraph.new
       @agent = agent
       @agents = []
-      @depth = depth + 1
+      @depth = depth
       @type = type
     end
 
@@ -40,11 +40,13 @@ module Collector
     end
 
     def collect_agents(agents, depth)
-      return if depth.zero?
       agents.each do |agent|
         if !@agents.map{|a| a[:agent]}.include? agent
           @agents << { agent: agent, recordings: agent.occurrence_recorders.pluck(:occurrence_id) }
         end
+      end
+      return if depth.zero?
+      agents.each do |agent|
         collect_agents(agent.recordings_with, depth-1)
       end
     end

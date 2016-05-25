@@ -254,14 +254,14 @@ module Collector
     end
 
     def import_agents
-      agents = Agent.where("id = canonical_id").pluck(:id)
-      Parallel.map(agents.in_groups_of(10, false), progress: "Search-Agents") do |batch|
+      agents = Agent.where("id = canonical_id")
+      Parallel.map(agents.find_in_batches(batch_size: 10), progress: "Search-Agents") do |batch|
         agents = []
         batch.each do |a|
           agents << {
             index: {
-              _id: a,
-                data: agent_document(Agent.find(a))
+              _id: a.id,
+                data: agent_document(a)
             }
           }
         end

@@ -17,6 +17,10 @@ OptionParser.new do |opts|
     options[:destination] = agent_id
   end
 
+  opts.on("-w", "--with-search", "Update with search") do |a|
+    options[:search] = true
+  end
+
   opts.on("-h", "--help", "Prints this help") do
     puts opts
     exit
@@ -42,20 +46,22 @@ if options[:sources] && options[:destination]
   end
   agents = Agent.where(id: sources)
   agents.update_all(canonical_id: destination)
-  agent = Agent.find(destination)
 
-  occurrences = agent.occurrence_recorders.pluck(:occurrence_id)
-  Parallel.map(occurrences.in_groups_of(100, false), progress: "UpdateOccurrences")  do |batch|
-    index.bulk_occurrence(batch)
-  end
-  index.update_agent(agent)
+  if options[:search]
+    agent = Agent.find(destination)
+    occurrences = agent.occurrence_recorders.pluck(:occurrence_id)
+    Parallel.map(occurrences.in_groups_of(100, false), progress: "UpdateOccurrences")  do |batch|
+      index.bulk_occurrence(batch)
+    end
+    index.update_agent(agent)
 
-  colleagues = agent.recordings_with.pluck(:id)
-  Parallel.map(colleagues.in_groups_of(5, false), progress: "UpdateColleagues") do |batch|
-    index.bulk_agent(batch)
-  end
+    colleagues = agent.recordings_with.pluck(:id)
+    Parallel.map(colleagues.in_groups_of(5, false), progress: "UpdateColleagues") do |batch|
+      index.bulk_agent(batch)
+    end
 
-  agents.find_each do |agent|
-    index.delete_agent(agent) rescue nil
+    agents.find_each do |agent|
+      index.delete_agent(agent) rescue nil
+    end
   end
 end

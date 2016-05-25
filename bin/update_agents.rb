@@ -17,6 +17,10 @@ OptionParser.new do |opts|
     options[:all] = true
   end
 
+  opts.on("-w", "--with-search", "Update with search") do |a|
+    options[:search] = true
+  end
+
   opts.on("-d", "--delete [id]", Integer, "Delete agent [id] from index") do |id|
     options[:delete] = id
   end
@@ -32,7 +36,9 @@ index = Collector::ElasticIndexer.new
 if options[:delete]
   agent = Agent.find(options[:delete])
   agent.destroy
-  index.delete_agent(agent)
+  if options[:search]
+    index.delete_agent(agent)
+  end
 end
 
 if options[:agent_attributes]
@@ -42,9 +48,11 @@ if options[:agent_attributes]
   a.update_attributes(attributes)
   a.refresh_orcid_data
   Work.populate_citations
-  index.update_agent(a)
-  a.recordings_with.each do |colleague|
-    index.update_agent(colleague)
+  if options[:search]
+    index.update_agent(a)
+    a.recordings_with.each do |colleague|
+      index.update_agent(colleague)
+    end
   end
 end
 
@@ -69,20 +77,22 @@ if options[:all]
     models.each do |model|
       model.constantize.where(agent_id: agent.id).update_all(agent_id: agent.canonical_id)
     end
-    index.delete_agent(agent)
+    index.delete_agent(agent) if options[:search]
   end
   pbar.finish
 
-  pbar = ProgressBar.create(title: "GetColleagues", total: canonical_agent_ids.uniq.size, autofinish: false, format: '%t %b>> %i| %e')
-  canonical_agent_ids.uniq.each do |canonical_id|
-    pbar.increment
-    colleagues.merge(Agent.find(canonical_id).recordings_with)
-  end
-  pbar.finish
+  if options[:search]
+    pbar = ProgressBar.create(title: "GetColleagues", total: canonical_agent_ids.uniq.size, autofinish: false, format: '%t %b>> %i| %e')
+    canonical_agent_ids.uniq.each do |canonical_id|
+      pbar.increment
+      colleagues.merge(Agent.find(canonical_id).recordings_with)
+    end
+    pbar.finish
 
-  Parallel.map(colleagues.to_a.in_groups_of(10, false), progress: "UpdateColleagues") do |batch|
-    batch.each do |colleague|
-      index.update_agent(colleague)
+    Parallel.map(colleagues.to_a.in_groups_of(10, false), progress: "UpdateColleagues") do |batch|
+      batch.each do |colleague|
+        index.update_agent(colleague)
+      end
     end
   end
 

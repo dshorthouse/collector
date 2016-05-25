@@ -192,9 +192,9 @@ class Agent < ActiveRecord::Base
   end
 
   def recordings_with
-    Agent.uniq.joins(:occurrence_recorders)
+    Agent.joins(:occurrence_recorders)
          .where(occurrence_recorders: { occurrence_id: occurrence_recorders.pluck(:occurrence_id) })
-         .where.not(occurrence_recorders: { agent_id: id })
+         .where.not(occurrence_recorders: { agent_id: id }).uniq
   end
 
   def identified_taxa
@@ -241,20 +241,8 @@ class Agent < ActiveRecord::Base
   end
 
   def collector_index
-    naturalist_score = 1
-    if !occurrence_recorders.empty? && !occurrence_determiners.empty? && !identified_species.empty?
-      naturalist_score = (identified_species.size + (occurrence_recorders.pluck(:occurrence_id) & occurrence_determiners.pluck(:occurrence_id)).size)/2
-    end
-
-    sociability_score = 1
-    if !recordings_with.empty?
-      sociability_score = recordings_with.size
-    end
-
-    if !recordings_institutions.empty?
-      sociability_score = sociability_score + 2 * recordings_institutions.size
-    end
-
+    naturalist_score = (identified_species.size + (occurrence_recorders.pluck(:occurrence_id) & occurrence_determiners.pluck(:occurrence_id)).size)/2
+    sociability_score = 1 + recordings_with.size + 2 * recordings_institutions.size
     Math.sqrt(naturalist_score + sociability_score).to_i
   end
 

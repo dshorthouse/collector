@@ -241,6 +241,8 @@ module Sinatra
         @results = []
         client = Elasticsearch::Client.new
 
+        client.indices.put_settings body: { index: { max_result_window: 50_000 } }
+
         body = {
           query: {
             match_all: {}
