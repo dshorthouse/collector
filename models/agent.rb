@@ -132,23 +132,23 @@ class Agent < ActiveRecord::Base
   end
 
   def self.parse_profile_orcid_response(agent, response)
-    Agent.transaction do
-      AgentWork.delete_all(agent_id: agent.id)
-      profile = JSON.parse(response, :symbolize_names => true)[:"orcid-profile"]
-      agent.email = profile[:"orcid-bio"][:"contact-details"][:email][0][:value] rescue nil
-      agent.position = profile[:"orcid-activities"][:affiliations][:affiliation][0][:"role-title"] rescue nil
-      agent.affiliation = profile[:"orcid-activities"][:affiliations][:affiliation][0][:organization][:name] rescue nil
+    profile = JSON.parse(response, :symbolize_names => true)[:"orcid-profile"]
+    agent.email = profile[:"orcid-bio"][:"contact-details"][:email][0][:value] rescue nil
+    agent.position = profile[:"orcid-activities"][:affiliations][:affiliation][0][:"role-title"] rescue nil
+    agent.affiliation = profile[:"orcid-activities"][:affiliations][:affiliation][0][:organization][:name] rescue nil
 
-      publications = profile[:"orcid-activities"][:"orcid-works"][:"orcid-work"] rescue []
-      publications.each do |pub|
-        identifiers = pub[:"work-external-identifiers"][:"work-external-identifier"] rescue []
-        identifiers.each do |identifier|
-            if identifier[:"work-external-identifier-type"] == "DOI"
-              doi = Collector::AgentUtility.doi_clean(identifier[:"work-external-identifier-id"][:value])
-              work = Work.where(doi: doi).first_or_create
-              AgentWork.find_or_create_by(agent_id: agent.id, work_id: work.id)
-              break
-            end
+    publications = profile[:"orcid-activities"][:"orcid-works"][:"orcid-work"] rescue []
+    publications.each do |pub|
+      identifiers = pub[:"work-external-identifiers"][:"work-external-identifier"] rescue []
+      identifiers.each do |identifier|
+        if identifier[:"work-external-identifier-type"] == "DOI"
+          doi = Collector::AgentUtility.doi_clean(identifier[:"work-external-identifier-id"][:value])
+          begin
+            work = Work.where(doi: doi).first_or_create
+          rescue ActiveRecord::RecordNotUnique
+            retry
+          end
+          AgentWork.find_or_create_by(agent_id: agent.id, work_id: work.id)
         end
       end
     end

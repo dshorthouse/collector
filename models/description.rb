@@ -25,11 +25,11 @@ class Description < ActiveRecord::Base
                 if !cleaned_name[:family].nil?
                   begin
                     agent = Agent.find_or_create_by(family: cleaned_name[:family].to_s, given: cleaned_name[:given].to_s)
-                    if agent.canonical_id.nil?
-                      agent.update(canonical_id: agent.id)
-                    end
                   rescue ActiveRecord::RecordNotUnique
                     retry
+                  end
+                  if agent.canonical_id.nil?
+                    agent.update(canonical_id: agent.id)
                   end
                   AgentDescription.find_or_create_by(description_id: description.id, agent_id: agent.id)
                 end

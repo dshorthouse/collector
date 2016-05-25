@@ -299,7 +299,7 @@ module Collector
     end
 
     def import_taxa
-      Parallel.map(Taxon.find_in_batches, progress: "Search-Taxa") do |batch|
+      Parallel.map(Taxon.find_in_batches(batch_size:100), progress: "Search-Taxa") do |batch|
         taxa = []
         batch.each do |t|
           taxa << {

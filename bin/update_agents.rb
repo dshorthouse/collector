@@ -85,6 +85,7 @@ if options[:all]
       index.update_agent(colleague)
     end
   end
+
 end
 
 

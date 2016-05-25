@@ -963,6 +963,13 @@ describe "Utility functions to handle names of people" do
     expect(@utility.clean(parsed[0]).to_h).to eq({ family: "Picard", given: "J.H."})
   end
 
+  it "should parse a name with a small family name" do
+    input = "J.Z. Cao"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(['J.Z.', 'Cao'])
+  end
+
   it "should capitalize surnames like 'Jack smith'" do
     input = "Jack smith"
     parsed = @utility.parse(input)
