@@ -55,6 +55,7 @@ module Collector
       (?i:revised|photograph|fruits\s+only)|
       -?\s*(?i:sight\s+(id|identifi?cation))\.?\s*\b|
       (?i:doubtful)|
+      -?\s*(?i:synonym(y|ie))|
       \b\s*\(?(?i:(fe)?male)\)?\s*\b|
       \b(?i:to\s+(sub)?spp?)\.?|
       (?i:nom\.?\s+rev\.?)|
@@ -121,7 +122,7 @@ module Collector
       (?i:o?\.?m\.?n\.?r\.?)|
       (?i:mus(eum|ée)|universit(y|é)|college|institute?|acad(e|é)m|school|écol(e|iers?)|polytech|dep(t|art?ment)|research|clinic|hospital|cientifica|sanctuary|safari)|
       (?i:graduate|student|supervisor|rcmp|coordinator|minority|police|taxonomist|consultant|team|équipe|memb(er|re)|crew|group|staff|personnel|family|captain|friends|assistant|worker)|
-      (?i:non précisé)|
+      (?i:non\s+pr(é|e)cis(é|e))|
       (?i:ontario|qu(e|é)bec|assurance)|
       (?i:soci(e|é)t(y|é)|cent(er|re)|community|history|conservation|conference|assoc|class|commission|consortium|council|club|alliance|protective|circle)|
       (?i:commercial|company|control|product)|

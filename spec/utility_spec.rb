@@ -851,6 +851,13 @@ describe "Utility functions to handle names of people" do
     expect(parsed[1].values_at(:given, :family)).to eq(['J.G.', 'Lindsay'])
   end
 
+  it "should strip out 'synonymie'" do
+    input = "Université Laval - synonymie"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(@utility.clean(parsed[0]).to_h).to eq({ family: nil, given: nil})
+  end
+
   it "should explode names with Jan. 14, 2013 included in string" do
     input = "Jan Jones Jan. 14, 2013"
     parsed = @utility.parse(input)
@@ -947,6 +954,13 @@ describe "Utility functions to handle names of people" do
     expect(parsed[1].values_at(:given, :family)).to eq(["P", nil])
   end
 
+  it "should ignore 'non précisé'" do
+    input = "non précisé"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(@utility.clean(parsed[0]).to_h).to eq({ family: nil, given: nil})
+  end
+  
   it "should parse name with given initials without period(s)" do
     input = "JH Picard"
     parsed = @utility.parse(input)
