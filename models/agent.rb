@@ -1,24 +1,24 @@
 class Agent < ActiveRecord::Base
 
-  has_many :determinations, :through => :occurrence_determiners, :source => :occurrence
-  has_many :occurrence_determiners
+  has_many :determinations, through: :occurrence_determiners, source: :occurrence
+  has_many :occurrence_determiners, dependent: :destroy
 
-  has_many :recordings, :through => :occurrence_recorders, :source => :occurrence
-  has_many :occurrence_recorders
+  has_many :recordings, through: :occurrence_recorders, source: :occurrence
+  has_many :occurrence_recorders, dependent: :destroy
 
-  has_many :descriptions, :through => :agent_descriptions, :source => :description
-  has_many :agent_descriptions
+  has_many :descriptions, through: :agent_descriptions, source: :description
+  has_many :agent_descriptions, dependent: :destroy
 
-  has_many :determined_taxa, :through => :taxon_determiners, :source => :taxon
-  has_many :taxon_determiners
+  has_many :determined_taxa, through: :taxon_determiners, source: :taxon
+  has_many :taxon_determiners, dependent: :destroy
 
-  has_many :works, :through => :agent_works
+  has_many :works, through: :agent_works
   has_many :agent_works
 
-  has_many :barcodes, :through => :agent_barcodes
+  has_many :barcodes, through: :agent_barcodes
   has_many :agent_barcodes
 
-  has_many :datasets, :through => :agent_datasets
+  has_many :datasets, through: :agent_datasets
   has_many :agent_datasets
 
   has_many :aliases, class_name: "Agent", foreign_key: "canonical_id"

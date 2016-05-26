@@ -43,10 +43,13 @@ index = Collector::ElasticIndexer.new
 
 if options[:delete]
   agent = Agent.find(options[:delete])
-  agent.destroy
   if options[:search]
+    agent.recordings_with.each do |colleague|
+      index.update_agent(colleague)
+    end
     index.delete_agent(agent)
   end
+  agent.destroy
 end
 
 if options[:agent]

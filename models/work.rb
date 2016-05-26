@@ -1,5 +1,5 @@
 class Work < ActiveRecord::Base
-  has_many :agents, :through => :agent_works
+  has_many :agents, through: :agent_works
   has_many :agent_works
 
   def self.populate_citations

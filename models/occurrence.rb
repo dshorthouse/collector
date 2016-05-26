@@ -1,11 +1,11 @@
 class Occurrence < ActiveRecord::Base
-  has_many :determiners, :through => :occurrence_determiners, :source => :agent
+  has_many :determiners, through: :occurrence_determiners, source: :agent
   has_many :occurrence_determiners
 
-  has_many :recorders, :through => :occurrence_recorders, :source => :agent
+  has_many :recorders, through: :occurrence_recorders, source: :agent
   has_many :occurrence_recorders
 
-  has_many :taxa, :through => :taxon_occurrences, :source => :taxon
+  has_many :taxa, through: :taxon_occurrences, source: :taxon
   has_many :taxon_occurrences
 
   def self.populate_agents
