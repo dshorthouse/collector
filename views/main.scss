@@ -115,7 +115,7 @@ header {
     background-color: #246d80;
     border-color: #2e6da4;
     color: #fff;
-    margin-top:20px;
+    margin:5px 0;
 }
 .btn {
     -moz-user-select: none;
@@ -124,7 +124,6 @@ header {
     border-radius: 6px;
     display: inline-block;
     line-height: 16px;
-    margin-bottom: 0;
     padding: 6px 12px;
     text-align: center;
     white-space: nowrap;
@@ -338,13 +337,22 @@ label input {
   content:"";
 }
 
-.orcid{
+.orcid, .twitter{
   height:20px;
   line-height:20px;
 }
 
 #orcid-icon{
   background: transparent url("/images/mini-icon.png") no-repeat scroll 0 0 / 20px 20px;
+  display: block;
+  float: left;
+  height: 20px;
+  width: 20px;
+  margin-right:5px;
+}
+
+#twitter-icon{
+  background: transparent url("/images/twitter.png") no-repeat scroll 0 0 / 20px 20px;
   display: block;
   float: left;
   height: 20px;

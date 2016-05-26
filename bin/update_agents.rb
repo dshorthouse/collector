@@ -21,6 +21,10 @@ OptionParser.new do |opts|
     options[:search] = true
   end
 
+  opts.on("-o", "--orcid", "Update all agents with ORCIDs") do |a|
+    options[:orcid] = true
+  end
+
   opts.on("-d", "--delete [id]", Integer, "Delete agent [id] from index") do |id|
     options[:delete] = id
   end
@@ -98,4 +102,12 @@ if options[:all]
 
 end
 
-
+if options[:orcid]
+  agents = Agent.where.not(orcid: nil)
+  Parallel.map(agents.find_each, progress:"UpdateORCIDAgents") do |a|
+    a.refresh_orcid_data
+    if options[:search]
+      index.update_agent(a)
+    end
+  end
+end

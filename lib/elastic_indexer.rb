@@ -104,6 +104,7 @@ module Collector
               id: { type: 'integer', index: 'not_analyzed' },
               canonical_id: { type: 'integer', index: 'not_analyzed' },
               orcid: { type: 'string', index: 'not_analyzed' },
+              twitter: { type: 'string', index: 'not_analyzed' },
               personal: {
                 properties: {
                   family: { type: 'string', search_analyzer: :family_search, analyzer: :family_index, omit_norms: true },
@@ -370,6 +371,7 @@ module Collector
         id: a.id,
         canonical_id: a.canonical_id,
         orcid: a.orcid,
+        twitter: a.twitter,
         personal: {
           family: a.family,
           given: a.given,

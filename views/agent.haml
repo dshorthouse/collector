@@ -51,12 +51,17 @@
       %a{href: "https://orcid.org/#{@result[:orcid]}", itemprop: "sameAs" }
         orcid.org/#{@result[:orcid]}
 
-- if @result[:collector_index] > 0
-  .btn.btn-primary
-    %a{href: "/about"}
-      Collector Index
-      %span.badge
-        #{@result[:collector_index]}
+  - if !@result[:twitter].nil?
+    .contact-details.twitter
+      %span{id: "twitter-icon"}
+      %a{href: "https://twitter.com/#{@result[:twitter]}"} @#{@result[:twitter]}
+
+  - if @result[:collector_index] > 0
+    .btn.btn-primary
+      %a{href: "/about"}
+        Collector Index
+        %span.badge
+          #{@result[:collector_index]}
 
 - if @result[:recordings][:count] > 0
   %h2 Collections
