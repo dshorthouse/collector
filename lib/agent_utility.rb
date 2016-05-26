@@ -237,5 +237,12 @@ module Collector
       doi.gsub(sub,'')
     end
 
+    def self.is_orcid?(orcid)
+      matcher = %r{
+        ^\d{4}-\d{4}-\d{4}-\d{3}[0-9X]$
+      }x
+      !!(matcher.match orcid)
+    end
+
   end
 end

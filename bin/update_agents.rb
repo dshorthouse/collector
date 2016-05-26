@@ -13,6 +13,10 @@ OptionParser.new do |opts|
     options[:agent_attributes] = JSON.parse(h)
   end
 
+  opts.on("-i", "--id [id]", String, "Update a single agent by id or ORCID") do |id|
+    options[:agent] = id
+  end
+
   opts.on("-a", "--all", "Update all agents") do |a|
     options[:all] = true
   end
@@ -43,6 +47,27 @@ if options[:delete]
   if options[:search]
     index.delete_agent(agent)
   end
+end
+
+if options[:agent]
+  id = options[:agent]
+  if Collector::AgentUtility.is_orcid? id
+    agent = Agent.find_by_orcid(id)
+  else
+    agent = Agent.find(id)
+  end
+  if agent
+    puts "Updating %{name} ..." % { name: agent.fullname }
+    agent.refresh_orcid_data
+    Work.populate_citations
+    if options[:search]
+      index.update_agent(agent)
+      agent.recordings_with.each do |colleague|
+        index.update_agent(colleague)
+      end
+    end
+  end
+
 end
 
 if options[:agent_attributes]
