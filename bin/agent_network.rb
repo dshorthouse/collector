@@ -20,10 +20,6 @@ OptionParser.new do |opts|
     options[:agent_id] = a
   end
 
-  opts.on("-n", "--whole-network", "Generate graph file for entire social network") do |a|
-    options[:social_network] = true
-  end
-
   opts.on("-t", "--type [TYPE]", "Type of output, options are dot or d3") do |t|
     if ['dot', 'd3'].include? t
       options[:type] = t
@@ -41,12 +37,7 @@ OptionParser.new do |opts|
 
 end.parse!
 
-if options[:social_network]
-  puts 'Starting to create graph for whole network as ' + options[:type]
-  graph = Collector::SocialNetwork.new
-  graph.build
-  puts 'Done creating whole network'
-elsif options[:all_agents]
+if options[:all_agents]
   puts 'Starting to create all agent network graphs as ' + options[:type]
   count = 0
   agents = Agent.where("id = canonical_id")

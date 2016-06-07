@@ -31,7 +31,7 @@ module Collector
               agents << {
                 id: a.id, 
                 given: a.given,
-                collected_with: a.recordings_with.map{ |k| k[:family] }.uniq,
+                collected_with: a.recordings_with.map(&:family).uniq,
                 determined_families: a.determined_families,
                 recordings_year_range: a.recordings_year_range
               }
@@ -82,8 +82,9 @@ module Collector
     def combine_subgraphs
       @graph.each_connected_component do |vertices|
         sorted_vertices = vertices.sort_by { |g| g[:given].length }
-        ids = sorted_vertices.map {|v| v[:id] }
+        ids = sorted_vertices.map(&:id)
         #make the longest given name the 'canonical' version
+        #todo: make version with greatest number of objects the canonical version
         canonical = ids.pop
         Agent.where(id: ids).update_all(canonical_id: canonical)
       end
@@ -101,7 +102,7 @@ module Collector
       [diff1, diff2].min
     end
 
-    # TODO: not flexible enough to accommodate more nuances in score, maybe use neural network
+    # TODO: not flexible enough to accommodate more nuances in score
     def name_similarity(agent1, agent2)
       given1 = agent1[:given]
       given2 = agent2[:given]
@@ -180,14 +181,21 @@ module Collector
     end
 
     def reassign_data
+      models = [
+        "AgentBarcode",
+        "AgentDataset",
+        "AgentDescription",
+        "AgentWork",
+        "OccurrenceDeterminer",
+        "OccurrenceRecorder",
+        "TaxonDeterminer"
+      ]
       agents = Agent.where("id != canonical_id")
-      models = ["OccurrenceDeterminer", "OccurrenceRecorder", "TaxonDeterminer", "AgentWork", "AgentDescription", "AgentBarcode", "AgentDataset"]
       pbar = ProgressBar.create(title: "Reassign", total: agents.count, autofinish: false, format: '%t %b>> %i| %e')
       agents.find_each do |a|
         pbar.increment
         models.each do |model|
-          klass = Object.const_get model
-          klass.where(agent_id: a.id).update_all(agent_id: a.canonical_id, original_agent_id: a.id)
+          model.constantize.where(agent_id: a.id).update_all(agent_id: a.canonical_id)
         end
       end
       pbar.finish

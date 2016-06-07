@@ -112,7 +112,7 @@ module Collector
     BLACKLIST = %r{
       (?i:abundant)|
       (?i:adult|juvenile)|
-      (?i:believe|unclear|illegible)|
+      (?i:believe|unclear|illegible|none)|
       (?i:biolog|botan|zoo|ecolog|mycol|(in)?vertebrate|fisheries|genetic|animal|mushroom|wildlife|plumage|flower|agriculture)|
       (?i:bris?tish|canadi?an?|chinese|arctic|japan|russian|north\s+america)|
       (?i:herbarium|herbier|collection|collected|publication|specimen|species|describe|an(a|o)morph|isolated|recorded|inspection|define|status)|
@@ -124,6 +124,7 @@ module Collector
       (?i:graduate|student|supervisor|rcmp|coordinator|minority|police|taxonomist|consultant|team|équipe|memb(er|re)|crew|group|staff|personnel|family|captain|friends|assistant|worker)|
       (?i:non\s+pr(é|e)cis(é|e))|
       (?i:ontario|qu(e|é)bec|assurance)|
+      (?i:recreation|culture)|
       (?i:soci(e|é)t(y|é)|cent(er|re)|community|history|conservation|conference|assoc|class|commission|consortium|council|club|alliance|protective|circle)|
       (?i:commercial|company|control|product)|
       (?i:survey|assessment|station|monitor|stn\.|index|project|bureau|engine|expedi(c|t)ion|festival|generation|inventory|marine)|
