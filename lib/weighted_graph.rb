@@ -95,6 +95,43 @@ module Collector
       src
     end
 
+    def vertex_label(v)
+      v.to_s
+    end
+
+    def vertex_id(v)
+      v
+    end
+
+    def to_dot_graph(params = {})
+      params[:name] ||= self.class.name.gsub(/:/, '_')
+      fontsize       = params[:fontsize] ? params[:fontsize] : '8'
+      graph          = RGL::DOT::Graph.new(params)
+      edge_class     = RGL::DOT::Edge
+
+      each_vertex do |v|
+        options = {
+          name: vertex_id(v),
+          fontsize: fontsize,
+          label: vertex_label(v)
+        }
+        options.merge! vertex_attributes(v)
+        graph << RGL::DOT::Node.new(options.stringify_keys)
+      end
+
+      each_edge do |u, v|
+        options = {
+          from: vertex_id(u),
+          to: vertex_id(v),
+          fontsize: fontsize,
+          label: weight(u,v)
+        }
+        graph << edge_class.new(options.stringify_keys)
+      end
+
+      graph
+    end
+
     def write_to_d3_file(d3file="d3")
       src = d3file + ".json"
 
@@ -137,35 +174,6 @@ module Collector
 
       system("dot -T#{fmt} #{src} -o #{dot}")
       dot
-    end
-
-    def to_dot_graph(params = {})
-      params[:name] ||= self.class.name.gsub(/:/, '_')
-      fontsize       = params[:fontsize] ? params[:fontsize] : '8'
-      graph          = RGL::DOT::Graph.new(params)
-      edge_class     = RGL::DOT::Edge
-
-      each_vertex do |v|
-        name = v.to_s
-        options = {
-          name: name,
-          fontsize: fontsize,
-          label: name
-        }
-        options.merge! vertex_attributes(v)
-        graph << RGL::DOT::Node.new(options)
-      end
-
-      each_edge do |u, v|
-        graph << edge_class.new(
-            from: u.to_s,
-            to: v.to_s,
-            fontsize: fontsize,
-            label: weight(u,v)
-        )
-      end
-
-      graph
     end
 
   end

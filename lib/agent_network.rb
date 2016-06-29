@@ -1,13 +1,7 @@
 # encoding: utf-8
-require 'byebug'
 require 'rgl/adjacency'
 require 'rgl/connected_components'
 require 'rgl/dot'
-
-RGL::DOT::NODE_OPTS.push(:gender)
-RGL::DOT::NODE_OPTS.push(:given)
-RGL::DOT::NODE_OPTS.push(:family)
-RGL::DOT::NODE_OPTS.push(:id)
 
 module Collector
   class AgentNetwork
@@ -52,7 +46,7 @@ module Collector
     end
 
     def add_edges
-      @agents.to_a.combination(2).each do |pair|
+      @agents.combination(2).each do |pair|
         add_edge(pair.first, pair.second)
       end
     end

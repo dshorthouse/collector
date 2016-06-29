@@ -44,14 +44,15 @@ if options[:all_agents]
   pbar = ProgressBar.create(title: "Networks", total: agents.count, autofinish: false, format: '%t %b>> %i| %e')
   agents.find_each do |agent|
     pbar.increment
-    graph = Collector::AgentNetwork.new(agent.id, options[:depth], options[:type])
+    graph = Collector::AgentNetwork.new(agent, options[:depth], options[:type])
     graph.build
     graph.write
   end
   pbar.finish
 elsif options[:agent_id]
-  puts 'Creating agent network graph as ' + options[:type]
-  graph = Collector::AgentNetwork.new(options[:agent_id], options[:depth], options[:type])
+  agent = Agent.find(options[:agent_id])
+  puts "Creating network graph for #{agent.fullname} as " + options[:type]
+  graph = Collector::AgentNetwork.new(agent, options[:depth], options[:type])
   graph.build
   graph.write
   puts 'Done creating agent network graph'
