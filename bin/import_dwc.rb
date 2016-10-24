@@ -26,32 +26,31 @@ OptionParser.new do |opts|
 end.parse!
 
 def import_file(dwc_file, progress = true)
-  begin
-    dwc = DarwinCore.new(dwc_file)
-    title = dwc.metadata.data[:eml][:dataset][:title] rescue "DwC"
-    fields = {}
-    dwc.core.data[:field].each{|f| fields[f[:attributes][:index].to_s] = f[:attributes][:term].split("/")[-1].to_sym}
-    file = File.new(dwc.core.file_path)
-    pbar = ProgressBar.create(title: title, total: file.readlines.size, autofinish: false, format: '%t %b>> %i| %e') if progress
+  attributes = Occurrence.attribute_names
+  attributes.shift
 
-    attributes = Occurrence.attribute_names
-    dwc.core.read(500) do |data, errors|
-      Occurrence.transaction do
-        data.each do |record|
-          pbar.increment if progress
-          new_record = {}
-          record.each_with_index do |value, index|
-            field = fields[index.to_s]
-            new_record[field] = value if attributes.member?(field.to_s)
-          end
-          Occurrence.create(new_record)
-        end
-      end
-    end
-    pbar.finish if progress
-  rescue Exception => e
-    puts "#{dwc_file} failed"
+  dwc = DarwinCore.new(dwc_file)
+  title = dwc.metadata.data[:eml][:dataset][:title] rescue "DwC"
+  file = File.new(dwc.core.file_path)
+  batch_size = 5_000
+  if progress
+    pbar = ProgressBar.create(title: title, total: file.readlines.size/batch_size, autofinish: false, format: '%t %b>> %i| %e')
   end
+
+  indexes = {}
+  dwc.core.data[:field].each do |field|
+    key = field[:attributes][:term].split("/")[-1]
+    if attributes.include?(key)
+      indexes[key.to_sym] = field[:attributes][:index]
+    end
+  end
+
+  dwc.core.read(batch_size) do |data, errors|
+    pbar.increment if progress
+    records = data.map{|r| Occurrence.new(Hash[indexes.keys.zip(r.values_at(*indexes.values))]) }
+    Occurrence.import records, validate: false
+  end
+  pbar.finish if progress
 end
 
 if options[:file]

@@ -26,34 +26,29 @@ OptionParser.new do |opts|
 end.parse!
 
 def import_file(file_path)
+  attributes = Occurrence.attribute_names
+  attributes.shift
+
   file = File.new(file_path)
   pbar = ProgressBar.create(title: "CSV", total: file.readlines.size, autofinish: false, format: '%t %b>> %i| %e')
 
-  attributes = Occurrence.attribute_names
-  attributes_hash = Hash[attributes.map(&:downcase).map.with_index.to_a]
-
-  quote_chars = %w(" | ~ ^ & *)
-  
-  begin
-    CSV.foreach(file_path, options = { headers: true, return_headers: false, col_sep: "\t", quote_char: quote_chars.shift}) do |row|
-      pbar.increment
-      new_record = {}
-      row.each do |key,value|
-        new_record[attributes[attributes_hash[key.downcase]].to_sym] = value if attributes_hash[key.downcase]
-      end
-      Occurrence.create(new_record)
+  batch,batch_size = [], 5_000 
+  CSV.foreach(file_path, options = { headers: true, return_headers: false, col_sep: "\t", quote_char: "\x00"}) do |row|
+    pbar.increment
+    batch << Occurrence.new(row.to_h.slice(*attributes))
+    if batch.size >= batch_size
+      Occurrence.import batch, validate: false
+      batch = []
     end
-  rescue CSV::MalformedCSVError
-    quote_chars.empty? ? raise : retry
   end
-
+  Occurrence.import batch
   pbar.finish
 end
 
 if options[:file]
-  dwc_file = options[:file]
-  raise "File not found" unless File.exists?(dwc_file)
-  import_file(dwc_file)
+  csv_file = options[:file]
+  raise "File not found" unless File.exists?(csv_file)
+  import_file(csv_file)
 end
 
 if options[:directory]
