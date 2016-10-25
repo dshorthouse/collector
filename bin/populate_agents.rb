@@ -19,7 +19,8 @@ end.parse!
 
 if options[:truncate]
   tables = [
-    "agents", 
+    "agents",
+    "descriptions",
     "occurrence_determiners", 
     "occurrence_recorders", 
     "agent_barcodes", 
@@ -35,4 +36,3 @@ end
 
 Occurrence.populate_agents
 Description.populate_agents
-Agent.populate_recordings_with

@@ -3,42 +3,40 @@ class Description < ActiveRecord::Base
   has_many :agent_descriptions
 
   def self.populate_agents
-    types = Occurrence.where("typeStatus LIKE '%type%'").pluck(:scientificName).uniq
     parser = ScientificNameParser.new
+    types = Occurrence.where("LOWER(typeStatus) LIKE '%type%'").pluck(:scientificName).uniq
 
-    Parallel.map(types.in_groups_of(100, false), progress: "Descriptions")  do |batch|
-      batch.each do |namestring|
-        authors = []
-        year = nil
+    pbar = ProgressBar.create(title: "Descriptions", total: types.count, autofinish: false, format: '%t %b>> %i| %e')
 
-        parsed_scientific_name = parser.parse(namestring.gsub(/\A"|"\Z/, ''))[:scientificName] rescue nil
-        normalized_scientific_name = parsed_scientific_name[:normalized] rescue nil
+    types.each do |namestring|
+      pbar.increment
+      authors = []
+      year = nil
 
-        if !normalized_scientific_name.nil?
-          authors_year = description_authors(parsed_scientific_name)
-          Description.transaction do
-            description = Description.find_or_create_by(scientificName: normalized_scientific_name, year: authors_year[:year])
-            authors_year[:authors].uniq.each do |d|
-              names = Collector::AgentUtility.parse(d)
-              names.each do |name|
-                cleaned_name = Collector::AgentUtility.clean(name)
-                if !cleaned_name[:family].nil?
-                  begin
-                    agent = Agent.find_or_create_by(family: cleaned_name[:family].to_s, given: cleaned_name[:given].to_s)
-                  rescue ActiveRecord::RecordNotUnique
-                    retry
-                  end
-                  if agent.canonical_id.nil?
-                    agent.update(canonical_id: agent.id)
-                  end
-                  AgentDescription.find_or_create_by(description_id: description.id, agent_id: agent.id)
+      parsed_scientific_name = parser.parse(namestring.gsub(/\A"|"\Z/, ''))[:scientificName] rescue nil
+      normalized_scientific_name = parsed_scientific_name[:normalized] rescue nil
+
+      if !normalized_scientific_name.nil?
+        authors_year = description_authors(parsed_scientific_name)
+        Description.transaction do
+          description = Description.find_or_create_by(scientificName: normalized_scientific_name, year: authors_year[:year])
+          authors_year[:authors].uniq.each do |d|
+            names = Collector::AgentUtility.parse(d)
+            names.each do |name|
+              cleaned_name = Collector::AgentUtility.clean(name)
+              if !cleaned_name[:family].nil?
+                agent = Agent.find_or_create_by(family: cleaned_name[:family].to_s, given: cleaned_name[:given].to_s)
+                if agent.canonical_id.nil?
+                  agent.update(canonical_id: agent.id)
                 end
+                AgentDescription.find_or_create_by(description_id: description.id, agent_id: agent.id)
               end
             end
           end
         end
       end
     end
+    pbar.finish
   end
 
   def self.description_authors(parsed_scientific_name)

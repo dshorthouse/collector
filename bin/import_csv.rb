@@ -2,6 +2,7 @@
 # encoding: utf-8
 require_relative '../environment.rb'
 require 'optparse'
+require 'fileutils'
 
 ARGV << '-h' if ARGV.empty?
 
@@ -29,20 +30,38 @@ def import_file(file_path)
   attributes = Occurrence.attribute_names
   attributes.shift
 
-  file = File.new(file_path)
-  pbar = ProgressBar.create(title: "CSV", total: file.readlines.size, autofinish: false, format: '%t %b>> %i| %e')
+  header = File.open(file_path, &:readline).gsub("\n", "").split("\t")
+  indices = header.each_with_index.select{|v,i| i if attributes.include?(v)}.to_h
 
-  batch,batch_size = [], 5_000 
-  CSV.foreach(file_path, options = { headers: true, return_headers: false, col_sep: "\t", quote_char: "\x00"}) do |row|
-    pbar.increment
-    batch << Occurrence.new(row.to_h.slice(*attributes))
-    if batch.size >= batch_size
-      Occurrence.import batch, validate: false
-      batch = []
+  time = Time.now.to_i
+  chunked_dir = "/tmp/#{time}/"
+  FileUtils.mkdir(chunked_dir)
+  
+  #split files
+  puts "Splitting the csv..."
+  system("split -l 50000 #{file_path} #{chunked_dir}")
+
+  tmp_files = Dir.entries(chunked_dir).map{|f| File.join(chunked_dir, f) if !File.directory?(f)}.compact
+  
+  #remove the header row from the first file
+  system("tail -n +2 #{tmp_files[0]} > #{tmp_files[0]}.new && mv -f #{tmp_files[0]}.new #{tmp_files[0]}")
+
+  Parallel.map(tmp_files.each, progress: "Importing CSV", processes: 4) do |file|
+    output = file + ".csv"
+    CSV.open(output, 'w') do |csv|
+      CSV.foreach(file, options = { col_sep: "\t", quote_char: "\x00"}) do |row|
+        csv << row.values_at(*indices.values)
+      end
     end
+    sql = "LOAD DATA INFILE '#{output}' 
+           INTO TABLE occurrences
+           FIELDS TERMINATED BY ',' 
+           OPTIONALLY ENCLOSED BY '\"'
+           LINES TERMINATED BY '\n'
+           (" + indices.keys.join(",") + ")"
+    Occurrence.connection.execute sql
   end
-  Occurrence.import batch
-  pbar.finish
+  FileUtils.rm_rf(chunked_dir)
 end
 
 if options[:file]

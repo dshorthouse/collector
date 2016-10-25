@@ -33,8 +33,9 @@ def import_file(dwc_file, progress = true)
   title = dwc.metadata.data[:eml][:dataset][:title] rescue "DwC"
   file = File.new(dwc.core.file_path)
   batch_size = 5_000
+  total = (file.readlines.size < batch_size) ? 1 : file.readlines.size/batch_size
   if progress
-    pbar = ProgressBar.create(title: title, total: file.readlines.size/batch_size, autofinish: false, format: '%t %b>> %i| %e')
+    pbar = ProgressBar.create(title: title, total: total, autofinish: false, format: '%t %b>> %i| %e')
   end
 
   indexes = {}
