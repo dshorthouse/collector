@@ -46,7 +46,8 @@ def import_file(file_path)
   #remove the header row from the first file
   system("tail -n +2 #{tmp_files[0]} > #{tmp_files[0]}.new && mv -f #{tmp_files[0]}.new #{tmp_files[0]}")
 
-  Parallel.map(tmp_files.each, progress: "Importing CSV", processes: 4) do |file|
+  #load data in parallel
+  Parallel.map(tmp_files.each, progress: "Importing CSV", processes: 6) do |file|
     output = file + ".csv"
     CSV.open(output, 'w') do |csv|
       CSV.foreach(file, options = { col_sep: "\t", quote_char: "\x00"}) do |row|
