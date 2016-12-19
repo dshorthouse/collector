@@ -20,7 +20,9 @@ module Collector
     end
 
     def disambiguate
-      duplicates = Agent.where("family NOT LIKE '%.%'").group(:family).count.map{ |k,v| k if v > 1 }.compact
+      duplicates = Agent.where("family NOT LIKE '%.%'")
+                        .group(:family).count
+                        .map{ |k,v| k if v > 1 }.compact
       Parallel.map(duplicates.in_groups_of(100), progress: "Disambiguations") do |batch|
         batch.each do |d|
           @graph = WeightedGraph.new
@@ -84,7 +86,7 @@ module Collector
         sorted_vertices = vertices.sort_by { |g| g[:given].length }
         ids = sorted_vertices.map(&:id)
         #make the longest given name the 'canonical' version
-        #todo: make version with greatest number of objects the canonical version
+        #TODO: make version with greatest number of objects the canonical version
         canonical = ids.pop
         Agent.where(id: ids).update_all(canonical_id: canonical)
       end

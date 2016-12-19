@@ -27,11 +27,11 @@ OptionParser.new do |opts|
 end.parse!
 
 def import_file(file_path)
-  attributes = Occurrence.attribute_names
+  attributes = Occurrence.attribute_names.map(&:downcase)
   attributes.shift
 
   header = File.open(file_path, &:readline).gsub("\n", "").split("\t")
-  indices = header.each_with_index.select{|v,i| i if attributes.include?(v)}.to_h
+  indices = header.each_with_index.select{|v,i| i if attributes.include?(v.downcase)}.to_h
 
   time = Time.now.to_i
   chunked_dir = "/tmp/#{time}/"
