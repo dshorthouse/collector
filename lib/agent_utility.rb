@@ -46,12 +46,15 @@ module Collector
       \d+\s+(?i:Nov|Novemb(er|re))\.?\b|
       \d+\s+(?i:Dec|D(e|é)cemb(er|re))\.?\b|
       (?i:autres?\s+de|probably)|
+      (?i:collector\(?s?\)?)\:?\s*\b|
+      (?i:preparator\(?s?\)?)\:?\s*\b|
       (?i:fide)\:?\s*\b|
       (?i:game\s+dept)\.?\s*\b|
       (?i:see\s+notes?\s*(inside)?)|
       (?i:see\s+letter\s+enclosed)|
       (?i:pers\.?\s+comm\.?)|
       (?i:crossed\s+out)|
+      \(?(?i:source)\(?|
       (?i:revised|photograph|fruits\s+only)|
       -?\s*(?i:sight\s+(id|identifi?cation))\.?\s*\b|
       (?i:doubtful)|
@@ -78,6 +81,7 @@ module Collector
       \b(?i:and|et|with|per)\s+|
       \b(?i:annotated(\s+by)?)\s*\b|
       \b(?i:coll\.)\s*\b|
+      \b(?i:communicate?d(\s+to)?)\s*\b|
       \b(?i:conf\.?(\s+by)?|confirmed(\s+by)?)\s*\b|
       \b(?i:checked?(\s+by)?)\s*\b|
       \b(?i:det\.?(\s+by)?)\s*\b|
@@ -97,6 +101,7 @@ module Collector
     }x
 
     CHAR_SUBS = {
+      '|' => ' | ',
       '(' => ' ',
       ')' => ' ',
       '[' => ' ',
@@ -106,28 +111,45 @@ module Collector
       '=' => '',
       '#' => '',
       '/' => ' / ',
-      '&' => ' & '
+      '&' => ' & ',
+      '*' => ''
     }
 
     BLACKLIST = %r{
       (?i:abundant)|
       (?i:adult|juvenile)|
-      (?i:believe|unclear|illegible|none)|
+      (?i:average)|
+      (?i:believe|unclear|illegible|none|suggested)|
       (?i:biolog|botan|zoo|ecolog|mycol|(in)?vertebrate|fisheries|genetic|animal|mushroom|wildlife|plumage|flower|agriculture)|
       (?i:bris?tish|canadi?an?|chinese|arctic|japan|russian|north\s+america)|
-      (?i:herbarium|herbier|collection|collected|publication|specimen|species|describe|an(a|o)morph|isolated|recorded|inspection|define|status)|
+      (?i:herbarium|herbier|collection|collected|publication|specimen|species|describe|an(a|o)morph|isolated|recorded|inspection|define|status|lighthouse)|
       \b\s*(?i:help)\s*\b|
       (?i:description|drawing|identification|remark|original|illustration|checklist|intermedia|measurement|indisting|series)|
-      (?i:internation|gou?vern|ministry|unit|district|provincial|na(c|t)ional|military|region|environ|natur(e|al)|naturelles|division|program|direction)|
+      (?i:evidence|likely)|
+      (?i:internation|gou?vern|ministry|unit|district|provincial|na(c|t)ional|military|region|environ|natur(e|al)|naturelles|division|program|direction|national)|
+      (?i:label)|
       (?i:o?\.?m\.?n\.?r\.?)|
-      (?i:mus(eum|ée)|universit(y|é)|college|institute?|acad(e|é)m|school|écol(e|iers?)|polytech|dep(t|art?ment)|research|clinic|hospital|cientifica|sanctuary|safari)|
-      (?i:graduate|student|supervisor|rcmp|coordinator|minority|police|taxonomist|consultant|team|équipe|memb(er|re)|crew|group|staff|personnel|family|captain|friends|assistant|worker)|
+      (?i:measurement)|
+      (?i:mus(eum|ée)|universit(y|é|e|at)|college|institute?|acad(e|é)m|school|écol(e|iers?)|laboratoi?r|polytech|dep(t|art?ment)|research|clinic|hospital|cientifica|sanctuary|safari)|
+      (?i:univ\.)|
+      (?i:graduate|student|supervisor|superint|rcmp|coordinator|minority|police|taxonomist|consultant|team|équipe|memb(er|re)|crew|group|staff|personnel|family|captain|friends|assistant|worker)|
       (?i:non\s+pr(é|e)cis(é|e))|
-      (?i:ontario|qu(e|é)bec|assurance)|
+      (?i:ontario|qu(e|é)bec|saskatchewan|sault|newfoundland|assurance|u\.?s\.?s\.?r\.?)|
       (?i:recreation|culture)|
+      (?i:shaped|dark|pale|areas|phase|spotting|interior|between|closer)|
       (?i:soci(e|é)t(y|é)|cent(er|re)|community|history|conservation|conference|assoc|class|commission|consortium|council|club|alliance|protective|circle)|
       (?i:commercial|company|control|product)|
+      (?i:size|large|colou?r)\s+|
+      (?i:skeleton)|
       (?i:survey|assessment|station|monitor|stn\.|index|project|bureau|engine|expedi(c|t)ion|festival|generation|inventory|marine)|
+      (?i:submersible)|
+      (?i:systematic|perspective)|
+      \s+(?i:off)\s+|
+      \s*(?i:too)\s+|\s*(?i:the)\s+|
+      (?i:taxiderm(ies|y))|
+      (?i:though)|
+      (?i:toward|seen at)|
+      (?i:unidentified)|
       (?i:workshop|garden|farm|jardin|public)
     }x
 
@@ -138,11 +160,12 @@ module Collector
     Namae.options[:title] = TITLE
 
     def self.parse(name)
-      Namae.parse(name.gsub(STRIP_OUT, ' ')
-                      .gsub(/[#{CHAR_SUBS.keys.join('\\')}]/, CHAR_SUBS)
-                      .gsub(/([A-Z]{1}\.)([[:alpha:]]{2,})/, '\1 \2')
-                      .gsub(/,\z/, '')
-                      .squeeze(' ').strip)
+      cleaned = name.gsub(STRIP_OUT, ' ')
+                    .gsub(/[#{CHAR_SUBS.keys.join('\\')}]/, CHAR_SUBS)
+                    .gsub(/([A-Z]{1}\.)([[:alpha:]]{2,})/, '\1 \2')
+                    .gsub(/,\z/, '')
+                    .squeeze(' ').strip
+      Namae.parse(cleaned)
     end
 
     def self.clean(parsed_namae)
@@ -152,6 +175,9 @@ module Collector
         return blank_name
       end
       if parsed_namae.family && parsed_namae.family.length == 3 && parsed_namae.family.count('.') == 1
+        return blank_name
+      end
+      if parsed_namae.given && parsed_namae.given.length > 15
         return blank_name
       end
       if parsed_namae.given && parsed_namae.given.count('.') >= 3 && /\.\s*[a-zA-Z]{4,}\s+[a-zA-Z]{1,}\./.match(parsed_namae.given)
@@ -168,18 +194,32 @@ module Collector
       end
 
       if parsed_namae.given && 
-          parsed_namae.family && 
-          parsed_namae.family.count(".") > 0 && 
-          parsed_namae.family.length - parsed_namae.family.count(".") <= 3
-        given = parsed_namae.given
-        family = parsed_namae.family
-        parsed_namae.family = given
-        parsed_namae.given = family
+         parsed_namae.family && 
+         parsed_namae.family.count(".") > 0 && 
+         parsed_namae.family.length - parsed_namae.family.count(".") <= 3
+          given = parsed_namae.given
+          family = parsed_namae.family
+          parsed_namae.family = given
+          parsed_namae.given = family
       end
 
+      if parsed_namae.given && 
+        (parsed_namae.given == parsed_namae.given.upcase || 
+        parsed_namae.given == parsed_namae.given.downcase) && 
+        !parsed_namae.given.include?(".") &&
+        parsed_namae.given.length >= 4
+          parsed_namae.given = CapitalizeNames.capitalize(parsed_namae.given)
+      end
+
+      if parsed_namae.given && /[A-Za-z]\./.match(parsed_namae.given)
+        parsed_namae.given = CapitalizeNames.capitalize(parsed_namae.given).sub(/[a-z]\./, &:upcase)
+      end
+
+      parsed_namae.normalize_initials
+  
       family = parsed_namae.family.gsub(/\.\z/, '').strip rescue nil
-      given = parsed_namae.normalize_initials.given.strip rescue nil
-      particle = parsed_namae.normalize_initials.particle.strip rescue nil
+      given = parsed_namae.given.strip rescue nil
+      particle = parsed_namae.particle.strip rescue nil
 
       if family.nil? && !given.nil? && !given.include?(".")
         family = given
@@ -187,7 +227,7 @@ module Collector
       end
 
       if !family.nil? && given.nil? && !particle.nil?
-        given = particle.sub(/^(.)/) { $1.capitalize }
+        given = particle.sub(/[a-z]\./, &:upcase).sub(/^(.)/) { $1.capitalize }
         particle = nil
       end
 
@@ -195,8 +235,8 @@ module Collector
         family = family.mb_chars.capitalize.to_s rescue nil
       end
 
-      if !given.nil? && (given == given.upcase || given == given.downcase) && !given.include?(".")
-        given = given.mb_chars.capitalize.to_s rescue nil
+      if !family.nil? && family.length <= 3 && family !~ /[aeiouy]/
+        return blank_name
       end
 
       { given: given, family: family }

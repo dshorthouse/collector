@@ -38,6 +38,7 @@ require 'dwc-archive'
 require 'redis'
 require 'net/http'
 require 'uri'
+require 'capitalize_names'
 
 require_all 'lib'
 require_all 'helpers'

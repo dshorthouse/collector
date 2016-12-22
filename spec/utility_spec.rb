@@ -37,10 +37,10 @@ describe "Utility functions to handle names of people" do
   end
 
   it "should remove numerical values and lowercase letter" do
-    input = "23440a Ian D. Macdonald"
+    input = "23440a Ian D. MacDonald"
     parsed = @utility.parse(input)
     expect(parsed.size).to eq(1)
-    expect(parsed[0].values_at(:given, :family)).to eq(["Ian D.", "Macdonald"])
+    expect(parsed[0].values_at(:given, :family)).to eq(["Ian D.", "MacDonald"])
   end
 
   it "should remove 'male' or 'female' text from name" do
@@ -52,17 +52,33 @@ describe "Utility functions to handle names of people" do
   end
 
   it "should remove numerical values and capital letter" do
-    input = "23440G Ian D. Macdonald"
+    input = "23440G Ian D. MacDonald"
     parsed = @utility.parse(input)
     expect(parsed.size).to eq(1)
-    expect(parsed[0].values_at(:given, :family)).to eq(["Ian D.", "Macdonald"])
+    expect(parsed[0].values_at(:given, :family)).to eq(["Ian D.", "MacDonald"])
   end
 
   it "should remove numerical values and lowercase letter in brackets" do
-    input = "23440(a) Ian D. Macdonald"
+    input = "23440(a) Ian D. MacDonald"
     parsed = @utility.parse(input)
     expect(parsed.size).to eq(1)
-    expect(parsed[0].values_at(:given, :family)).to eq(["Ian D.", "Macdonald"])
+    expect(parsed[0].values_at(:given, :family)).to eq(["Ian D.", "MacDonald"])
+  end
+
+  it "should normalize a name all in caps" do
+    input = "WILLIAM BEEBE"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(["WILLIAM", "BEEBE"])
+    expect(@utility.clean(parsed[0]).to_h).to eq({given: 'William', family:'Beebe'})
+  end
+
+  it "should normalize a name all in caps, written in reverse order" do
+    input = "SOSIAK, MACLENNAN"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(["MACLENNAN", "SOSIAK"])
+    expect(@utility.clean(parsed[0]).to_h).to eq({given: 'MacLennan', family:'Sosiak'})
   end
 
   it "should remove 'et al'" do
@@ -104,6 +120,7 @@ describe "Utility functions to handle names of people" do
     input = "J.R.Smith"
     parsed = @utility.parse(input)
     expect(parsed[0].values_at(:given, :family)).to eq(['J.R.', 'Smith'])
+    expect(@utility.clean(parsed[0]).to_h).to eq({given: 'J.R.', family:'Smith'})
   end
 
   it "should separate multiple concatenated names" do
@@ -175,6 +192,7 @@ describe "Utility functions to handle names of people" do
     parsed = @utility.parse(input)
     expect(parsed.size).to eq(1)
     expect(parsed[0].values_at(:given, :family)).to eq(['W.P.', 'Coreneuk'])
+    expect(@utility.clean(parsed[0]).to_h).to eq({given: 'W.P.', family:'Coreneuk'})
   end
 
   it "should remove 'Game Dept.'" do
@@ -284,6 +302,7 @@ describe "Utility functions to handle names of people" do
     parsed = @utility.parse(input)
     expect(parsed.size).to eq(1)
     expect(parsed[0].values_at(:given, :family)).to eq(['FAH', 'Sperling'])
+    expect(@utility.clean(parsed[0]).to_h).to eq({ family: "Sperling", given: "F.A.H."})
   end
 
   it "should preserve caps in family names" do
@@ -366,8 +385,16 @@ describe "Utility functions to handle names of people" do
     expect(parsed[1].values_at(:given, :family)).to eq(['Yves', 'Archambault'])
   end
 
-  it "should explode names with '|'" do
+  it "should explode names with ' | '" do
     input = "Jack Smith | Yves Archambault"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(2)
+    expect(parsed[0].values_at(:given, :family)).to eq(['Jack', 'Smith'])
+    expect(parsed[1].values_at(:given, :family)).to eq(['Yves', 'Archambault'])
+  end
+
+  it "should explode names with '|'" do
+    input = "Jack Smith|Yves Archambault"
     parsed = @utility.parse(input)
     expect(parsed.size).to eq(2)
     expect(parsed[0].values_at(:given, :family)).to eq(['Jack', 'Smith'])
@@ -1000,6 +1027,22 @@ describe "Utility functions to handle names of people" do
     expect(@utility.clean(parsed[0]).to_h).to eq({ family: "Young", given: "C."})
   end
 
+  it "should capitalize names like 'Chris R.T. YOUNG'" do
+    input = "Chris R.T. YOUNG"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(['Chris R.T.', 'YOUNG'])
+    expect(@utility.clean(parsed[0]).to_h).to eq({ family: "Young", given: "Chris R.T."})
+  end
+
+  it "should capitalize names like 'CHRIS R.T. YOUNG'" do
+    input = "CHRIS R.T. YOUNG"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(['CHRIS R.T.', 'YOUNG'])
+    expect(@utility.clean(parsed[0]).to_h).to eq({ family: "Young", given: "Chris R.T."})
+  end
+
   it "should properly handle and capitalize utf-8 characters" do
     input = "Sicard, Léas"
     parsed = @utility.parse(input)
@@ -1014,6 +1057,57 @@ describe "Utility functions to handle names of people" do
     expect(parsed.size).to eq(3)
     expect(parsed[0].values_at(:given, :family)).to eq(['J.', 'Green'])
     expect(@utility.clean(parsed[2]).to_h).to eq({ family: nil, given: nil })
+  end
+
+  it "should ignore names with 'the'" do
+    input = "The old bird was dead"
+    parsed = @utility.parse(input)
+    expect(parsed[0].values_at(:given, :family)).to eq(["The", "dead"])
+    expect(@utility.clean(parsed[0]).to_h).to eq({ family: nil, given: nil })
+  end
+
+  it "should ignore names with 'unidentified'" do
+    input = "Unidentified Beetle"
+    parsed = @utility.parse(input)
+    expect(parsed[0].values_at(:given, :family)).to eq(["Unidentified", "Beetle"])
+    expect(@utility.clean(parsed[0]).to_h).to eq({ family: nil, given: nil })
+  end
+
+  it "should remove '(source)'" do
+    input = "Tuck, Leslie M.; Vladykov, Vadim D. (source)"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(2)
+    expect(parsed[0].values_at(:given, :family)).to eq(["Leslie M.", "Tuck"])
+    expect(parsed[1].values_at(:given, :family)).to eq(["Vadim D.", "Vladykov"])
+  end
+
+  it "should remove asterisks from a name" do
+    input = "White*"
+    parsed = @utility.parse(input)
+    expect(parsed[0].values_at(:given, :family)).to eq(["White", nil])
+    expect(@utility.clean(parsed[0]).to_h).to eq({ family: "White", given: nil })
+  end
+
+  it "should split with 'communicated to' in text" do
+    input = "Huber Moore; communicatd to Terry M. Taylor"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(2)
+    expect(parsed[0].values_at(:given, :family)).to eq(["Huber", "Moore"])
+    expect(@utility.clean(parsed[1]).to_h).to eq({given: "Terry M.", family: "Taylor"})
+  end
+
+  it "should ignore a three letter family name without vowels" do
+    input = "Jack Wft"
+    parsed = @utility.parse(input)
+    expect(parsed[0].values_at(:given, :family)).to eq(["Jack", "Wft"])
+    expect(@utility.clean(parsed[0]).to_h).to eq({given: nil, family: nil})
+  end
+
+  it "should accept a three letter family name with a vowel" do
+    input = "Jack Wit"
+    parsed = @utility.parse(input)
+    expect(parsed[0].values_at(:given, :family)).to eq(["Jack", "Wit"])
+    expect(@utility.clean(parsed[0]).to_h).to eq({given: "Jack", family: "Wit"})
   end
 
   it "should clean a doi with http://dx.doi.org" do

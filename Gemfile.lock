@@ -40,6 +40,8 @@ GEM
       unicode_utils (~> 1.4)
     builder (3.2.2)
     byebug (8.2.1)
+    capitalize-names (1.0.4)
+      activesupport (>= 3)
     chronic (0.10.2)
     crass (1.0.2)
     daemons (1.2.3)
@@ -188,6 +190,7 @@ DEPENDENCIES
   activerecord-import
   biodiversity
   byebug
+  capitalize-names
   chronic
   dwc-archive
   elasticsearch

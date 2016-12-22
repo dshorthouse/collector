@@ -5,6 +5,7 @@ The progression is as follows:
     ./bin/populate_occurrences [--truncate] (one-time)
     ./bin/populate_agents [--truncate]
     ./bin/populate_taxa [--truncate]
+    ./bin/populate_genders.rb [--reset] 
     ./bin/disambiguate_agents [--reset]
     ./bin/populate_orcids [--reset]
     ./bin/populate_profiles [--res]
