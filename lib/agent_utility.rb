@@ -118,13 +118,16 @@ module Collector
     BLACKLIST = %r{
       (?i:abundant)|
       (?i:adult|juvenile)|
+      (?i:anon)|
       (?i:average)|
       (?i:believe|unclear|illegible|none|suggested)|
+      (?i:barcod)|
       (?i:biolog|botan|zoo|ecolog|mycol|(in)?vertebrate|fisheries|genetic|animal|mushroom|wildlife|plumage|flower|agriculture)|
       (?i:bris?tish|canadi?an?|chinese|arctic|japan|russian|north\s+america)|
+      (?i:carex|salix)|
       (?i:herbarium|herbier|collection|collected|publication|specimen|species|describe|an(a|o)morph|isolated|recorded|inspection|define|status|lighthouse)|
       \b\s*(?i:help)\s*\b|
-      (?i:description|drawing|identification|remark|original|illustration|checklist|intermedia|measurement|indisting|series)|
+      (?i:description|drawing|identification|remark|original|illustration|checklist|intermedia|measurement|indisting|series|imperfect)|
       (?i:evidence|likely)|
       (?i:internation|gou?vern|ministry|unit|district|provincial|na(c|t)ional|military|region|environ|natur(e|al)|naturelles|division|program|direction|national)|
       (?i:label)|
@@ -132,28 +135,31 @@ module Collector
       (?i:measurement)|
       (?i:mus(eum|ée)|universit(y|é|e|at)|college|institute?|acad(e|é)m|school|écol(e|iers?)|laboratoi?r|polytech|dep(t|art?ment)|research|clinic|hospital|cientifica|sanctuary|safari)|
       (?i:univ\.)|
-      (?i:graduate|student|supervisor|superint|rcmp|coordinator|minority|police|taxonomist|consultant|team|équipe|memb(er|re)|crew|group|staff|personnel|family|captain|friends|assistant|worker)|
+      (?i:graduate|student|storekeep|supervisor|superint|rcmp|coordinator|minority|police|taxonomist|consultant|team|équipe|memb(er|re)|crew|group|staff|personnel|family|captain|friends|assistant|worker)|
       (?i:non\s+pr(é|e)cis(é|e))|
-      (?i:ontario|qu(e|é)bec|saskatchewan|sault|newfoundland|assurance|u\.?s\.?s\.?r\.?)|
+      (?i:ontario|qu(e|é)bec|saskatchewan|sault|newfoundland|assurance|vancouver|u\.?s\.?s\.?r\.?)|
       (?i:recreation|culture)|
       (?i:shaped|dark|pale|areas|phase|spotting|interior|between|closer)|
       (?i:soci(e|é)t(y|é)|cent(er|re)|community|history|conservation|conference|assoc|class|commission|consortium|council|club|alliance|protective|circle)|
       (?i:commercial|company|control|product)|
       (?i:size|large|colou?r)\s+|
       (?i:skeleton)|
-      (?i:survey|assessment|station|monitor|stn\.|index|project|bureau|engine|expedi(c|t)ion|festival|generation|inventory|marine)|
+      (?i:survey|assessment|station|monitor|stn\.|index|project|bureau|engine|expedi(c|t)ion|festival|generation|inventory|marine|service)|
       (?i:submersible)|
+      (?i:synonymy?)|
       (?i:systematic|perspective)|
       \s+(?i:off)\s+|
       \s*(?i:too)\s+|\s*(?i:the)\s+|
       (?i:taxiderm(ies|y))|
       (?i:though)|
       (?i:toward|seen at)|
-      (?i:unidentified)|
+      (?i:unidentified|unspecified|unk?nown|unnamed|unread|unmistak|no agent)|
+      (?i:urn\:)|
+      (?i:usda|ucla)|
       (?i:workshop|garden|farm|jardin|public)
     }x
 
-    TITLE = /\s*\b(sir|lord|count(ess)?|(gen|adm|col|maj|capt|cmdr|lt|sgt|cpl|pvt|prof|dr|md|ph\.?d|rev|docteur|mme|abbé|ptre)\.?|frère|frere|père|pere)(\s+|$)/i
+    TITLE = /\s*\b(sir|lord|count(ess)?|(gen|adm|col|maj|capt|cmdr|lt|sgt|cpl|pvt|prof|dr|md|ph\.?d|rev|docteur|mme|abbé|ptre)\.?|frère|frere|père|pere|professor)(\s+|$)/i
 
     Namae.options[:prefer_comma_as_separator] = true
     Namae.options[:separator] = SPLIT_BY
@@ -235,7 +241,15 @@ module Collector
         family = family.mb_chars.capitalize.to_s rescue nil
       end
 
-      if !family.nil? && family.length <= 3 && family !~ /[aeiouy]/
+      if !family.nil? && family.length <= 4 && family !~ /[aeiouy]/
+        return blank_name
+      end
+
+      if !family.nil? && family.match(/[A-Z]$/)
+        return blank_name
+      end
+
+      if !family.nil? && family.match(/^[A-Z]{2}/)
         return blank_name
       end
 

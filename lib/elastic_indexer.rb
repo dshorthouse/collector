@@ -16,18 +16,20 @@ module Collector
     end
 
     def delete_agents
-      #requires ES plugin. See: https://www.elastic.co/guide/en/elasticsearch/plugins/current/plugins-delete-by-query.html
-      @client.delete_by_query index: @settings.elastic_index, type: 'agent', q: '*'
+      delete_docs_by_type({type: "agent"})
     end
 
     def delete_occurrences
-      #requires ES plugin. See: https://www.elastic.co/guide/en/elasticsearch/plugins/current/plugins-delete-by-query.html
-      @client.delete_by_query index: @settings.elastic_index, type: 'occurrence', q: '*'
+      delete_docs_by_type({type: "occurrence"})
     end
 
     def delete_taxa
-      #requires ES plugin. See: https://www.elastic.co/guide/en/elasticsearch/plugins/current/plugins-delete-by-query.html
-      @client.delete_by_query index: @settings.elastic_index, type: 'taxon', q: '*'
+      delete_docs_by_type({type: "taxon"})
+    end
+
+    def delete_docs_by_type(hsh = {})
+      client = Elasticsearch::Client.new url: @settings.elastic_server
+      client.perform_request 'POST', @settings.elastic_index + "/#{hsh[:type]}/_delete_by_query", {}, { query: { match_all: {} } }
     end
 
     def create
@@ -133,7 +135,7 @@ module Collector
                       given: { type: 'string', index: 'not_analyzed' }
                     }
                   },
-                  coordinates: { type: 'geo_point', lat_lon: true, fielddata: { format: 'compressed', precision: "5km" }, index: 'not_analyzed' },
+                  coordinates: { type: 'geo_point', index: 'not_analyzed' },
                   institutions: { type: 'string', index: 'not_analyzed' }
                 }
               },
@@ -203,7 +205,7 @@ module Collector
           occurrence: {
             properties: {
               id: { type: 'integer', index: 'not_analyzed' },
-              occurrence_coordinates: { type: 'geo_point', lat_lon: true, fielddata: { format: 'compressed', precision: "100m" }, index: 'not_analyzed' },
+              occurrence_coordinates: { type: 'geo_point', index: 'not_analyzed' },
               dateIdentified: { type: 'date', format: 'year' },
               identifiedBy: {
                 type: 'nested',
@@ -246,7 +248,7 @@ module Collector
                   count: { type: 'integer', index: 'not_analyzed' }
                 }
               },
-              taxon_coordinates: { type: 'geo_point', lat_lon: true, fielddata: { format: 'compressed', precision: "5km" }, index: 'not_analyzed' },
+              taxon_coordinates: { type: 'geo_point', index: 'not_analyzed' },
             }
           }
         }
@@ -271,7 +273,8 @@ module Collector
     end
 
     def import_occurrences
-      Parallel.map(Occurrence.find_in_batches(batch_size: 100), progress: "Search-Occurrences") do |batch|
+      occurrences = Occurrence.where("id IS NOT NULL")
+      Parallel.map(occurrences.find_in_batches(batch_size: 100), progress: "Search-Occurrences") do |batch|
         occurrences = []
         batch.each do |o|
           occurrences << {

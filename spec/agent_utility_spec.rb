@@ -1110,49 +1110,18 @@ describe "Utility functions to handle names of people" do
     expect(@utility.clean(parsed[0]).to_h).to eq({given: "Jack", family: "Wit"})
   end
 
-  it "should clean a doi with http://dx.doi.org" do
-    input = "http://dx.doi.org/10.12345/12345"
-    cleaned = @utility.doi_clean(input)
-    expect(cleaned).to eq("10.12345/12345")
+  it "should ignore a family name with CAPs at end" do
+    input = "Jack SmitH"
+    parsed = @utility.parse(input)
+    expect(parsed[0].values_at(:given, :family)).to eq(["Jack", "SmitH"])
+    expect(@utility.clean(parsed[0]).to_h).to eq({given: nil, family: nil})
   end
 
-  it "should clean a doi with http://doi.org" do
-    input = "http://doi.org/10.12345/12345"
-    cleaned = @utility.doi_clean(input)
-    expect(cleaned).to eq("10.12345/12345")
-  end
-
-  it "should clean a doi with doi:" do
-    input = "doi:10.12345/12345"
-    cleaned = @utility.doi_clean(input)
-    expect(cleaned).to eq("10.12345/12345")
-  end
-
-  it "should clean a doi with DOI:" do
-    input = "DOI:10.12345/12345"
-    cleaned = @utility.doi_clean(input)
-    expect(cleaned).to eq("10.12345/12345")
-  end
-
-  it "should clean a doi with DOI= " do
-    input = "DOI= 10.12345/12345"
-    cleaned = @utility.doi_clean(input)
-    expect(cleaned).to eq("10.12345/12345")
-  end
-
-  it "should recognize a valid ORCID, all nums" do
-    input = "0000-0002-1825-0097"
-    expect(@utility.is_orcid?(input)).to be true
-  end
-
-  it "should recognize a valid ORCID, X checksum" do
-    input = "0000-0002-1825-009X"
-    expect(@utility.is_orcid?(input)).to be true
-  end
-
-  it "should not recognize an ivalid ORCID" do
-    input = "0000-0002-1825-009A"
-    expect(@utility.is_orcid?(input)).to be false
+  it "should ignore ignore a family name with two CAPs at the beginning" do
+    input = "RGBennett"
+    parsed = @utility.parse(input)
+    expect(parsed[0].values_at(:given, :family)).to eq(["RGBennett", nil])
+    expect(@utility.clean(parsed[0]).to_h).to eq({given: nil, family: nil})
   end
 
 end

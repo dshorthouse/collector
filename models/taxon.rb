@@ -7,6 +7,7 @@ class Taxon < ActiveRecord::Base
 
   def self.populate_metadata
     Parallel.map(Taxon.find_each, progress: "Metadata") do |t|
+      next if t.common || t.image
       response = RestClient::Request.execute(
         method: :get,
         url: Sinatra::Application.settings.eol_api + 'search/1.0.json?exact=true&q=' + URI::encode(t.family),

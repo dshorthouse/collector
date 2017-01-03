@@ -1,5 +1,4 @@
 # encoding: utf-8
-require 'byebug'
 require 'rgl/adjacency'
 require 'rgl/connected_components'
 require 'rgl/dot'
@@ -84,8 +83,7 @@ module Collector
     def combine_subgraphs
       @graph.each_connected_component do |vertices|
         sorted_vertices = vertices.sort_by { |g| g[:given].length }
-        ids = sorted_vertices.map(&:id)
-        #make the longest given name the 'canonical' version
+        ids = sorted_vertices.map{|v| v[:id]}
         #TODO: make version with greatest number of objects the canonical version
         canonical = ids.pop
         Agent.where(id: ids).update_all(canonical_id: canonical)
