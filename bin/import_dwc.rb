@@ -30,7 +30,7 @@ def import_file(dwc_file, progress = true)
   attributes.shift
 
   dwc = DarwinCore.new(dwc_file)
-  title = dwc.metadata.data[:eml][:dataset][:title] rescue "DwC"
+  title = File.basename(dwc_file)
   file = File.new(dwc.core.file_path)
   batch_size = 5_000
   row_count = file.readlines.size
@@ -66,9 +66,9 @@ if options[:directory]
   raise "Directory not foud" unless File.directory?(directory)
   accepted_formats = [".zip", ".gzip"]
   files = Dir.entries(directory).select {|f| accepted_formats.include?(File.extname(f))}
-  Parallel.map(files.in_groups_of(5, false), progress: "Bulk") do |batch|
+  Parallel.map(files.in_groups_of(3, false), progress: "Bulk Import") do |batch|
     batch.each do |file|
-      import_file(File.join(directory, file), false)
+      import_file(File.join(directory, file), false) rescue puts File.basename(file)
     end
   end
 end

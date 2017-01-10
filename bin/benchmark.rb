@@ -3,15 +3,16 @@
 require_relative '../environment.rb'
 require 'benchmark'
 
-iterations = 10
+iterations = 100
 
-agent = Agent.find(4191)
+occ = Occurrence.find(1124328)
 
 Benchmark.bm do |bm|
 
-  bm.report("network") do
+  bm.report("agents_orig") do
     iterations.times do
-      agent.network
+      occ.agents
     end
   end
+
 end

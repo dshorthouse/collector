@@ -89,7 +89,7 @@ class Occurrence < ActiveRecord::Base
   end
 
   def self.populate_taxa
-    @redis = Redis.new(db: 1)
+    @redis = Redis.new(db: 2)
     @redis.flushdb
 
     @taxon_occurrences = File.open("/tmp/taxon_occurrences", "w")
@@ -145,27 +145,9 @@ class Occurrence < ActiveRecord::Base
   end
 
   def agents
-    response = Occurrence.connection.select_all("
-      SELECT
-        d.agent_id as determiner, null as recorder, a.given, a.family
-      FROM 
-        occurrences o 
-      JOIN occurrence_determiners d ON d.occurrence_id = o.id 
-      JOIN agents a ON d.agent_id = a.id
-      WHERE 
-        o.id = %s 
-      UNION ALL 
-      SELECT 
-        null as determiner, r.agent_id as recorder, a.given, a.family
-      FROM 
-        occurrences o 
-      JOIN occurrence_recorders r ON r.occurrence_id = o.id 
-      JOIN agents a ON r.agent_id = a.id
-      WHERE 
-        o.id = %s" % [id,id])
-    { 
-      determiners: response.map{|d| { id: d["determiner"], given: d["given"], family: d["family"] } if d["determiner"]}.compact, 
-      recorders: response.map{|r|  { id: r["recorder"], given: r["given"], family: r["family"] } if r["recorder"]}.compact
+    {
+      determiners: determiners.map{|d| { id: d[:id], given: d[:given], family: d[:family] } },
+      recorders: recorders.map{|d| { id: d[:id], given: d[:given], family: d[:family] } }
     }
   end
 

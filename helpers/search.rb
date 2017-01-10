@@ -21,8 +21,7 @@ module Sinatra
         bounds = (params[:b] || "0,0,0,0").split(",").map(&:to_f) rescue [0,0,0,0]
         polygon = YAML::load(params[:p] || "[[0,0]]").map{ |n| n.reverse } rescue []
 
-        body = { query: { match_all: {} } }
-        fields = "id,family,personal.family,personal.given,orcid,collector_index"
+        body = { query: { bool: { must: [ match_all: {} ] } } }
 
         client = Elasticsearch::Client.new
 
@@ -48,13 +47,6 @@ module Sinatra
         end
 
         if geo.present?
-          if !searched_term.present?
-            if type == "taxon"
-              sort.push("family:asc")
-            elsif type == "agent"
-              sort.push("personal.family:asc")
-            end
-          end
 
           if type == "taxon"
             geo_circle = { geo_distance: { coordinates: center, distance: radius } }
@@ -77,19 +69,16 @@ module Sinatra
         end
 
         if taxon.present?
-          if !searched_term.present?
-            sort.push("family:asc")
-          end
           filters << { term: { "determinations.families.family" => taxon } }
         end
 
         if filters.size > 0
-          body[:filter] = { bool: { must: filters } }
+          body[:query][:bool][:filter] = filters
         end
 
         from = (page -1) * search_size
 
-        response = client.search index: settings.elastic_index, type: type, fields: fields, from: from, size: search_size, sort: sort, body: body
+        response = client.search index: settings.elastic_index, type: type, from: from, sort: sort, size: search_size, body: body
         results = response["hits"].deep_symbolize_keys
 
         @results = WillPaginate::Collection.create(page, search_size, results[:total]) do |pager|
@@ -196,22 +185,23 @@ module Sinatra
 
           aggregations: {
             determinations: {
-              filter: { query: { nested: { path: "identifiedBy", query: { match: { "identifiedBy.id" => id } } } } },
-              aggregations: {
-                histogram: {
+              #filter: { query: { nested: { path: "identifiedBy", query: { match: { "identifiedBy.id" => id } } } } },
+              #aggregations: {
+                #histogram: {
                   date_histogram: {
                     field: "dateIdentified",
                     interval: "year",
                     format: "year",
                     min_doc_count: 0
                   }
-                }
-              }
+                  #}
+                #}
             },
+
             recordings: {
-              filter: { query: { nested: { path: "recordedBy", query: { match: { "recordedBy.id" => id } } } } },
-              aggregations: {
-                histogram: {
+              #filter: { query: { nested: { path: "recordedBy", query: { match: { "recordedBy.id" => id } } } } },
+              #aggregations: {
+                #histogram: {
                   date_histogram: {
                     field: "eventDate",
                     interval: "year",
@@ -226,14 +216,15 @@ module Sinatra
                       }
                     }
                   }
-                }
-              }
+                  #}
+                #}
             }
+
           }
 
         }
 
-        response = client.search index: settings.elastic_index, type: "occurrence", search_type: "count", body: body
+        response = client.search index: settings.elastic_index, type: "occurrence", search_type: "query_then_fetch", size: 0, body: body
         @result = response.deep_symbolize_keys!
       end
 
@@ -241,13 +232,12 @@ module Sinatra
         @results = []
         client = Elasticsearch::Client.new
 
-        client.indices.put_settings body: { index: { max_result_window: 50_000 } }
+        client.indices.put_settings body: { index: { max_result_window: 60_000 } }
 
         body = {
           query: {
             match_all: {}
           },
-          fields: ["id","personal.family","personal.given","orcid","collector_index"],
           sort: {
             collector_index: { order: "desc" }
           }
@@ -267,17 +257,17 @@ module Sinatra
 
       def format_agents
         @results.map{ |n|
-          orcid = n[:fields][:orcid][0].presence if n[:fields].has_key? :orcid
-          { id: n[:fields][:id][0],
-            name: [n[:fields][:"personal.family"][0].presence, n[:fields][:"personal.given"][0].presence].compact.join(", "),
+          orcid = n[:_source][:orcid].presence if n[:_source].has_key? :orcid
+          { id: n[:_source][:id],
+            name: [n[:_source][:personal][:family].presence, n[:_source][:personal][:given].presence].compact.join(", "),
             orcid: orcid,
-            collector_index:  n[:fields][:collector_index][0]
+            collector_index:  n[:_source][:collector_index]
           }
         }
       end
 
       def format_taxa
-        @results.map{ |f| { id: f[:fields][:id][0], name: f[:fields][:family][0].presence } }
+        @results.map{ |f| { id: f[:_source][:id], name: f[:_source][:family].presence } }
       end
 
     end

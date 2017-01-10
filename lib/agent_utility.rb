@@ -45,19 +45,20 @@ module Collector
       \d+\s+(?i:Oct|Octob(er|re))\.?\b|
       \d+\s+(?i:Nov|Novemb(er|re))\.?\b|
       \d+\s+(?i:Dec|D(e|é)cemb(er|re))\.?\b|
-      (?i:autres?\s+de|probably)|
+      (?i:autres?\s+de|probab|likely|possibl(e|y)|doubtful)|
+      \b\s*maybe\s*\b|
       (?i:collector\(?s?\)?)\:?\s*\b|
       (?i:preparator\(?s?\)?)\:?\s*\b|
       (?i:fide)\:?\s*\b|
       (?i:game\s+dept)\.?\s*\b|
       (?i:see\s+notes?\s*(inside)?)|
       (?i:see\s+letter\s+enclosed)|
+      (?i:(by)?\s+correspondance)|
       (?i:pers\.?\s+comm\.?)|
       (?i:crossed\s+out)|
       \(?(?i:source)\(?|
       (?i:revised|photograph|fruits\s+only)|
       -?\s*(?i:sight\s+(id|identifi?cation))\.?\s*\b|
-      (?i:doubtful)|
       -?\s*(?i:synonym(y|ie))|
       \b\s*\(?(?i:(fe)?male)\)?\s*\b|
       \b(?i:to\s+(sub)?spp?)\.?|
@@ -78,6 +79,7 @@ module Collector
     SPLIT_BY = %r{
       [–|&+/;]|
       \s+-\s+|
+      \s+a\.\s+|
       \b(?i:and|et|with|per)\s+|
       \b(?i:annotated(\s+by)?)\s*\b|
       \b(?i:coll\.)\s*\b|
@@ -128,14 +130,15 @@ module Collector
       (?i:herbarium|herbier|collection|collected|publication|specimen|species|describe|an(a|o)morph|isolated|recorded|inspection|define|status|lighthouse)|
       \b\s*(?i:help)\s*\b|
       (?i:description|drawing|identification|remark|original|illustration|checklist|intermedia|measurement|indisting|series|imperfect)|
-      (?i:evidence|likely)|
+      (?i:evidence)|
       (?i:internation|gou?vern|ministry|unit|district|provincial|na(c|t)ional|military|region|environ|natur(e|al)|naturelles|division|program|direction|national)|
       (?i:label)|
       (?i:o?\.?m\.?n\.?r\.?)|
       (?i:measurement)|
-      (?i:mus(eum|ée)|universit(y|é|e|at)|college|institute?|acad(e|é)m|school|écol(e|iers?)|laboratoi?r|polytech|dep(t|art?ment)|research|clinic|hospital|cientifica|sanctuary|safari)|
+      (?i:ent(o|y)mology)|
+      (?i:mus(eum|ée)|universit(y|é|e|at)|college|institute?|acad(e|é)m|school|écol(e|iers?)|laboratoi?r|projec?t|polytech|dep(t|art?ment)|research|clinic|hospital|cientifica|sanctuary|safari)|
       (?i:univ\.)|
-      (?i:graduate|student|storekeep|supervisor|superint|rcmp|coordinator|minority|police|taxonomist|consultant|team|équipe|memb(er|re)|crew|group|staff|personnel|family|captain|friends|assistant|worker)|
+      (?i:graduate|student|storekeep|supervisor|superint|rcmp|coordinator|minority|police|taxonomist|consultant|team|(é|e)quipe|memb(er|re)|crew|group|staff|personnel|family|captain|friends|assistant|worker)|
       (?i:non\s+pr(é|e)cis(é|e))|
       (?i:ontario|qu(e|é)bec|saskatchewan|sault|newfoundland|assurance|vancouver|u\.?s\.?s\.?r\.?)|
       (?i:recreation|culture)|
@@ -146,7 +149,7 @@ module Collector
       (?i:skeleton)|
       (?i:survey|assessment|station|monitor|stn\.|index|project|bureau|engine|expedi(c|t)ion|festival|generation|inventory|marine|service)|
       (?i:submersible)|
-      (?i:synonymy?)|
+      (?i:synonymy?)|(topo|syn|holo)type|
       (?i:systematic|perspective)|
       \s+(?i:off)\s+|
       \s*(?i:too)\s+|\s*(?i:the)\s+|

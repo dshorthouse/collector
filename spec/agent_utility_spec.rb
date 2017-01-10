@@ -1124,4 +1124,42 @@ describe "Utility functions to handle names of people" do
     expect(@utility.clean(parsed[0]).to_h).to eq({given: nil, family: nil})
   end
 
+  it "should split a string of names with a." do
+    input = "R.K. Godfrey a. R.D. Houk"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(2)
+    expect(parsed[0].values_at(:given, :family)).to eq(["R.K.", "Godfrey"])
+    expect(parsed[1].values_at(:given, :family)).to eq(["R.D.", "Houk"])
+  end
+
+  it "should not split a string of names with A." do
+    input = "R.K. A. Godfrey"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(["R.K. A.", "Godfrey"])
+    expect(@utility.clean(parsed[0]).to_h).to eq({given: "R.K.A.", family: "Godfrey"})
+  end
+
+  it "should not ignore the name Paula Maybee" do
+    input = "Paula Maybee"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(["Paula", "Maybee"])
+    expect(@utility.clean(parsed[0]).to_h).to eq({given: "Paula", family: "Maybee"})
+  end
+
+  it "it should not ignore the word maybe" do
+    input = "Paula Maybee maybe"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(["Paula", "Maybee"])
+    expect(@utility.clean(parsed[0]).to_h).to eq({given: "Paula", family: "Maybee"})
+  end
+
+  it "should strip out 'by correspondance" do
+    input = "Stephen Darbyshire 2005 (by correspondance)"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(1)
+    expect(parsed[0].values_at(:given, :family)).to eq(["Stephen", "Darbyshire"])
+  end
 end

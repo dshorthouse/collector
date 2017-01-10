@@ -16,14 +16,17 @@ module Collector
     end
 
     def delete_agents
+      puts "Deleting all agents..."
       delete_docs_by_type({type: "agent"})
     end
 
     def delete_occurrences
+      puts "Deleting all occurrences..."
       delete_docs_by_type({type: "occurrence"})
     end
 
     def delete_taxa
+      puts "Deleting all taxa..."
       delete_docs_by_type({type: "taxon"})
     end
 
@@ -257,84 +260,72 @@ module Collector
     end
 
     def import_agents
-      agents = Agent.where("id = canonical_id")
-      Parallel.map(agents.find_in_batches(batch_size: 10), progress: "Search-Agents") do |batch|
-        agents = []
-        batch.each do |a|
-          agents << {
-            index: {
-              _id: a.id,
-                data: agent_document(a)
-            }
-          }
-        end
-        @client.bulk index: @settings.elastic_index, type: 'agent', refresh: false, body: agents
+      agents = Agent.where("id = canonical_id").pluck(:id)
+      Parallel.map(agents.in_groups_of(10, false), progress: "Search-Agents") do |batch|
+        bulk_agent(batch)
       end
     end
 
     def import_occurrences
-      occurrences = Occurrence.where("id IS NOT NULL")
-      Parallel.map(occurrences.find_in_batches(batch_size: 100), progress: "Search-Occurrences") do |batch|
-        occurrences = []
-        batch.each do |o|
-          occurrences << {
-            index: {
-              _id: o.id,
-              data: occurrence_document(o)
-            }
-          }
-        end
-        @client.bulk index: @settings.elastic_index, type: 'occurrence', refresh: false, body: occurrences
+      Parallel.map(Occurrence.pluck(:id).in_groups_of(100, false), progress: "Search-Occurrences") do |batch|
+        bulk_occurrence(batch)
       end
     end
 
     def occurrence_document(o)
       date_identified = Collector::AgentUtility.valid_year(o.dateIdentified)
       event_date = Collector::AgentUtility.valid_year(o.eventDate)
-      agents = o.agents
       {
         id: o.id,
         occurrence_coordinates: o.coordinates,
-        identifiedBy: agents[:determiners],
+        identifiedBy: o.agents[:determiners],
         dateIdentified: !date_identified.nil? ? date_identified.to_s : nil,
-        recordedBy: agents[:recorders],
+        recordedBy: o.agents[:recorders],
         eventDate: !event_date.nil? ? event_date.to_s : nil
       }
     end
 
+    def taxon_document(t)
+      {
+         id: t.id,
+         family: t.family,
+         common_name: t.common,
+         image_data: t.image_data,
+         identifiedBy: t.determinations.pluck(:id, :given, :family).group_by{ |i| i }.map {|k, v| { id: k[0], given: k[1], family: k[2], count: v.count } },
+         taxon_coordinates: t.occurrence_coordinates
+       }
+    end
+
     def import_taxa
-      Parallel.map(Taxon.find_in_batches(batch_size:100), progress: "Search-Taxa") do |batch|
-        taxa = []
-        batch.each do |t|
-          taxa << {
-                  index: {
-                    _id: t.id,
-                    data: {
-                      id: t.id,
-                      family: t.family,
-                      common_name: t.common,
-                      image_data: t.image_data,
-                      identifiedBy: t.determinations.pluck(:id, :given, :family).group_by{ |i| i }.map {|k, v| { id: k[0], given: k[1], family: k[2], count: v.count } },
-                      taxon_coordinates: t.occurrence_coordinates
-                    }
-                  }
-                }
-        end
-        @client.bulk index: @settings.elastic_index, type: 'taxon', refresh: false, body: taxa
+      Parallel.map(Taxon.pluck(:id).in_groups_of(100, false), progress: "Search-Taxa") do |batch|
+        bulk_taxon(batch)
       end
     end
 
-    def bulk_agent(batches)
+    def bulk_agent(batch)
       agents = []
-      batches.each do |a|
+      batch.each do |a|
         agents << {
           index: {
             _id: a,
-              data: agent_document(Agent.find(a))
+            data: agent_document(Agent.find(a))
           }
         }
       end
       @client.bulk index: @settings.elastic_index, type: 'agent', refresh: false, body: agents
+    end
+
+    def bulk_taxon(batch)
+      taxa = []
+      batch.each do |t|
+        taxa << {
+          index: {
+            _id: t,
+            data: taxon_document(Taxon.find(t))
+          }
+        }
+      end
+      @client.bulk index: @settings.elastic_index, type: 'taxon', refresh: false, body: taxa
     end
 
     def add_agent(a)
@@ -350,13 +341,13 @@ module Collector
       @client.delete index: @settings.elastic_index, type: 'agent', id: a.id
     end
 
-    def bulk_occurrence(batches)
+    def bulk_occurrence(batch)
       occurrences = []
-      batches.each do |a|
+      batch.each do |a|
         occurrences << {
           index: {
             _id: a,
-              data: occurrence_document(Occurrence.find(a))
+            data: occurrence_document(Occurrence.find(a))
           }
         }
       end

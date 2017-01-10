@@ -50,11 +50,11 @@ module Sinatra
       end
 
       def format_agent(n)
-        orcid = n[:fields][:orcid][0].presence if n[:fields].has_key? :orcid
-        { id: n[:fields][:id][0],
-          name: [n[:fields][:"personal.family"][0].presence, n[:fields][:"personal.given"][0].presence].compact.join(", "),
+        orcid = n[:_source][:orcid].presence if n[:_source].has_key? :orcid
+        { id: n[:_source][:id],
+          name: [n[:_source][:personal][:family].presence, n[:_source][:personal][:given].presence].compact.join(", "),
           orcid: orcid,
-          collector_index:  n[:fields][:collector_index][0]
+          collector_index:  n[:_source][:collector_index]
         }
       end
 
