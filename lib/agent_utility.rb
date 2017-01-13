@@ -47,8 +47,7 @@ module Collector
       \d+\s+(?i:Dec|D(e|é)cemb(er|re))\.?\b|
       (?i:autres?\s+de|probab|likely|possibl(e|y)|doubtful)|
       \b\s*maybe\s*\b|
-      (?i:collector\(?s?\)?)\:?\s*\b|
-      (?i:preparator\(?s?\)?)\:?\s*\b|
+      \(?(?i:collector|data\s*recorder|netter|(oper|prepar)ator)\)?\.?\:?|
       (?i:fide)\:?\s*\b|
       (?i:game\s+dept)\.?\s*\b|
       (?i:see\s+notes?\s*(inside)?)|
@@ -138,7 +137,7 @@ module Collector
       (?i:ent(o|y)mology)|
       (?i:mus(eum|ée)|universit(y|é|e|at)|college|institute?|acad(e|é)m|school|écol(e|iers?)|laboratoi?r|projec?t|polytech|dep(t|art?ment)|research|clinic|hospital|cientifica|sanctuary|safari)|
       (?i:univ\.)|
-      (?i:graduate|student|storekeep|supervisor|superint|rcmp|coordinator|minority|police|taxonomist|consultant|team|(é|e)quipe|memb(er|re)|crew|group|staff|personnel|family|captain|friends|assistant|worker)|
+      (?i:graduate|student|storekeep|supervisor|superint|rcmp|coordinator|minority|fishermen|police|taxonomist|consultant|team|(é|e)quipe|memb(er|re)|crew|group|staff|personnel|family|captain|friends|assistant|worker)|
       (?i:non\s+pr(é|e)cis(é|e))|
       (?i:ontario|qu(e|é)bec|saskatchewan|sault|newfoundland|assurance|vancouver|u\.?s\.?s\.?r\.?)|
       (?i:recreation|culture)|

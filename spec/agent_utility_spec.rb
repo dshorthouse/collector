@@ -1162,4 +1162,14 @@ describe "Utility functions to handle names of people" do
     expect(parsed.size).to eq(1)
     expect(parsed[0].values_at(:given, :family)).to eq(["Stephen", "Darbyshire"])
   end
+
+  it "should strip out 'operator', 'netter, and 'data recorder'" do
+    input = "Holm, E (operator).; Ng, J.(netter); Litwiller, S. (netter); Lee, C. (data recorder)"
+    parsed = @utility.parse(input)
+    expect(parsed.size).to eq(4)
+    expect(parsed[0].values_at(:given, :family)).to eq(["E", "Holm"])
+    expect(parsed[1].values_at(:given, :family)).to eq(["J.", "Ng"])
+    expect(parsed[2].values_at(:given, :family)).to eq(["S.", "Litwiller"])
+    expect(parsed[3].values_at(:given, :family)).to eq(["C.", "Lee"])
+  end
 end

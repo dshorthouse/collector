@@ -25,6 +25,10 @@ module Sinatra
             haml :roster
           end
 
+          app.get '/network' do
+            haml :network
+          end
+
           app.get '/agent.json' do
             execute_search('agent')
             format_agents.to_json
