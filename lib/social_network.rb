@@ -9,30 +9,61 @@ module Collector
 
     def initialize
       super
+      @agent_ids = Set.new
       @agents = []
       @attributes = {}
-      @kingdom = {}
+      @kingdoms = {}
     end
 
-    def add_edge(u, v, w)
+    def build
+      collect_agent_ids
+      collect_agent_data
+      add_edges
+      add_attributes
+      remove_isolates
+    end
+
+    def collect_agent_ids
+      occurrence_ids = OccurrenceRecorder.group("occurrence_id").having("count(*) > 4").pluck(:occurrence_id)
+      pbar = ProgressBar.create(title: "CollectingAgents", total: occurrence_ids.count/50+1, autofinish: false, format: '%t %b>> %i| %e')
+      occurrence_ids.in_groups_of(50, false) do |group|
+        @agent_ids.merge(OccurrenceRecorder.where(occurrence_id: group).pluck(:agent_id).uniq)
+        pbar.increment
+      end
+      pbar.finish
+    end
+
+    def collect_agent_data
+      pbar = ProgressBar.create(title: "BuildingAgentData", total: @agent_ids.count/25+1, autofinish: false, format: '%t %b>> %i| %e')
+      @agent_ids.to_a.in_groups_of(25, false) do |group|
+        agents = Agent.find(group).map{|a| 
+          { fullname: a.fullname, gender: a.gender, recordings: a.occurrence_recorders.pluck(:occurrence_id) } if !a.given.nil?
+        }.compact
+        @agents.push(*agents)
+        pbar.increment
+      end
+      pbar.finish
+    end
+
+    def add_edge(u,v,w)
       super(u,v)
-      @kingdom[[u,v]] = w
+      @kingdoms[[u,v]] = w
     end
 
     def add_edges
-      occurrence_ids = OccurrenceRecorder.group("occurrence_id").having("count(*) > 5").pluck(:occurrence_id)
-      recorders = Occurrence.find(occurrence_ids).collect(&:recorders).flatten.uniq
-      @agents = recorders.map{|a| 
-        { fullname: a.fullname, gender: a.gender, recordings: a.occurrence_recorders.pluck(:occurrence_id) } if !a.given.nil? 
-      }.compact
-      @agents.combination(2).each do |pair|
+      combinations = @agents.combination(2)
+      pbar = ProgressBar.create(title: "AddingEdges", total: combinations.count, autofinish: false, format: '%t %b>> %i| %e')
+      combinations.each do |pair|
         common = pair.first[:recordings] & pair.second[:recordings]
-        kingdom = Occurrence.find(common.first).taxa.first.kingdom rescue nil
-        self.add_edge(pair.first[:fullname], pair.second[:fullname], kingdom) if common.size > 0
+        shared_kingdom = TaxonOccurrence.find_by_occurrence_id(common.first).taxon.kingdom rescue nil
+        self.add_edge(pair.first[:fullname], pair.second[:fullname], shared_kingdom) if common.size > 0
+        pbar.increment
       end
+      pbar.finish
     end
 
     def add_attributes
+      pbar = ProgressBar.create(title: "AddingAttributes", total: @agents.count, autofinish: false, format: '%t %b>> %i| %e')
       @agents.each do |a|
         options = {}
         options[:style] = "filled"
@@ -43,7 +74,9 @@ module Collector
           options[:fillcolor] = "lightblue"
         end
         add_vertex_attributes(a[:fullname], options)
+        pbar.increment
       end
+      pbar.finish
     end
 
     # A set of all the unconnected vertices in the graph.
@@ -59,12 +92,16 @@ module Collector
       @attributes[v] || {}
     end
 
+    def kingdom(u,v)
+      @kingdoms[[u,v]] || @kingdoms[[v,u]]
+    end
+
     def remove_isolates
       isolates.each { |v| remove_vertex v }
     end
 
-    def write_to_dot_file(dotfile="graph")
-      src = dotfile + ".dot"
+    def write_to_dot_file(file_name="graph")
+      src = file_name + ".dot"
 
       File.open(src, 'w') do |f|
         f << self.to_dot_graph.to_s << "\n"
@@ -72,13 +109,12 @@ module Collector
       src
     end
 
-    def write_to_graphic_file(fmt='png', dotfile="graph")
-      src = dotfile + ".dot"
-      dot = dotfile + "." + fmt
-
-      write_to_dot_file(dotfile)
-      system("dot -T#{fmt} #{src} -o #{dot}")
-      dot
+    def write_to_graphic_file(fmt='png', file_name="graph")
+      puts "Creating graphic..."
+      src = write_to_dot_file(file_name)
+      output = file_name + "." + fmt
+      system("sfdp -Goutputorder=edgesfirst -Goverlap=prism -T#{fmt} #{src} > #{output}")
+      output
     end
 
 
@@ -94,14 +130,6 @@ module Collector
 
     def vertex_id(v)
       v
-    end
-
-    # Edge kingdom
-    #
-    # [_u_] source vertex
-    # [_v_] target vertex
-    def kingdom(u, v)
-      @kingdom[[u,v]] || @kingdom[[v,u]]
     end
 
     def to_dot_graph(params = {})
@@ -121,23 +149,27 @@ module Collector
       end
 
       each_edge do |u, v|
-        edge_color = "black"
-        if kingdom(u,v) == "Animalia"
-          edge_color = "maroon"
-        elsif kingdom(u,v) == "Plantae"
-          edge_color = "green"
-        elsif kingdom(u,v) == "Fungi"
-          edge_color = "orange"
-        elsif kingdom(u,v) == "Protozoa"
-          edge_color = "blue"
-        elsif kingdom(u,v) == "Chromista"
-          edge_color = "blue"
+
+        case kingdom(u,v)
+        when "Animalia"
+          color = "brown"
+        when "Plantae"
+          color = "green"
+        when "Chromista"
+          color = "blue"
+        when "Fungi"
+          color ="gold"
+        when "Protozoa"
+          color = "lightblue"
+        else
+          color = "black"
         end
+
         options = {
           from: vertex_id(u),
           to: vertex_id(v),
           fontsize: fontsize,
-          color: edge_color
+          color: color
         }
         graph << edge_class.new(options.stringify_keys)
       end

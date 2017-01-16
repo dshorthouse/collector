@@ -1,26 +1,18 @@
+:css
+  #search{width:95%;text-align:right;}
+  #container{margin-top:10px;}
+
 -content_for :scripts do
   %script{src: '/javascript/svg-pan-zoom.min.js', type: 'text/javascript' }
-  :javascript
-    $(function() {
-      var embed = document.createElement('embed');
-      embed.setAttribute('style', 'width: 1000px; height: 500px; border:1px solid black;');
-      embed.setAttribute('type', 'image/svg+xml');
-      embed.setAttribute('src', '/images/collector-network.svg');
-
-      document.getElementById('container').appendChild(embed)
-
-      lastEventListener = function(){
-        svgPanZoom(embed, {
-          zoomEnabled: true,
-          controlIconsEnabled: true
-        });
-      }
-      embed.addEventListener('load', lastEventListener);
-    });
+  %script{src: '/javascript/network.js', type: 'text/javascript' }
 
 -content_for :title do
   Collector Network
 
 %h1 Network of Collectors
 
-#container
+#search
+  %label{for: "search"} Search
+  %input{id: "search-box", style: 'width:200px;'}
+
+#container{style: 'width: 100%; height: 500px'}

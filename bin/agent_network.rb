@@ -12,7 +12,11 @@ options[:depth] = 1
 OptionParser.new do |opts|
   opts.banner = "Usage:agent_network.rb [options]"
 
-  opts.on("-e", "--all-agents", "Generate graph files for all agents") do |a|
+  opts.on("-e", "--each-agent", "Generate graph files for each agent") do |a|
+    options[:each_agent] = true
+  end
+
+  opts.on("-s", "--all-agents", "Generate single graph file for all agents") do |a|
     options[:all_agents] = true
   end
 
@@ -38,7 +42,11 @@ OptionParser.new do |opts|
 end.parse!
 
 if options[:all_agents]
-  puts 'Starting to create all agent network graphs as ' + options[:type]
+  graph = Collector::SocialNetwork.new
+  graph.build
+  graph.write_to_graphic_file('svg', File.join(Sinatra::Application.settings.root, 'public/images/collector-network'))
+elsif options[:each_agent]
+  puts 'Starting to create network graphs for each agent as ' + options[:type]
   count = 0
   agents = Agent.where("id = canonical_id")
   pbar = ProgressBar.create(title: "Networks", total: agents.count, autofinish: false, format: '%t %b>> %i| %e')

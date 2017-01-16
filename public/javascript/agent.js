@@ -56,7 +56,7 @@ var Agent = (function($, window) {
       }
       if(this.chartData.determinations.length > 1) {
         google.setOnLoadCallback(function() { self.drawCharts(self.chartData.determinations, 'determinations'); });
-        $('#determinations-wrapper').show();
+        $('#determinations').show();
       }
       if(this.chartData.recordings.length > 1) {
         google.setOnLoadCallback(function() { self.drawCharts(self.chartData.recordings, 'recordings'); });
