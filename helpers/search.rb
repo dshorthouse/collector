@@ -260,6 +260,7 @@ module Sinatra
           orcid = n[:_source][:orcid].presence if n[:_source].has_key? :orcid
           { id: n[:_source][:id],
             name: [n[:_source][:personal][:family].presence, n[:_source][:personal][:given].presence].compact.join(", "),
+            fullname: [n[:_source][:personal][:given].presence, n[:_source][:personal][:family].presence].compact.join(" "),
             orcid: orcid,
             collector_index:  n[:_source][:collector_index]
           }

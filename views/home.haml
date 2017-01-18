@@ -18,7 +18,7 @@
   %div.search-agent
     %form{ id: "search_form", method: "get", action: "/", "accept-charset" => "UTF-8" }
       %div.inputs
-        %label{for: "typeahead-taxon"}= "Collector"
+        %label{for: "typeahead-agent"}= "Collector"
         %input.typeahead{id: "typeahead-agent", type: :text, name: "q", placeholder: "Terry Wheeler", value: "#{params[:q]}", size: 30}
       %div.inputs
         %label{for: "typeahead-taxon"}= "Taxon Family"
