@@ -62,7 +62,7 @@ var Network = (function($, window) {
       this.svg.obj.setAttribute('style', 'width: 95%; height: 100%; border:1px solid black;');
       this.svg.obj.setAttribute('type', 'image/svg+xml');
       this.svg.obj.setAttribute('data', '/images/collector-network.svg');
-      $('#container').append(this.svg.obj);
+      $('#svg-container').append(this.svg.obj);
       this.svg.obj.addEventListener('load', function() { self.svgEventListener(); });
     },
     svgEventListener: function(){
