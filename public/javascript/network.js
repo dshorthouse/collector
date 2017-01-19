@@ -83,7 +83,7 @@ var Network = (function($, window) {
       });
     },
     executeSearch: function(search) {
-      var self = this, ellipse, mean_pt_width, mean_pt_height, center, pixel_ratio, white_space;
+      var self = this, ellipse, mean_pt_width, mean_pt_height, center, pixel_ratio, white_space, x_arr, max, min;
       if (this.search_cache.length > 0) {
         $.each(this.search_cache, function() {
           this.ellipse.setAttribute("fill", this.fill);
@@ -119,7 +119,14 @@ var Network = (function($, window) {
         pixel_ratio = this.svg.size.height/this.svg.size.viewBox.height;
         white_space = (this.svg.size.width - this.svg.size.viewBox.width*pixel_ratio)/2;
         this.panZoom.pan({x: (center.x - mean_pt_width)*pixel_ratio + white_space, y: (mean_pt_height - center.y)*pixel_ratio});
-        this.panZoom.zoom(4);
+        if (this.search_cache.length > 1) {
+          x_arr = this.search_cache.map(function(a) { return a.cx; });
+          max = Math.max.apply(Math,x_arr);
+          min = Math.min.apply(Math,x_arr);
+          this.panZoom.zoom(parseInt(this.svg.size.viewBox.width/(max-min),10));
+        } else {
+          this.panZoom.zoom(7);
+        }
       }
     }
   };
