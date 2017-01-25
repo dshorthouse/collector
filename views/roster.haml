@@ -1,6 +1,11 @@
 -content_for :title do
   Roster
 
+-content_for :scripts do
+  %script{src: '/javascript/roster.js', type: 'text/javascript' }
+  :javascript
+    $(function() { Roster.init(); });
+
 %h1 Roster of #{number_with_delimiter(@results.total_entries)} Collectors and Determiners
 %p
   #summary= "Page #{@results.current_page.to_i}"
@@ -8,8 +13,14 @@
 %table{id: "roster"}
   %thead
     %tr
-      %th Name
-      %th.column Collector Index
+      %th
+        %a{href: "#", "data-field": "personal.family"}
+          Name
+          %span{class: "arrow"}
+      %th.column
+        %a{href: "#", "data-field": "collector_index"}
+          Collector Index
+          %span{class: "arrow arrow-down"}
   %tbody
   - @results.each do |r|
     - agent = format_agent(r)

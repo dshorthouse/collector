@@ -529,7 +529,24 @@ ol.ranked li {
     overflow: hidden; }
 
 /* Roster */
-
+#roster th a{
+  color:#fff;
+}
+span.arrow{
+  width: 0;
+  height: 0;
+  position:relative;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+}
+span.arrow-up{
+  border-bottom: 5px solid white;
+  bottom:0.75em;
+}
+span.arrow-down{
+  border-top: 5px solid white;
+  top:0.75em;
+}
 #roster {
   border-top:1px solid #e5eff8;
   border-right:1px solid #e5eff8;

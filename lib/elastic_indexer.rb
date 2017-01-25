@@ -112,7 +112,7 @@ module Collector
               twitter: { type: 'string', index: 'not_analyzed' },
               personal: {
                 properties: {
-                  family: { type: 'string', search_analyzer: :family_search, analyzer: :family_index, omit_norms: true },
+                  family: { type: 'string', fielddata: true, search_analyzer: :family_search, analyzer: :family_index, omit_norms: true },
                   given: { type: 'string', search_analyzer: :given_search, analyzer: :given_index, omit_norms: true },
                   gender: { type: 'string', index: 'not_analyzed' },
                   aka: {

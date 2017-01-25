@@ -234,13 +234,17 @@ module Sinatra
 
         client.indices.put_settings body: { index: { max_result_window: 60_000 } }
 
+        sort_field = params[:sort_field] || "collector_index"
+        sort_dir = params[:dir] || "desc"
+
+        sort = {}
+        sort[sort_field.to_sym] = sort_dir
+
         body = {
           query: {
             match_all: {}
           },
-          sort: {
-            collector_index: { order: "desc" }
-          }
+          sort: sort
         }
 
         page = (params[:page] || 1).to_i
