@@ -12,7 +12,7 @@ module Collector
       @agent_ids = Set.new
       @agents = []
       @attributes = {}
-      @kingdoms = {}
+      @occurrences = {}
     end
 
     def build
@@ -24,7 +24,7 @@ module Collector
     end
 
     def collect_agent_ids
-      occurrence_ids = OccurrenceRecorder.group("occurrence_id").having("count(*) > 4").pluck(:occurrence_id)
+      occurrence_ids = OccurrenceRecorder.group("occurrence_id").having("count(*) > 1").pluck(:occurrence_id)
       pbar = ProgressBar.create(title: "CollectingAgents", total: occurrence_ids.count/50+1, autofinish: false, format: '%t %b>> %i| %e')
       occurrence_ids.in_groups_of(50, false) do |group|
         @agent_ids.merge(OccurrenceRecorder.where(occurrence_id: group).pluck(:agent_id).uniq)
@@ -47,7 +47,7 @@ module Collector
 
     def add_edge(u,v,w)
       super(u,v)
-      @kingdoms[[u,v]] = w
+      @occurrences[[u,v]] = w
     end
 
     def add_edges
@@ -55,8 +55,7 @@ module Collector
       pbar = ProgressBar.create(title: "AddingEdges", total: combinations.count, autofinish: false, format: '%t %b>> %i| %e')
       combinations.each do |pair|
         common = pair.first[:recordings] & pair.second[:recordings]
-        shared_kingdom = TaxonOccurrence.find_by_occurrence_id(common.first).taxon.kingdom rescue nil
-        self.add_edge(pair.first[:fullname], pair.second[:fullname], shared_kingdom) if common.size > 0
+        self.add_edge(pair.first[:fullname], pair.second[:fullname], common) if common.size > 0
         pbar.increment
       end
       pbar.finish
@@ -66,12 +65,13 @@ module Collector
       pbar = ProgressBar.create(title: "AddingAttributes", total: @agents.count, autofinish: false, format: '%t %b>> %i| %e')
       @agents.each do |a|
         options = {}
-        options[:style] = "filled"
-        options[:fillcolor] = "white"
+        if edge_count(a[:fullname]) > 60
+          options[:fontsize] = 16
+        end
         if a[:gender] == "female"
-          options[:fillcolor] = "lightpink"
+          options[:fillcolor] = "#e55798"
         elsif a[:gender] == "male"
-          options[:fillcolor] = "lightblue"
+          options[:fillcolor] = "#3399ff"
         end
         add_vertex_attributes(a[:fullname], options)
         pbar.increment
@@ -92,8 +92,14 @@ module Collector
       @attributes[v] || {}
     end
 
-    def kingdom(u,v)
-      @kingdoms[[u,v]] || @kingdoms[[v,u]]
+    def edge_count(a)
+      count = 0
+      each_edge{|u,v| count += 1 if u == a || v == a}
+      count
+    end
+
+    def occurrences(u,v)
+      @occurrences[[u,v]] || @occurrences[[v,u]]
     end
 
     def remove_isolates
@@ -135,7 +141,7 @@ module Collector
     def to_dot_graph(params = {})
       params[:name] ||= self.class.name.gsub(/:/, '_')
       fontsize       = params[:fontsize] ? params[:fontsize] : '8'
-      graph          = RGL::DOT::Graph.new(params)
+      graph          = RGL::DOT::Graph.new(params.stringify_keys)
       edge_class     = RGL::DOT::Edge
 
       each_vertex do |v|
@@ -149,27 +155,43 @@ module Collector
       end
 
       each_edge do |u, v|
+        kingdom = Occurrence.find(occurrences(u,v).first).taxon.kingdom rescue nil
+        weight = 1
+        style = "filled"
+        if occurrences(u,v).count.between?(2,50)
+          style = "setlinewidth(2)"
+          weight = 2
+        elsif occurrences(u,v).count.between?(51,100)
+          style = "setlinewidth(3)"
+          weight = 3
+        elsif occurrences(u,v).count > 100
+          style = "setlinewidth(4)"
+          weight = 4
+        end
 
-        case kingdom(u,v)
+        case kingdom
         when "Animalia"
-          color = "brown"
+          color = "#f0f02e"
         when "Plantae"
-          color = "green"
+          color = "#00ff04"
         when "Chromista"
-          color = "blue"
+          color = "#00f9ff"
         when "Fungi"
-          color ="gold"
+          color ="#fb7d00"
         when "Protozoa"
-          color = "lightblue"
+          color = "#00f9ff"
+        when "Protista"
+          color = "#00f9ff"
         else
-          color = "black"
+          color = "#cccccc"
         end
 
         options = {
           from: vertex_id(u),
           to: vertex_id(v),
-          fontsize: fontsize,
-          color: color
+          color: color,
+          style: style,
+          weight: weight
         }
         graph << edge_class.new(options.stringify_keys)
       end

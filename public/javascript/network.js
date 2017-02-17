@@ -83,9 +83,10 @@ var Network = (function($, window) {
       });
     },
     executeSearch: function(search) {
-      var self = this, ellipse, mean_pt_width, mean_pt_height, center, pixel_ratio, white_space, x_arr, max, min;
+      var self = this, ellipse, txt, mean_pt_width, mean_pt_height, center, pixel_ratio, white_space, x_arr, max, min;
       if (this.search_cache.length > 0) {
         $.each(this.search_cache, function() {
+          this.txt.setAttribute("fill", this.fontcolor);
           this.ellipse.setAttribute("fill", this.fill);
           this.ellipse.setAttribute("stroke", this.stroke);
           this.ellipse.setAttribute("stroke-width", 1);
@@ -95,18 +96,22 @@ var Network = (function($, window) {
       $.each(this.svg.nodes, function() {
         if (search != "" && $(this).find("title:icontains('"+search+"')").length) {
           ellipse = $(this).find("ellipse")[0];
+          txt = $(this).find("text")[0];
           self.search_cache.push(
             { 
-              ellipse: ellipse, 
+              ellipse: ellipse,
+              txt: txt,
+              fontcolor: txt.getAttribute("fill"),
               fill: ellipse.getAttribute("fill"), 
               stroke: ellipse.getAttribute("stroke"),
-              cx: parseInt(ellipse.getAttribute("cx"), 10),
+              cx: parseInt(ellipse.getAttribute("cx"),10),
               cy: parseInt(ellipse.getAttribute("cy"),10)
             }
           );
           ellipse.setAttribute("fill", '#ffff00');
           ellipse.setAttribute("stroke", '#ff0000');
           ellipse.setAttribute("stroke-width", 5);
+          txt.setAttribute("fill", '#000000');
         }
       });
       if(search != "" && this.search_cache.length > 0) {

@@ -56,6 +56,7 @@ module Collector
       (?i:pers\.?\s+comm\.?)|
       (?i:crossed\s+out)|
       \(?(?i:source)\(?|
+      (?i:according\s+to)|
       (?i:revised|photograph|fruits\s+only)|
       -?\s*(?i:sight\s+(id|identifi?cation))\.?\s*\b|
       -?\s*(?i:synonym(y|ie))|
@@ -121,7 +122,7 @@ module Collector
       (?i:adult|juvenile)|
       (?i:anon)|
       (?i:average)|
-      (?i:believe|unclear|illegible|none|suggested)|
+      (?i:believe|unclear|illegible|none|suggested|(dis)?agrees?)|approach|
       (?i:barcod)|
       (?i:biolog|botan|zoo|ecolog|mycol|(in)?vertebrate|fisheries|genetic|animal|mushroom|wildlife|plumage|flower|agriculture)|
       (?i:bris?tish|canadi?an?|chinese|arctic|japan|russian|north\s+america)|

@@ -25,3 +25,4 @@ end
 
 Occurrence.populate_taxa
 Taxon.populate_metadata
+Taxon.populate_kingdoms

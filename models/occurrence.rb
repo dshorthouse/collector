@@ -5,8 +5,8 @@ class Occurrence < ActiveRecord::Base
   has_many :recorders, through: :occurrence_recorders, source: :agent
   has_many :occurrence_recorders
 
-  has_many :taxa, through: :taxon_occurrences, source: :taxon
-  has_many :taxon_occurrences
+  has_one :taxon, through: :taxon_occurrence, source: :taxon
+  has_one :taxon_occurrence
 
   def self.populate_agents
     @redis = Redis.new(db: 1)
@@ -95,7 +95,7 @@ class Occurrence < ActiveRecord::Base
     @taxon_occurrences = File.open("/tmp/taxon_occurrences", "w")
     @taxon_determiners = File.open("/tmp/taxon_determiners", "w")
 
-    taxa = Occurrence.where.not(identifiedBy: [nil, ''], family: [nil,'']).pluck(:id, :family)
+    taxa = Occurrence.where.not(recordedBy: [nil, ''], family: [nil,'']).pluck(:id, :family)
     Parallel.map(taxa.in_groups_of(1000, false), progress: "Taxa") do |batch|
       batch.each do |o|
         taxon_id = @redis.get(o[1])

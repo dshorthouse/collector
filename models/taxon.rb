@@ -16,13 +16,33 @@ class Taxon < ActiveRecord::Base
     end
   end
 
+  def self.populate_kingdoms
+    accepted = ["Animalia", "Plantae", "Fungi", "Protista", "Chromista", "Protozoa"]
+    taxa = Taxon.where(kingdom: nil)
+    pbar = ProgressBar.create(title: "Kingdoms", total: taxa.count, autofinish: false, format: '%t %b>> %i| %e')
+    taxa.find_each do |t|
+      response = RestClient::Request.execute(
+        method: :get,
+        url: Sinatra::Application.settings.gn_api + 'name_resolvers.json?data_source_ids=11&names=' + URI::encode(t.family),
+      )
+      results = JSON.parse(response, :symbolize_names => true)
+      kingdom = results[:data][0][:results][0][:classification_path].split("|")[0] rescue nil
+      if accepted.include?(kingdom)
+        t.kingdom = kingdom
+        t.save
+      end
+      pbar.increment
+    end
+    pbar.finish
+  end
+
   def self.parse_search_eol_response(taxon, response)
     results = JSON.parse(response, :symbolize_names => true)
     id = results[:results][0][:id] rescue nil
     if !id.nil?
       response = RestClient::Request.execute(
         method: :get,
-        url: Sinatra::Application.settings.eol_api + 'pages/1.0/' + id.to_s + '.json?common_names=true&images=1&&details=true&videos=0&sounds=0&maps=0&text=0'
+        url: Sinatra::Application.settings.eol_api + 'pages/1.0/' + id.to_s + '.json?common_names=true&images=1&details=true&videos=0&sounds=0&maps=0&text=0'
       ) rescue nil
       parse_page_eol_response(taxon, response) if !response.nil?
     end
