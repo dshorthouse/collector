@@ -145,7 +145,7 @@
   #publications-wrapper{ itemscope: true, itemtype: "http://schema.org/ItemList" }
     %h3{ itemprop: "name" } Publications With DOIs
     %p.sums Total: #{number_with_delimiter(@result[:works][:publications].size)}
-    - @result[:works][:publications].sort_by{ |w| w[:citation] }.each do |w|
+    - @result[:works][:publications].sort_by{ |w| w[:citation].to_s }.each do |w|
       %div.citation
         %a{href: "http://doi.org/#{w[:doi]}", itemprop: "itemListElement" }= w[:citation]
 

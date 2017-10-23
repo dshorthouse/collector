@@ -1,6 +1,6 @@
 class Description < ActiveRecord::Base
-  has_many :agents, through: :agent_descriptions
   has_many :agent_descriptions
+  has_many :agents, through: :agent_descriptions
 
   def self.populate_agents
     parser = ScientificNameParser.new

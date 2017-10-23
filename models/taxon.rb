@@ -1,9 +1,9 @@
 class Taxon < ActiveRecord::Base
-  has_many :determinations, through: :taxon_determiners, source: :agent
   has_many :taxon_determiners
+  has_many :determinations, through: :taxon_determiners, source: :agent
 
-  has_many :occurrences, through: :taxon_occurrences, source: :occurrence
   has_many :taxon_occurrences
+  has_many :occurrences, through: :taxon_occurrences, source: :occurrence
 
   def self.populate_metadata
     Parallel.map(Taxon.find_each, progress: "Metadata") do |t|

@@ -1,25 +1,25 @@
 class Agent < ActiveRecord::Base
 
-  has_many :determinations, through: :occurrence_determiners, source: :occurrence
   has_many :occurrence_determiners, dependent: :destroy
+  has_many :determinations, through: :occurrence_determiners, source: :occurrence
 
-  has_many :recordings, through: :occurrence_recorders, source: :occurrence
   has_many :occurrence_recorders, dependent: :destroy
+  has_many :recordings, through: :occurrence_recorders, source: :occurrence
 
-  has_many :descriptions, through: :agent_descriptions, source: :description
   has_many :agent_descriptions, dependent: :destroy
+  has_many :descriptions, through: :agent_descriptions, source: :description
 
-  has_many :determined_taxa, through: :taxon_determiners, source: :taxon
   has_many :taxon_determiners, dependent: :destroy
+  has_many :determined_taxa, through: :taxon_determiners, source: :taxon
 
-  has_many :works, through: :agent_works
   has_many :agent_works
+  has_many :works, through: :agent_works
 
-  has_many :barcodes, through: :agent_barcodes
   has_many :agent_barcodes
+  has_many :barcodes, through: :agent_barcodes
 
-  has_many :datasets, through: :agent_datasets
   has_many :agent_datasets
+  has_many :datasets, through: :agent_datasets
 
   has_many :aliases, class_name: "Agent", foreign_key: "canonical_id"
   belongs_to :canonical, class_name: "Agent"
@@ -57,6 +57,7 @@ class Agent < ActiveRecord::Base
 
   def self.parse_search_orcid_response(agent, response)
     matches = {}
+    byebug
     results = JSON.parse(response, :symbolize_names => true)[:"orcid-search-results"][:"orcid-search-result"] rescue []
     results.each do |r|
       orcid_id = r[:"orcid-profile"][:"orcid-identifier"][:path] rescue nil
@@ -133,6 +134,7 @@ class Agent < ActiveRecord::Base
 
   def self.parse_profile_orcid_response(agent, response)
     profile = JSON.parse(response, :symbolize_names => true)[:"orcid-profile"]
+    byebug
     agent.email = profile[:"orcid-bio"][:"contact-details"][:email][0][:value] rescue nil
     agent.position = profile[:"orcid-activities"][:affiliations][:affiliation][0][:"role-title"] rescue nil
     agent.affiliation = profile[:"orcid-activities"][:affiliations][:affiliation][0][:organization][:name] rescue nil
@@ -221,7 +223,7 @@ class Agent < ActiveRecord::Base
     return if !orcid.present?
     response = RestClient::Request.execute(
       method: :get,
-      url: Sinatra::Application.settings.orcid_api_url + orcid + '/orcid-profile',
+      url: Sinatra::Application.settings.orcid_api_url + orcid,
       headers: { accept: 'application/orcid+json' }
     )
     self.class.parse_profile_orcid_response(self, response)

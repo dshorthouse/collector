@@ -4,7 +4,7 @@ module Collector
   class ElasticIndexer
 
     def initialize
-      @client = Elasticsearch::Client.new
+      @client = Elasticsearch::Client.new request_timeout: 5*60
       @settings = Sinatra::Application.settings
       @processes = 8
     end
@@ -261,13 +261,13 @@ module Collector
 
     def import_agents
       agents = Agent.where("id = canonical_id").pluck(:id)
-      Parallel.map(agents.in_groups_of(10, false), progress: "Search-Agents") do |batch|
+      Parallel.map(agents.in_groups_of(5, false), progress: "Search-Agents") do |batch|
         bulk_agent(batch)
       end
     end
 
     def import_occurrences
-      Parallel.map(Occurrence.pluck(:id).in_groups_of(100, false), progress: "Search-Occurrences") do |batch|
+      Parallel.map(Occurrence.pluck(:id).in_groups_of(5, false), progress: "Search-Occurrences") do |batch|
         bulk_occurrence(batch)
       end
     end
@@ -297,7 +297,7 @@ module Collector
     end
 
     def import_taxa
-      Parallel.map(Taxon.pluck(:id).in_groups_of(100, false), progress: "Search-Taxa") do |batch|
+      Parallel.map(Taxon.pluck(:id).in_groups_of(50, false), progress: "Search-Taxa") do |batch|
         bulk_taxon(batch)
       end
     end

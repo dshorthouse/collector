@@ -98,10 +98,8 @@ module Sinatra
                 match: { "personal.family" => family }
               ],
               should: [
-                match: { "personal.family" => search }
-              ],
-              should: [
-                match: { "personal.given" => given }
+                { match: { "personal.family" => search } },
+                { match: { "personal.given" => given } }
               ]
             }
           }

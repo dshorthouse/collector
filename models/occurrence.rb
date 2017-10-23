@@ -1,12 +1,12 @@
 class Occurrence < ActiveRecord::Base
-  has_many :determiners, through: :occurrence_determiners, source: :agent
   has_many :occurrence_determiners
+  has_many :determiners, through: :occurrence_determiners, source: :agent
 
-  has_many :recorders, through: :occurrence_recorders, source: :agent
   has_many :occurrence_recorders
+  has_many :recorders, through: :occurrence_recorders, source: :agent
 
-  has_one :taxon, through: :taxon_occurrence, source: :taxon
   has_one :taxon_occurrence
+  has_one :taxon, through: :taxon_occurrence, source: :taxon
 
   def self.populate_agents
     @redis = Redis.new(db: 1)

@@ -11,7 +11,8 @@ module Sinatra
             :database =>  app.settings.database,
             :host => app.settings.host,
             :username => app.settings.username,
-            :password => app.settings.password
+            :password => app.settings.password,
+            :reconnect => true
           )
 
           ActiveSupport::Inflector.inflections do |inflect|

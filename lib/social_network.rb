@@ -24,7 +24,7 @@ module Collector
     end
 
     def collect_agent_ids
-      occurrence_ids = OccurrenceRecorder.group("occurrence_id").having("count(*) > 1").pluck(:occurrence_id)
+      occurrence_ids = OccurrenceRecorder.group("occurrence_id").having("count(*) > 2").pluck(:occurrence_id)
       pbar = ProgressBar.create(title: "CollectingAgents", total: occurrence_ids.count/50+1, autofinish: false, format: '%t %b>> %i| %e')
       occurrence_ids.in_groups_of(50, false) do |group|
         @agent_ids.merge(OccurrenceRecorder.where(occurrence_id: group).pluck(:agent_id).uniq)
@@ -65,14 +65,17 @@ module Collector
       pbar = ProgressBar.create(title: "AddingAttributes", total: @agents.count, autofinish: false, format: '%t %b>> %i| %e')
       @agents.each do |a|
         options = {}
+        options[:fontsize] = 14
         if edge_count(a[:fullname]) > 60
-          options[:fontsize] = 16
+          options[:fontsize] = 24
         end
-        if a[:gender] == "female"
-          options[:fillcolor] = "#e55798"
-        elsif a[:gender] == "male"
-          options[:fillcolor] = "#3399ff"
-        end
+
+        options[:color] = "#51565A"
+        options[:penwidth] = 8
+        options[:style] = "filled"
+        options[:fillcolor] = "#51565A"
+        options[:fontcolor] = "#ffffff"
+        options[:fontname] = "Arial"
         add_vertex_attributes(a[:fullname], options)
         pbar.increment
       end
@@ -125,7 +128,7 @@ module Collector
 
 
     def to_s
-      # TODO Sort toplogically instead of by edge string.
+      # TODO Sort topologically instead of by edge string.
       (edges.sort_by {|e| e.to_s} + 
        isolates.sort_by {|n| n.to_s}).map { |e| e.to_s }.join("\n")
     end
@@ -139,6 +142,7 @@ module Collector
     end
 
     def to_dot_graph(params = {})
+      params[:bgcolor] = "#D5D0CA"
       params[:name] ||= self.class.name.gsub(/:/, '_')
       fontsize       = params[:fontsize] ? params[:fontsize] : '8'
       graph          = RGL::DOT::Graph.new(params.stringify_keys)
@@ -156,42 +160,42 @@ module Collector
 
       each_edge do |u, v|
         kingdom = Occurrence.find(occurrences(u,v).first).taxon.kingdom rescue nil
-        weight = 1
-        style = "filled"
+        penwidth = 2
+        weight = 2
         if occurrences(u,v).count.between?(2,50)
-          style = "setlinewidth(2)"
-          weight = 2
-        elsif occurrences(u,v).count.between?(51,100)
-          style = "setlinewidth(3)"
-          weight = 3
-        elsif occurrences(u,v).count > 100
-          style = "setlinewidth(4)"
+          penwidth = 4
           weight = 4
+        elsif occurrences(u,v).count.between?(51,100)
+          penwidth = 6
+          weight = 6
+        elsif occurrences(u,v).count > 100
+          penwidth = 10
+          weight = 10
         end
 
         case kingdom
         when "Animalia"
-          color = "#f0f02e"
+          color = "#1072B7"
         when "Plantae"
-          color = "#00ff04"
+          color = "#68A94B"
         when "Chromista"
-          color = "#00f9ff"
+          color = "#68A94B"
         when "Fungi"
-          color ="#fb7d00"
+          color ="#CD333C"
         when "Protozoa"
-          color = "#00f9ff"
+          color = "#68A94B"
         when "Protista"
-          color = "#00f9ff"
+          color = "#68A94B"
         else
-          color = "#cccccc"
+          #color = "#cccccc"
         end
 
         options = {
           from: vertex_id(u),
           to: vertex_id(v),
           color: color,
-          style: style,
-          weight: weight
+          penwidth: penwidth,
+          #weight: weight
         }
         graph << edge_class.new(options.stringify_keys)
       end
