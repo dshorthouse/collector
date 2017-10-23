@@ -57,7 +57,6 @@ class Agent < ActiveRecord::Base
 
   def self.parse_search_orcid_response(agent, response)
     matches = {}
-    byebug
     results = JSON.parse(response, :symbolize_names => true)[:"orcid-search-results"][:"orcid-search-result"] rescue []
     results.each do |r|
       orcid_id = r[:"orcid-profile"][:"orcid-identifier"][:path] rescue nil
@@ -134,7 +133,6 @@ class Agent < ActiveRecord::Base
 
   def self.parse_profile_orcid_response(agent, response)
     profile = JSON.parse(response, :symbolize_names => true)[:"orcid-profile"]
-    byebug
     agent.email = profile[:"orcid-bio"][:"contact-details"][:email][0][:value] rescue nil
     agent.position = profile[:"orcid-activities"][:affiliations][:affiliation][0][:"role-title"] rescue nil
     agent.affiliation = profile[:"orcid-activities"][:affiliations][:affiliation][0][:organization][:name] rescue nil

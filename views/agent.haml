@@ -90,7 +90,7 @@
       %h3 Fellow Collectors
       %p.sums Total: #{number_with_delimiter(@result[:recordings][:with].size)}
       %ul.collectors
-        - @result[:recordings][:with].sort_by { |a| a[:family] }.each do |c|
+        - @result[:recordings][:with].sort_by { |a| a[:family].to_s }.each do |c|
           %li
             - name = [c[:given].presence, c[:family].presence].join(" ")
             %a{href: "/agent/#{c[:id]}" }=  name
@@ -112,7 +112,7 @@
       %h3{ itemprop: "name" } Families Identified
       %p.sums Total: #{number_with_delimiter(@result[:determinations][:families].size)}
       %ul.determinations
-        - @result[:determinations][:families].sort_by { |d| d[:family] }.each do |t|
+        - @result[:determinations][:families].sort_by { |d| d[:family].to_s }.each do |t|
           %li
             %a{href: "/taxon/#{t[:family]}" }
               %span{ itemprop: "itemListElement" }= t[:family]
@@ -153,7 +153,7 @@
   #datasets-wrapper{ itemscope: true, itemtype: "http://schema.org/ItemList" }
     %h3{ itemprop: "name" } Datasets With DOIs
     %p.sums Total: #{number_with_delimiter(@result[:works][:datasets].size)}
-    - @result[:works][:datasets].sort_by{ |d| d[:title] }.each do |d|
+    - @result[:works][:datasets].sort_by{ |d| d[:title].to_s }.each do |d|
       %div.citation
         %a{href: "http://doi.org/#{d[:doi]}", itemprop: "itemListElement" }= d[:title]
 
@@ -162,6 +162,6 @@
     %h3{ itemprop: "name" } Barcode of Life Specimen Citations
     %p.sums Total: #{number_with_delimiter(@result[:works][:barcodes].size)}
     %ul.barcodes
-      - @result[:works][:barcodes].sort_by{|b| b[:processid] }.each do |b|
+      - @result[:works][:barcodes].sort_by{|b| b[:processid].to_s }.each do |b|
         %li
           %a{href: "http://www.boldsystems.org/index.php/Public_RecordView?processid=#{b[:processid]}", itemprop: "itemListElement" }= b[:processid]
