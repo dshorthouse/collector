@@ -3,7 +3,7 @@ ruby '2.3.3'
 
 gem 'sinatra'
 gem 'sinatra-contrib'
-gem 'mysql2'
+gem 'mysql2', '~> 0.3.18'
 gem 'activerecord'
 gem 'activerecord-import'
 gem 'rest-client'
